@@ -8,13 +8,18 @@ export function prettyConsoleAxiosError(err: AxiosError | Error) {
   }
   const {config, message, code, stack, request, response} = err as AxiosError;
   logWithColor('red', message, code);
-  const {data} = config;
-  if (request) {
-    const {method, protocol, host, path} = request as http.ClientRequest;
-    logWithColor('black', `${method.toUpperCase()}  ${protocol}${host}${path}`, request.getHeaders(), data);
+  if (config.maxRedirects === 0) {
+    const {data} = config;
+    if (request) {
+      const {method, host, path, protocol} = request;
+      logWithColor('black', `${method} ${protocol}//${host}${path}`, {...request.getHeaders()}, data);
+    }
   }
   if (response) {
     const {status, statusText, headers, data} = response;
-    logWithColor('black', `${status} ${statusText}`, headers, data as any);
+    logWithColor('red', `${status} ${statusText}`);
+    logWithColor('black', {...headers}, data as any);
+  } else {
+    logWithColor('red', 'No response');
   }
 }
