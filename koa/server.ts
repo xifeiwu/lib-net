@@ -5,7 +5,7 @@ import http from 'http';
 import Koa from 'koa';
 import {getAFreePort} from '../node';
 
-export async function startServer(middlewareList: Koa.Middleware[] = []): Promise<{
+export async function startKoaServer(middlewareList: Koa.Middleware[] = []): Promise<{
   href: string;
   port: number;
   server: http.Server;
@@ -33,5 +33,5 @@ export async function startServer(middlewareList: Koa.Middleware[] = []): Promis
 }
 
 export async function startDefaultServer(middlewareList: Koa.Middleware[] = []) {
-  return await startServer([log({}), cors(), ...middlewareList, debug]);
+  return await startKoaServer([cors(), ...middlewareList, debug]);
 }

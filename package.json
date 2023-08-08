@@ -2,7 +2,7 @@
   "name": "net-tool",
   "version": "0.0.1",
   "description": "common network related logic base on some popular modules, such as koa, axios, ws, http-proxy",
-  "main": "index.js",
+  "main": "index.ts",
   "directories": {
     "lib": "lib"
   },
