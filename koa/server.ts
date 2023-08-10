@@ -7,6 +7,7 @@ import {getAFreePort} from '../node';
 
 interface Options {
   port?: number;
+  keys?: string[];
 }
 export async function startKoaServer(
   middlewareList: Koa.Middleware[] = [],
@@ -15,9 +16,13 @@ export async function startKoaServer(
   href: string;
   port: number;
   server: http.Server;
+  app: Koa;
 }> {
-  let {port} = options;
+  let {port, keys} = options;
   const app = new Koa();
+  if (Array.isArray(keys)) {
+    app.keys = keys;
+  }
   middlewareList.forEach(middleware => {
     app.use(middleware);
   });
@@ -33,6 +38,7 @@ export async function startKoaServer(
         href,
         port,
         server,
+        app,
       });
     });
     server.on('error', error => {
