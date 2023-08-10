@@ -5,16 +5,25 @@ import http from 'http';
 import Koa from 'koa';
 import {getAFreePort} from '../node';
 
-export async function startKoaServer(middlewareList: Koa.Middleware[] = []): Promise<{
+interface Options {
+  port?: number;
+}
+export async function startKoaServer(
+  middlewareList: Koa.Middleware[] = [],
+  options: Options = {}
+): Promise<{
   href: string;
   port: number;
   server: http.Server;
 }> {
+  let {port} = options;
   const app = new Koa();
   middlewareList.forEach(middleware => {
     app.use(middleware);
   });
-  const port = await getAFreePort(3000);
+  if (!port) {
+    port = await getAFreePort(3000);
+  }
   const server = app.listen(port);
   return new Promise((res, rej) => {
     server.on('listening', () => {
@@ -32,6 +41,6 @@ export async function startKoaServer(middlewareList: Koa.Middleware[] = []): Pro
   });
 }
 
-export async function startDefaultServer(middlewareList: Koa.Middleware[] = []) {
-  return await startKoaServer([cors(), ...middlewareList, debug]);
+export async function startDefaultServer(middlewareList: Koa.Middleware[] = [], options: Options = {}) {
+  return await startKoaServer([cors(), ...middlewareList, debug], options);
 }
