@@ -3,11 +3,13 @@ import log from './log';
 import debug from './debug';
 import http from 'http';
 import Koa from 'koa';
+import session from 'koa-session';
 import {getAFreePort} from '../node';
 
 interface Options {
   port?: number;
   keys?: string[];
+  sessionOptions?: session.opts;
 }
 export async function startKoaServer(
   middlewareList: Koa.Middleware[] = [],
@@ -18,14 +20,17 @@ export async function startKoaServer(
   server: http.Server;
   app: Koa;
 }> {
-  let {port, keys} = options;
+  let {port, keys, sessionOptions} = options;
   const app = new Koa();
   if (Array.isArray(keys)) {
     app.keys = keys;
   }
-  middlewareList.forEach(middleware => {
+  if (sessionOptions) {
+    app.use(session(sessionOptions, app));
+  }
+  for (let middleware of middlewareList) {
     app.use(middleware);
-  });
+  }
   if (!port) {
     port = await getAFreePort(3000);
   }
