@@ -9,7 +9,7 @@ import {getAFreePort} from '../node';
 interface Options {
   port?: number;
   keys?: string[];
-  sessionOptions?: session.opts;
+  sessionOptions?: Partial<session.opts>;
 }
 export async function startKoaServer(
   middlewareList: Koa.Middleware[] = [],
