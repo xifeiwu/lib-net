@@ -1,4 +1,5 @@
 import Koa from 'koa';
+import {logWithColor} from '../node';
 
 export default function(options: {
   prefix?: string;
@@ -9,7 +10,7 @@ export default function(options: {
   const {prefix = '->', maxRequestDataLength = 3000, showHeaders = true, showPayload = true} = options;
   return async (ctx: Koa.Context, next: Koa.Next) => {
     const {method = null, href, type, headers, req} = ctx;
-    console.log(`\x1b[33m${prefix}${href}\x1b[0m'`);
+    logWithColor('blue', `${prefix}${href}`);
     if (showHeaders) {
       console.log(headers);
     }
