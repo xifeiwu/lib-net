@@ -53,5 +53,6 @@ export async function startKoaServer(
 }
 
 export async function startDefaultServer(middlewareList: Koa.Middleware[] = [], options: Options = {}) {
+  // @ts-ignore
   return await startKoaServer([cors(), ...middlewareList, debug], options);
 }
