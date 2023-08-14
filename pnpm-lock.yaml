@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 dependencies:
   axios:
     specifier: ^1.4.0
@@ -20,7 +16,7 @@ dependencies:
 
 devDependencies:
   '@types/koa':
-    specifier: ^2.13.7
+    specifier: 2.13.8
     version: registry.npmmirror.com/@types/koa@2.13.8
   '@types/koa-router':
     specifier: ^7.4.4
@@ -740,3 +736,7 @@ packages:
     version: 1.3.2
     engines: {node: '>= 4.0.0'}
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
