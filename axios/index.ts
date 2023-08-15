@@ -10,10 +10,12 @@ export function prettyConsoleAxiosError(err: AxiosError | Error, v1: boolean = t
   logWithColor('red', message, code);
   if (v1) {
     if (config.maxRedirects === 0) {
-      const {data} = config;
+      const {data, method, baseURL, url} = config;
       if (request) {
         const {method, host, path, protocol} = request;
-        logWithColor('black', `${method} ${protocol}//${host}${path}`, {...request.getHeaders()}, data);
+        // const firstLine = `${method} ${protocol}//${host}${path}`;
+        const firstLine = `${method.toUpperCase()} ${baseURL}${url}`;
+        logWithColor('black', firstLine, {...request.getHeaders()}, data);
       }
     } else {
       throw err;
