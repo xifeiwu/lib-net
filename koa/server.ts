@@ -28,7 +28,7 @@ export async function startKoaServer(
   if (sessionOptions) {
     app.use(session(sessionOptions, app));
   }
-  for (let middleware of middlewareList) {
+  for (const middleware of middlewareList) {
     app.use(middleware);
   }
   if (!port) {

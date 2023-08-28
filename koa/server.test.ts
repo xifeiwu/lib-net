@@ -23,7 +23,7 @@ export async function testDebugEcho() {
     const {method, path, headers, data} = JSON.parse(resData.toString());
     assert.equal(method, 'POST');
     assert.equal(path, '/api/debug/echo');
-    assert.equal(headers['agent'], 'node');
+    assert.equal(headers.agent, 'node');
     assert.equal(data, 'abc');
   } catch (err) {
     console.error(err);
