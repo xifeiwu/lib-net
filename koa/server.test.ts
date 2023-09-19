@@ -4,18 +4,16 @@ import {startDefaultServer} from './server';
 import {getStreamData, requestAndGetResponse} from '../node';
 
 export async function testDebugEcho() {
-  const {href, server} = await startDefaultServer();
-  const response = await requestAndGetResponse(
-    href,
-    {
-      path: '/api/debug/echo',
-      method: 'post',
-      headers: {
-        agent: 'node',
-      },
+  const {url, server} = await startDefaultServer();
+  const response = await requestAndGetResponse({
+    url,
+    path: '/api/debug/echo',
+    method: 'post',
+    headers: {
+      agent: 'node',
     },
-    Buffer.from('abc')
-  );
+    data: Buffer.from('abc'),
+  });
   const {statusCode, headers} = response;
   assert.equal(statusCode, 200);
   const resData = await getStreamData(response);

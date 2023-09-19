@@ -15,7 +15,7 @@ export async function startKoaServer(
   middlewareList: Koa.Middleware[] = [],
   options: Options = {}
 ): Promise<{
-  href: string;
+  url: string;
   port: number;
   server: http.Server;
   app: Koa;
@@ -37,10 +37,10 @@ export async function startKoaServer(
   const server = app.listen(port);
   return new Promise((res, rej) => {
     server.on('listening', () => {
-      const href = `http://127.0.0.1:${port}`;
-      console.log(`server start on ${href}`);
+      const url = `http://127.0.0.1:${port}`;
+      console.log(`server start on ${url}`);
       res({
-        href,
+        url,
         port,
         server,
         app,
