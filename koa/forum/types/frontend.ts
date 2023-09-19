@@ -8,16 +8,16 @@ export interface User {
 }
 
 export interface Post {
-  id: string;
+  // id: string;
+  // date: string;
   title: string;
-  date: string;
   content: string;
   reactions: Reaction;
-  comments?: Comment;
   user: string;
 }
+
 export interface Reaction {
-  id: string;
+  // id: string;
   thumbsUp: number;
   hooray: number;
   heart: number;

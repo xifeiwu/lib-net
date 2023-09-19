@@ -1,8 +1,9 @@
 import KoaRouter from 'koa-router';
 import {posts} from './mock-data';
 import Koa from 'koa';
-import {getStreamData} from '../../node';
-import {Post} from './type';
+import {formatDate, getStreamData, uuid} from '../../node';
+import {Post} from './types/backend';
+import {postValidator} from './rules';
 // import {getStreamData} from '../node';
 
 export const prefix = '/api/forum';
@@ -24,23 +25,33 @@ router.get('/posts/:postId', async (ctx: Koa.Context, next) => {
   }
 });
 
-// export interface Post {
-//   id: string;
-//   title: string;
-//   date: string;
-//   content: string;
-//   reactions: Reaction;
-//   comments?: Comment;
-//   user: string;
-// }
 router.post('/posts', async (ctx: Koa.Context, next) => {
   const data = await getStreamData(ctx.req);
   try {
+    if (!data || data.length === 0) {
+      ctx.throw('data is empty', 400);
+    }
     const post = JSON.parse(data.toString()) as Post;
+    post.id = uuid(32);
+    post.date = formatDate(Date.now(), 'yyyy-MM-dd hh:mm:ss');
+    post.reactions = {
+      thumbsUp: 0,
+      hooray: 0,
+      heart: 0,
+      rocket: 0,
+      eyes: 0,
+    };
+    await postValidator.validate(post);
     posts.push(post);
     ctx.body = post;
   } catch (err) {
-    ctx.throw(`parse payload error`, 400);
+    if (err.errors && err.fields) {
+      const {errors: [firstError], fields} = err;
+      ctx.throw(firstError.message, 400);
+    } else {
+      const message = err.message ? err.message : `unknown error for POST /post`;
+      ctx.throw(message, 400);
+    }
   }
 });
 
