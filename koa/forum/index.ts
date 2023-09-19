@@ -48,18 +48,16 @@ router.post('/posts', async (ctx: Koa.Context, next) => {
 
 router.patch('/posts', async (ctx: Koa.Context, next) => {
   const data = await getStreamData(ctx.req);
-  try {
-    if (!data || data.length === 0) {
-      ctx.throw('data is empty', 400);
-    }
-    const post = JSON.parse(data.toString()) as Post;
-    await postValidator.validate(post);
-    const target = posts.find(it => it.id === post.id);
-    Object.entries(post).forEach(([key, value]) => {
-      target[key] = value;
-    });
-    ctx.body = target;
-  } catch (err) {}
+  if (!data || data.length === 0) {
+    ctx.throw('data is empty', 400);
+  }
+  const post = JSON.parse(data.toString()) as Post;
+  await postValidator.validate(post);
+  const target = posts.find(it => it.id === post.id);
+  Object.entries(post).forEach(([key, value]) => {
+    target[key] = value;
+  });
+  ctx.body = target;
 });
 
 router.post('posts/:postId/reactions', async (ctx: Koa.Context, next) => {
@@ -73,9 +71,7 @@ router.post('posts/:postId/reactions', async (ctx: Koa.Context, next) => {
   }
   const {reaction} = data as unknown as {reaction: Reaction};
   ctx.assert(reaction, 400, 'property reaction not found in request payload.');
-  try {
-    await reactionValidator.validate(reaction);
-  } catch (err) {}
+  await reactionValidator.validate(reaction);
 });
 
 const middlewareForum = router.routes();

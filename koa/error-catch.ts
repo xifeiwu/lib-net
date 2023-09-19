@@ -2,6 +2,11 @@ import Koa from 'koa';
 
 export const INVALIDATE_PAYLOAD = 'invalidate payload';
 
+export interface ErrorBody {
+  url: string;
+  message: string;
+  [name: string]: any;
+}
 const errorCatchMiddleware: Koa.Middleware = async (ctx: Koa.Context, next) => {
   try {
     await next();

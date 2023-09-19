@@ -4,7 +4,7 @@ import {users, posts} from './mock-data';
 import middlewareForum, {prefix} from './index';
 import assert from 'assert';
 import {Post} from './types/frontend';
-import {INVALIDATE_PAYLOAD} from '../error-catch';
+import {ErrorBody, INVALIDATE_PAYLOAD} from '../error-catch';
 
 export async function getPosts() {
   // const [, secondUser] = users;
@@ -23,8 +23,7 @@ export async function getPosts() {
   // console.log({statusCode, headers, data});
   assert.equal(statusCode, 200);
   assert(deepEqual(parsedData, posts, {debug: true}));
-  // await new Promise(res => setTimeout(res, 1000 * 60));
-  // server.close();
+  server.close();
 }
 
 export async function getPostById() {
@@ -46,7 +45,7 @@ export async function getPostById() {
     assert(deepEqual(JSON.parse(data as string), secondPost));
   }
   {
-    const {statusCode, headers, data} = await requestAndGetResponseInfo({
+    const {statusCode, headers, data} = await requestAndGetResponseInfo<ErrorBody>({
       url: href,
       method: 'get',
       path: toUrl({
@@ -56,7 +55,7 @@ export async function getPostById() {
         },
       }),
     });
-    assert(statusCode === 400 && data === 'post with postId secondPost.id not exist');
+    assert(statusCode === 400 && data.message === 'post with postId secondPost.id not exist');
   }
   server.close();
 }
@@ -66,14 +65,19 @@ export async function postPost() {
   const {url: href, server} = await startDefaultServer([middlewareForum]);
   /** data is not passed */
   {
-    const {statusCode, headers, data} = await requestAndGetResponseInfo({
-      url: href,
-      method: 'post',
-      path: toUrl({
-        path: pathname,
-      }),
-    });
-    assert.equal(data, 'data is empty');
+    const {statusCode, headers, data} = await requestAndGetResponseInfo(
+      {
+        url: href,
+        method: 'post',
+        path: toUrl({
+          path: pathname,
+        }),
+      },
+      {
+        dataType: 'json',
+      }
+    );
+    assert.equal(data.message, 'data is empty');
   }
   /** send post instance to server, and return the final instance on server side. */
   {
@@ -141,7 +145,7 @@ export async function testValidate() {
       }
     );
     assert.equal(statusCode, 400);
-    assert.equal((data as {message: string}).message, INVALIDATE_PAYLOAD);
+    assert.equal(data.message, INVALIDATE_PAYLOAD);
   }
   server.close();
 }
