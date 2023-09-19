@@ -24,6 +24,7 @@ const reactionRule: Rules = {
     required: true,
   },
 };
+export const reactionValidator = new Schema(reactionRule);
 
 export const postRule: Rules = {
   id: {

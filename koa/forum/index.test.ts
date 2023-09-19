@@ -4,6 +4,7 @@ import {users, posts} from './mock-data';
 import middlewareForum, {prefix} from './index';
 import assert from 'assert';
 import {Post} from './types/frontend';
+import {INVALIDATE_PAYLOAD} from '../error-catch';
 
 export async function getPosts() {
   // const [, secondUser] = users;
@@ -74,6 +75,7 @@ export async function postPost() {
     });
     assert.equal(data, 'data is empty');
   }
+  /** send post instance to server, and return the final instance on server side. */
   {
     const post: Post = {
       title: `title` + uuid(21),
@@ -87,19 +89,84 @@ export async function postPost() {
       },
       user: users[0].id,
     };
-    const {statusCode, headers, data} = await requestAndGetResponseInfo({
-      url: href,
-      method: 'post',
-      path: toUrl({
-        path: pathname,
-      }),
-      data: post,
-    }, {
-      dataType: 'json'
-    });
+    const {statusCode, headers, data} = await requestAndGetResponseInfo(
+      {
+        url: href,
+        method: 'post',
+        path: toUrl({
+          path: pathname,
+        }),
+        data: post,
+      },
+      {
+        dataType: 'json',
+      }
+    );
     assert(deepEqual(post, data, {}, {refer: 'first'}));
-    console.log({statusCode, headers, data});
+    // console.log({statusCode, headers, data});
     // assert(deepEqual(JSON.parse(data as string), secondPost));
+  }
+  server.close();
+}
+
+export async function testValidate() {
+  const pathname = `${prefix}/posts`;
+  const {url: href, server} = await startDefaultServer([middlewareForum]);
+  /** validate post payload */
+  {
+    const post: Post = {
+      title: `title` + uuid(21),
+      // @ts-ignore
+      content: 0,
+      reactions: {
+        thumbsUp: 0,
+        hooray: 0,
+        heart: 0,
+        rocket: 0,
+        eyes: 0,
+      },
+      user: users[0].id,
+    };
+    const {statusCode, headers, data} = await requestAndGetResponseInfo(
+      {
+        url: href,
+        method: 'post',
+        path: toUrl({
+          path: pathname,
+        }),
+        data: post,
+      },
+      {
+        dataType: 'json',
+      }
+    );
+    assert.equal(statusCode, 400);
+    assert.equal((data as {message: string}).message, INVALIDATE_PAYLOAD);
+  }
+  server.close();
+}
+
+export async function patchPost() {
+  const pathname = `${prefix}/posts`;
+  const {url: href, server} = await startDefaultServer([middlewareForum]);
+  const [firstPost] = posts;
+  firstPost.title = `modified: ${firstPost.title}`;
+  /** data is not passed */
+  {
+    const {statusCode, headers, data} = await requestAndGetResponseInfo(
+      {
+        url: href,
+        method: 'patch',
+        path: toUrl({
+          path: pathname,
+        }),
+        data: firstPost,
+      },
+      {
+        dataType: 'json',
+      }
+    );
+    assert.deepEqual(firstPost, data);
   }
   server.close();
 }

@@ -5,6 +5,7 @@ import http from 'http';
 import Koa from 'koa';
 import session from 'koa-session';
 import {getAFreePort} from '../node';
+import errorCatchMiddleware from './error-catch';
 
 interface Options {
   port?: number;
@@ -25,6 +26,7 @@ export async function startKoaServer(
   if (Array.isArray(keys)) {
     app.keys = keys;
   }
+  app.use(errorCatchMiddleware);
   if (sessionOptions) {
     app.use(session(sessionOptions, app));
   }
