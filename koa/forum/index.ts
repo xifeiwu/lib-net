@@ -1,5 +1,5 @@
 import KoaRouter from 'koa-router';
-import {posts} from './mock-data';
+import {notifications, posts, users} from './mock-data';
 import Koa from 'koa';
 import {formatDate, getStreamData, uuid} from '../../node';
 import {Post} from './types/backend';
@@ -10,6 +10,13 @@ import {Reaction} from './types/frontend';
 export const prefix = '/api/forum';
 const router = new KoaRouter({
   prefix,
+});
+
+router.get('/users', async (ctx: Koa.Context, next) => {
+  ctx.body = users;
+});
+router.get('/notifications', async (ctx: Koa.Context, next) => {
+  ctx.body = notifications;
 });
 
 router.get('/posts', async (ctx: Koa.Context, next) => {
@@ -60,7 +67,7 @@ router.patch('/posts', async (ctx: Koa.Context, next) => {
   ctx.body = target;
 });
 
-router.post('posts/:postId/reactions', async (ctx: Koa.Context, next) => {
+router.post('/posts/:postId/reactions', async (ctx: Koa.Context, next) => {
   const {postId} = ctx.params;
   ctx.assert(postId, 400, 'postId not found in url');
   const post = posts.find(it => it.id === postId);
@@ -69,9 +76,15 @@ router.post('posts/:postId/reactions', async (ctx: Koa.Context, next) => {
   if (!data || data.length === 0) {
     ctx.throw('data is empty', 400);
   }
-  const {reaction} = data as unknown as {reaction: Reaction};
-  ctx.assert(reaction, 400, 'property reaction not found in request payload.');
-  await reactionValidator.validate(reaction);
+  const payload = JSON.parse(data.toString()) as Reaction;
+  await reactionValidator.validate(payload);
+  Object.entries(payload).forEach(([key, _value]) => {
+    if (!Object.prototype.hasOwnProperty.call(post.reactions, key)) {
+      ctx.throw(`${key} is not a key of reactions`);
+    }
+    post.reactions[key]++;
+  })
+  ctx.body = post.reactions;
 });
 
 const middlewareForum = router.routes();

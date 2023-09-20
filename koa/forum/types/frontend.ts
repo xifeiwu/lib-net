@@ -25,6 +25,7 @@ export interface Reaction {
   eyes: number;
   // post: string;
 }
+
 export interface Comment {
   id: string;
   date: string;

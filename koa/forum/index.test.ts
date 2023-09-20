@@ -3,7 +3,7 @@ import {startDefaultServer} from '../server';
 import {users, posts} from './mock-data';
 import middlewareForum, {prefix} from './index';
 import assert from 'assert';
-import {Post} from './types/frontend';
+import {Post, Reaction} from './types/frontend';
 import {ErrorBody, INVALIDATE_PAYLOAD} from '../error-catch';
 
 export async function getPosts() {
@@ -152,14 +152,14 @@ export async function testValidate() {
 
 export async function patchPost() {
   const pathname = `${prefix}/posts`;
-  const {url: href, server} = await startDefaultServer([middlewareForum]);
+  const {url, server} = await startDefaultServer([middlewareForum]);
   const [firstPost] = posts;
   firstPost.title = `modified: ${firstPost.title}`;
   /** data is not passed */
   {
     const {statusCode, headers, data} = await requestAndGetResponseInfo(
       {
-        url: href,
+        url: url,
         method: 'patch',
         path: toUrl({
           path: pathname,
@@ -171,6 +171,37 @@ export async function patchPost() {
       }
     );
     assert.deepEqual(firstPost, data);
+  }
+  server.close();
+}
+
+export async function testReaction() {
+  const pathname = `${prefix}/posts/:postId/reactions`;
+  const {url, server} = await startDefaultServer([middlewareForum]);
+  const [firstPost] = posts;
+  {
+    const {id: postId} = firstPost;
+    const {statusCode, headers, data} = await requestAndGetResponseInfo<Reaction, Partial<Reaction>>(
+      {
+        url: url,
+        method: 'post',
+        path: toUrl({
+          path: pathname,
+          params: {
+            postId,
+          },
+        }),
+        data: {
+          thumbsUp: 1,
+          heart: 1,
+        },
+      },
+      {
+        dataType: 'json',
+      }
+    );
+    assert.equal(data.heart, 1);
+    assert.equal(data.thumbsUp, 1);
   }
   server.close();
 }

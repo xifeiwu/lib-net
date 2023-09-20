@@ -2,6 +2,7 @@ import http from 'http';
 import assert from 'assert';
 import {startDefaultServer} from './server';
 import {getStreamData, requestAndGetResponse} from '../node';
+import middlewareForum from './forum';
 
 export async function testDebugEcho() {
   const {url, server} = await startDefaultServer();
@@ -26,5 +27,25 @@ export async function testDebugEcho() {
   } catch (err) {
     console.error(err);
   }
+  server.close();
+}
+
+export async function startForumServer() {
+  const {url, server} = await startDefaultServer(
+    [
+      async (ctx, next) => {
+        const {url} = ctx;
+        // console.log(url);
+        // ctx.body = url;
+        await next();
+      },
+      middlewareForum,
+    ],
+    {
+      port: 3100,
+    }
+  );
+  console.log(url);
+  await new Promise(res => setTimeout(res, 24 * 3600 * 1000));
   server.close();
 }

@@ -5,23 +5,23 @@ import {users} from './mock-data';
 const reactionRule: Rules = {
   thumbsUp: {
     type: 'number',
-    required: true,
+    // required: true,
   },
   hooray: {
     type: 'number',
-    required: true,
+    // required: true,
   },
   heart: {
     type: 'number',
-    required: true,
+    // required: true,
   },
   rocket: {
     type: 'number',
-    required: true,
+    // required: true,
   },
   eyes: {
     type: 'number',
-    required: true,
+    // required: true,
   },
 };
 export const reactionValidator = new Schema(reactionRule);
