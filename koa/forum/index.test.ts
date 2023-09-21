@@ -131,7 +131,7 @@ export async function testValidate() {
       },
       user: users[0].id,
     };
-    const {statusCode, headers, data} = await requestAndGetResponseInfo(
+    const {statusCode, headers, data} = await requestAndGetResponseInfo<ErrorBody, Post>(
       {
         url: href,
         method: 'post',
@@ -157,7 +157,7 @@ export async function patchPost() {
   firstPost.title = `modified: ${firstPost.title}`;
   /** data is not passed */
   {
-    const {statusCode, headers, data} = await requestAndGetResponseInfo(
+    const {statusCode, headers, data} = await requestAndGetResponseInfo<Post, Partial<Post>>(
       {
         url: url,
         method: 'patch',
