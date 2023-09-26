@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@types/ws':
+    specifier: ^8.5.6
+    version: registry.npmmirror.com/@types/ws@8.5.6
   async-validator:
     specifier: ^4.2.5
     version: registry.npmmirror.com/async-validator@4.2.5
@@ -20,6 +23,9 @@ dependencies:
   koa-session:
     specifier: ^6.4.0
     version: registry.npmmirror.com/koa-session@6.4.0
+  ws:
+    specifier: ^8.14.2
+    version: registry.npmmirror.com/ws@8.14.2
 
 devDependencies:
   '@types/koa':
@@ -172,7 +178,6 @@ packages:
     resolution: {integrity: sha512-0mHckf6D2DiIAzh8fM8f3HQCvMKDpK94YQ0DSVkfWTG9BZleYIWudw9cJxX8oCk9bM+vAkDyujDV6dmKHbvQpg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@types/node/-/node-20.4.8.tgz}
     name: '@types/node'
     version: 20.4.8
-    dev: true
 
   registry.npmmirror.com/@types/qs@6.9.7:
     resolution: {integrity: sha512-FGa1F62FT09qcrueBA6qYTrJPVDzah9a+493+o2PCXsesWHIn27G98TsSMs3WPNbZIEj4+VJf6saSFpvD+3Zsw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@types/qs/-/qs-6.9.7.tgz}
@@ -204,6 +209,14 @@ packages:
       '@types/mime': registry.npmmirror.com/@types/mime@3.0.1
       '@types/node': registry.npmmirror.com/@types/node@20.4.8
     dev: true
+
+  registry.npmmirror.com/@types/ws@8.5.6:
+    resolution: {integrity: sha512-8B5EO9jLVCy+B58PLHvLDuOD8DRVMgQzq8d55SjLCOn9kqGyqOvy27exVaTio1q1nX5zLu8/6N0n2ThSxOM6tg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@types/ws/-/ws-8.5.6.tgz}
+    name: '@types/ws'
+    version: 8.5.6
+    dependencies:
+      '@types/node': registry.npmmirror.com/@types/node@20.4.8
+    dev: false
 
   registry.npmmirror.com/accepts@1.3.8:
     resolution: {integrity: sha512-PYAthTa2m2VKxuvSD3DPC/Gy+U+sOA1LAuT8mkmRuvw+NACSaeXEQ+NHcVF7rONl6qcaxV3Uuemwawk+7+SJLw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/accepts/-/accepts-1.3.8.tgz}
@@ -741,6 +754,21 @@ packages:
     name: vary
     version: 1.1.2
     engines: {node: '>= 0.8'}
+    dev: false
+
+  registry.npmmirror.com/ws@8.14.2:
+    resolution: {integrity: sha512-wEBG1ftX4jcglPxgFCMJmZ2PLtSbJ2Peg6TmpJFTbe9GZYOQCDPdMYu/Tm0/bGZkw8paZnJY45J4K2PZrLYq8g==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/ws/-/ws-8.14.2.tgz}
+    name: ws
+    version: 8.14.2
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
     dev: false
 
   registry.npmmirror.com/ylru@1.3.2:
