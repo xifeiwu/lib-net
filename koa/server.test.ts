@@ -30,22 +30,3 @@ export async function testDebugEcho() {
   server.close();
 }
 
-export async function startForumServer() {
-  const {url, server} = await startDefaultServer(
-    [
-      async (ctx, next) => {
-        const {url} = ctx;
-        // console.log(url);
-        // ctx.body = url;
-        await next();
-      },
-      middlewareForum,
-    ],
-    {
-      port: 3100,
-    }
-  );
-  console.log(url);
-  await new Promise(res => setTimeout(res, 24 * 3600 * 1000));
-  server.close();
-}

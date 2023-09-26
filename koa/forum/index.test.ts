@@ -1,7 +1,7 @@
 import {deepEqual, requestAndGetResponseInfo, toUrl, uuid} from '../../node';
 import {startDefaultServer} from '../server';
 import {users, posts} from './mock-data';
-import middlewareForum, {prefix} from './index';
+import middlewareForum, {prefix, handleUpgrade} from './index';
 import assert from 'assert';
 import {Post, Reaction} from './types/frontend';
 import {ErrorBody, INVALIDATE_PAYLOAD} from '../error-catch';
@@ -203,5 +203,26 @@ export async function testReaction() {
     assert.equal(data.heart, 1);
     assert.equal(data.thumbsUp, 1);
   }
+  server.close();
+}
+
+export async function startForumServer() {
+  const {url, server} = await startDefaultServer(
+    [
+      async (ctx, next) => {
+        const {url} = ctx;
+        // console.log(url);
+        // ctx.body = url;
+        await next();
+      },
+      middlewareForum,
+    ],
+    {
+      port: 3100,
+    }
+  );
+  server.on('upgrade', handleUpgrade);
+  console.log(url);
+  await new Promise(res => setTimeout(res, 24 * 3600 * 1000));
   server.close();
 }
