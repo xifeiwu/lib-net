@@ -5,7 +5,7 @@ import {parse} from 'url';
 import {prefix} from './service';
 export const wss = new WebSocketServer({noServer: true});
 
-const wsPath = `${prefix}/ws/notifications`;
+export const wsPath = `${prefix}/ws/notifications`;
 export function handleUpgrade(req: http.IncomingMessage, socket: stream.Duplex, head: Buffer) {
   const {pathname} = parse(req.url);
   if (pathname === wsPath) {
