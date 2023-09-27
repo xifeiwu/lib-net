@@ -1,22 +1,19 @@
 import KoaRouter from 'koa-router';
 import {notifications, posts, users} from './mock-data';
 import Koa from 'koa';
-import {formatDate, getStreamData, uuid} from '../../node';
+import {formatDate, getStreamData, toBuffer, uuid} from '../../node';
 import {Post} from './types/backend';
 import {postValidator, reactionValidator} from './rules';
 import {Reaction} from './types/frontend';
-// import {getStreamData} from '../node';
+import {generateRandomNotifications, getRandom, prefix} from './service';
+import {handleUpgrade, wss} from './websocket';
 
-export const prefix = '/api/forum';
 const router = new KoaRouter({
   prefix,
 });
 
 router.get('/users', async (ctx: Koa.Context, next) => {
   ctx.body = users;
-});
-router.get('/notifications', async (ctx: Koa.Context, next) => {
-  ctx.body = notifications;
 });
 
 router.get('/posts', async (ctx: Koa.Context, next) => {
@@ -83,10 +80,27 @@ router.post('/posts/:postId/reactions', async (ctx: Koa.Context, next) => {
       ctx.throw(`${key} is not a key of reactions`);
     }
     post.reactions[key]++;
-  })
+  });
   ctx.body = post.reactions;
+});
+
+router.get('/notifications', async (ctx: Koa.Context, next) => {
+  const numNotifications = getRandom(5) + 1;
+  const notifications = generateRandomNotifications(Date.now() - 5 * 3600 * 1000, numNotifications);
+  ctx.body = notifications;
+});
+/** broadcast notification to all connected websocket */
+router.get('/notifications/broadcast', async (ctx: Koa.Context, next) => {
+  const numNotifications = getRandom(5) + 1;
+  const notifications = generateRandomNotifications(Date.now() - 5 * 3600 * 1000, numNotifications);
+  const buf = await toBuffer({type: 'notifications', payload: notifications});
+  for (let socket of wss.clients.values()) {
+    socket.send(buf, {binary: false});
+  }
+  ctx.body = notifications;
 });
 
 const middlewareForum = router.routes();
 
+export {handleUpgrade}
 export default middlewareForum;

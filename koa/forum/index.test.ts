@@ -1,10 +1,11 @@
 import {deepEqual, requestAndGetResponseInfo, toUrl, uuid} from '../../node';
 import {startDefaultServer} from '../server';
 import {users, posts} from './mock-data';
-import middlewareForum, {prefix, handleUpgrade} from './index';
+import middlewareForum, {handleUpgrade} from './index';
 import assert from 'assert';
 import {Post, Reaction} from './types/frontend';
 import {ErrorBody, INVALIDATE_PAYLOAD} from '../error-catch';
+import {prefix} from './service';
 
 export async function getPosts() {
   // const [, secondUser] = users;
@@ -222,7 +223,7 @@ export async function startForumServer() {
     }
   );
   server.on('upgrade', handleUpgrade);
-  console.log(url);
+  console.log(`start server: ${url}`);
   await new Promise(res => setTimeout(res, 24 * 3600 * 1000));
   server.close();
 }
