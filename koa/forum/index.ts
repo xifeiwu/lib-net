@@ -94,7 +94,7 @@ router.get('/ws/notifications/broadcast', async (ctx: Koa.Context, next) => {
   const numNotifications = getRandom(5) + 1;
   const notifications = generateRandomNotifications(Date.now() - 5 * 3600 * 1000, numNotifications);
   const buf = await toBuffer({type: 'notifications', payload: notifications});
-  for (let socket of wss.clients.values()) {
+  for (const socket of wss.clients.values()) {
     socket.send(buf, {binary: false});
   }
   ctx.body = notifications;
@@ -102,5 +102,5 @@ router.get('/ws/notifications/broadcast', async (ctx: Koa.Context, next) => {
 
 const middlewareForum = router.routes();
 
-export {handleUpgrade}
+export {handleUpgrade};
 export default middlewareForum;

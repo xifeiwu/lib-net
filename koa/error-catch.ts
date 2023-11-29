@@ -26,7 +26,7 @@ const errorCatchMiddleware: Koa.Middleware = async (ctx: Koa.Context, next) => {
       ctx.status = 400;
       ctx.body = {
         url,
-        message: message,
+        message,
       };
       // ctx.throw({url, message}, 400);
     }

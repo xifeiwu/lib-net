@@ -46,4 +46,3 @@ export function generateRandomNotifications(since: string | number, numNotificat
 
   return notifications;
 }
-

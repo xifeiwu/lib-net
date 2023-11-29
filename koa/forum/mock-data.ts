@@ -176,7 +176,7 @@ export const notifications: INotification[] = [
   {
     id: 'jU_z4GK9mW3_hxfu9_cP-',
     date: '2023-09-14T08:46:41.268Z',
-    message: "is glad we're friends",
+    message: 'is glad we\'re friends',
     user: 'a0h0dSykT3K0J7EWx2L7J',
   },
   {
@@ -188,13 +188,13 @@ export const notifications: INotification[] = [
   {
     id: 'kodwFBBo6Sz-WCBreAeY4',
     date: '2023-09-14T08:39:49.729Z',
-    message: "is glad we're friends",
+    message: 'is glad we\'re friends',
     user: 'CgtqRbOXsSaoaP_bK-uk_',
   },
   {
     id: 'Otp56YHNkU0fJqI0wcBJB',
     date: '2023-09-14T08:39:11.024Z',
-    message: "is glad we're friends",
+    message: 'is glad we\'re friends',
     user: 'CgtqRbOXsSaoaP_bK-uk_',
   },
 ];

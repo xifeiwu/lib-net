@@ -164,7 +164,7 @@ export async function patchPost() {
   {
     const {statusCode, headers, data} = await requestAndGetResponseInfo<Post, Partial<Post>>(
       {
-        url: url,
+        url,
         method: 'patch',
         path: toUrl({
           path: pathname,
@@ -188,7 +188,7 @@ export async function testReaction() {
     const {id: postId} = firstPost;
     const {statusCode, headers, data} = await requestAndGetResponseInfo<Reaction, Partial<Reaction>>(
       {
-        url: url,
+        url,
         method: 'post',
         path: toUrl({
           path: pathname,
@@ -274,7 +274,7 @@ export async function testWsNotification() {
   // });
 
   const res = await requestAndGetResponseInfo({
-    url: url,
+    url,
     path: `${prefix}/ws/notifications/broadcast`,
   });
   console.log(res);
