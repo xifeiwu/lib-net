@@ -26,6 +26,7 @@ export async function startKoaServer(
   if (Array.isArray(keys)) {
     app.keys = keys;
   }
+  /** errorCatchMiddleware should be set as first koa middleware */
   app.use(errorCatchMiddleware);
   if (sessionOptions) {
     app.use(session(sessionOptions, app));
@@ -54,6 +55,7 @@ export async function startKoaServer(
   });
 }
 
+/** A wrapper for startKoaServer, add two default koa middleware: cors, debug  */
 export async function startDefaultServer(middlewareList: Koa.Middleware[] = [], options: Options = {}) {
   // @ts-ignore
   return await startKoaServer([cors(), ...middlewareList, debug], options);
