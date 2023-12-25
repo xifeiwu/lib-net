@@ -62,7 +62,6 @@ export interface ClientConfig {
   /** get tcp connection by http upgrade */
   httpUrl?: string;
   targetServiceInfo: Pick<ConnectServiceInfo, 'address' | 'port'>;
-  replyServiceInfo?: TargetServiceInfo;
 }
 
 export interface TargetServiceInfo {
@@ -98,10 +97,15 @@ export interface ClientStatus {
 /** connect status on server side */
 export interface ConnectStatus extends ClientStatus {
   socket2Service?: Socket;
+  proxyAsClientStatus?: ClientStatus;
 }
 
+export interface MatchItem {
+  address: string | RegExp;
+  port: number;
+}
 /** proxy to another socks server when address/port meets condition in matches list */
 export interface ProxyAsSocksClientConfig
   extends Pick<ClientConfig, 'methodList' | 'socketConfig' | 'httpUrl'> {
-  matches: Array<{address: string | RegExp; port: number} | string | RegExp>;
+  matches: Array<MatchItem | string | RegExp>;
 }

@@ -1,0 +1,155 @@
+import {
+  LogColors,
+  handleSocketEvents,
+  logWithColor,
+  startSocketServer,
+  toBuffer,
+  writeDataByInterval,
+} from '../../../node';
+import {startSocksServer} from '../../server-net';
+import {EMethod, getSocketInfo} from '../../service';
+import {connectToSocksServer} from '../../client';
+
+const colors: {
+  targetServer: LogColors;
+  socksServer: LogColors;
+  socksClient: LogColors;
+  inSocketOfSocks: LogColors;
+  outSocketOfSocks: LogColors;
+} = {
+  targetServer: 'red',
+  socksServer: 'yellow',
+  socksClient: 'green',
+  inSocketOfSocks: 'blue',
+  outSocketOfSocks: 'magenta',
+};
+const ports = {
+  targetServer1: 3300,
+  targetServer2: 3301,
+  socksServer1: 3302,
+  socksServer: 3304,
+};
+
+// http://elif.site/
+const host = '127.0.0.1';
+/**
+ * Go through the basic work flow
+ */
+export async function start() {
+  const targetServerInfo1 = await startSocketServer(
+    {
+      port: ports.targetServer1,
+    },
+    socket => {
+      // logWithColor(colors.targetServer, 'socket connect:', getSocketInfo(socket));
+      // handleSocketEvents(socket, {isServer: true, color: colors.targetServer});
+      socket.on('data', (chunk: Buffer) => {
+        socket.write(toBuffer(['from targetServerInfo1:', chunk]));
+      });
+    }
+  );
+  const targetServerInfo2 = await startSocketServer(
+    {
+      port: ports.targetServer2,
+    },
+    socket => {
+      // logWithColor(colors.targetServer, 'socket connect:', getSocketInfo(socket));
+      // handleSocketEvents(socket, {isServer: true, color: colors.targetServer});
+      socket.on('data', (chunk: Buffer) => {
+        socket.write(toBuffer(['from targetServerInfo2:', chunk]));
+      });
+    }
+  );
+  // logWithColor(colors.targetServer, `target service port: ${targetServerInfo1.port}`);
+  const {socksService: socksService1, httpService: httpService1} = await startSocksServer({
+    isStartHttpServer: true,
+    methodList: [
+      {method: EMethod.NoAuth},
+      {method: EMethod.UserPass, info: {username: 'aaa', password: 'socksService1'}},
+    ],
+    serverConfig: {
+      host,
+      port: ports.socksServer1,
+      options: {
+        allowHalfOpen: true,
+      },
+    },
+    onConnection(status) {},
+  });
+  logWithColor('yellow', `socks service1 start http server at: ${httpService1.url}`);
+
+  const {socksService, httpService} = await startSocksServer({
+    isStartHttpServer: true,
+    methodList: [
+      {method: EMethod.NoAuth},
+      {method: EMethod.UserPass, info: {username: 'aaa', password: 'socksService'}},
+    ],
+    serverConfig: {
+      host,
+      port: ports.socksServer,
+      options: {
+        allowHalfOpen: true,
+      },
+    },
+    proxyAsSocketClientConfigList: [
+      {
+        methodList: [
+          {method: EMethod.NoAuth},
+          {method: EMethod.UserPass, info: {username: 'aaa', password: 'socksService1'}},
+        ],
+        socketConfig: {
+          host,
+          port: socksService1.port,
+        },
+        matches: [/elif\.site/, {address: host, port: targetServerInfo1.port}],
+      },
+    ],
+    onConnection(status) {},
+  });
+  logWithColor('yellow', `socks service start http server at: ${httpService.url}`);
+
+  const client1 = await connectToSocksServer({
+    methodList: [
+      {method: EMethod.NoAuth},
+      {method: EMethod.UserPass, info: {username: 'aaa', password: 'socksService'}},
+    ],
+    socketConfig: {host, port: socksService.port, allowHalfOpen: true},
+    targetServiceInfo: {
+      address: targetServerInfo1.host,
+      port: targetServerInfo1.port,
+    },
+  });
+  if (client1.error) {
+    console.log(client1.error);
+  } else {
+    handleSocketEvents(client1.socket, {color: colors.socksClient});
+    logWithColor(colors.socksClient, getSocketInfo(client1.socket));
+    await writeDataByInterval(client1.socket, {
+      startChar: 'b',
+      end: 'bye',
+      maxCount: 3,
+    });
+  }
+  const client2 = await connectToSocksServer({
+    methodList: [
+      {method: EMethod.NoAuth},
+      {method: EMethod.UserPass, info: {username: 'aaa', password: 'socksService'}},
+    ],
+    socketConfig: {host, port: socksService.port, allowHalfOpen: true},
+    targetServiceInfo: {
+      address: targetServerInfo2.host,
+      port: targetServerInfo2.port,
+    },
+  });
+  if (client2.error) {
+    console.log(client2.error);
+  } else {
+    handleSocketEvents(client2.socket, {color: colors.socksClient});
+    logWithColor(colors.socksClient, getSocketInfo(client2.socket));
+    await writeDataByInterval(client2.socket, {
+      startChar: 'b',
+      end: 'bye',
+      maxCount: 3,
+    });
+  }
+}

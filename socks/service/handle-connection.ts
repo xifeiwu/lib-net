@@ -17,9 +17,12 @@ import {
   getAddressType,
   MethodAuthInfo,
   ProxyAsSocksClientConfig,
+  getMatchedProxyConfig,
 } from './';
 import {deepClone, deepEqual} from '../../node';
 import {Socket, isIP} from 'net';
+import {isRegExp} from 'util/types';
+import {connectToSocksServer} from '../client';
 
 export async function handleConnection(
   socket: Socket,
@@ -63,63 +66,79 @@ export async function handleConnection(
     status.state = ESocksState.wait_targer_service_info;
     const targetServiceInfo = await waitTargetServiceInfo(socket);
     status.targetServiceInfo = targetServiceInfo;
-    const replyServiceInfo = deepClone<ConnectServiceInfo>(targetServiceInfo);
+    const proxyAsClientConfig = (proxyAsSocketClientConfigList ?? []).find(
+      getMatchedProxyConfig.bind(null, targetServiceInfo)
+    );
+    let socket2Service: Socket;
+    if (proxyAsClientConfig) {
+      const proxyAsClientStatus = await connectToSocksServer({...proxyAsClientConfig, targetServiceInfo});
+      if (proxyAsClientStatus.error) {
+        throw createError(ERRORS.proxy_error);
+      }
+      await replyTargetServiceInfo(socket, {
+        reply: ETargetServiceConnectState.succeeded,
+        ...proxyAsClientStatus.replyServiceInfo,
+      });
+      status.proxyAsClientStatus = proxyAsClientStatus;
+      socket2Service = proxyAsClientStatus.socket;
+    } else {
+      const replyServiceInfo = deepClone<ConnectServiceInfo>(targetServiceInfo);
 
-    const isDomain = isIP(targetServiceInfo.address) === 0;
-    if (isDomain) {
+      const isDomain = isIP(targetServiceInfo.address) === 0;
+      if (isDomain) {
+        try {
+          const ip = await new Promise<string>((resolve, reject) => {
+            dns.lookup(targetServiceInfo.address, function (err, ip) {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(ip);
+              }
+            });
+          });
+          replyServiceInfo.address = ip;
+          replyServiceInfo.addressType = getAddressType(ip);
+        } catch (err) {
+          await replyTargetServiceInfo(socket, {
+            reply: ETargetServiceConnectState.Host_unreachable,
+            ...replyServiceInfo,
+          });
+          throw err;
+        }
+      }
+
+      status.replyServiceInfo = replyServiceInfo;
       try {
-        const ip = await new Promise<string>((resolve, reject) => {
-          dns.lookup(targetServiceInfo.address, function (err, ip) {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(ip);
-            }
+        socket2Service = await new Promise((res, rej) => {
+          const socket = new Socket();
+          socket.on('connect', () => {
+            res(socket);
+          });
+          socket.on('error', err => {
+            rej(ETargetServiceConnectState.general_SOCKS_server_failure);
+          });
+          socket.on('timeout', err => {
+            rej(ETargetServiceConnectState.general_SOCKS_server_failure);
+          });
+          socket.connect({
+            host: replyServiceInfo.address,
+            port: replyServiceInfo.port,
           });
         });
-        replyServiceInfo.address = ip;
-        replyServiceInfo.addressType = getAddressType(ip);
       } catch (err) {
         await replyTargetServiceInfo(socket, {
-          reply: ETargetServiceConnectState.Host_unreachable,
+          reply: err as ETargetServiceConnectState,
           ...replyServiceInfo,
         });
         throw err;
       }
-    }
 
-    status.replyServiceInfo = replyServiceInfo;
-    let socket2Service: Socket;
-    try {
-      socket2Service = await new Promise((res, rej) => {
-        const socket = new Socket();
-        socket.on('connect', () => {
-          res(socket);
-        });
-        socket.on('error', err => {
-          rej(ETargetServiceConnectState.general_SOCKS_server_failure);
-        });
-        socket.on('timeout', err => {
-          rej(ETargetServiceConnectState.general_SOCKS_server_failure);
-        });
-        socket.connect({
-          host: replyServiceInfo.address,
-          port: replyServiceInfo.port,
-        });
-      });
-    } catch (err) {
+      // const ipType = ip2Bytes(socket.localAddress || '127.0.0.1');
       await replyTargetServiceInfo(socket, {
-        reply: err as ETargetServiceConnectState,
+        reply: ETargetServiceConnectState.succeeded,
         ...replyServiceInfo,
       });
-      throw err;
     }
-
-    // const ipType = ip2Bytes(socket.localAddress || '127.0.0.1');
-    await replyTargetServiceInfo(socket, {
-      reply: ETargetServiceConnectState.succeeded,
-      ...replyServiceInfo,
-    });
     socket.pipe(socket2Service).pipe(socket);
     socket.resume();
     status.socket2Service = socket2Service;

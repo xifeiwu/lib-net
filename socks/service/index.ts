@@ -1,6 +1,14 @@
 import net, {Socket} from 'net';
-import {isNumber, toBuffer} from '../../node';
-import {ConnectServiceInfo, EAddressType, EMethod} from './types';
+import {isNumber, isPlainObject, isRegExp, toBuffer} from '../../node';
+import {
+  ClientConfig,
+  ConnectServiceInfo,
+  EAddressType,
+  EMethod,
+  MatchItem,
+  ProxyAsSocksClientConfig,
+  TargetServiceInfo,
+} from './types';
 export * from './types';
 export * from './client';
 export * from './server';
@@ -49,6 +57,7 @@ export const ERRORS = {
   InvalidSocks5IncomingConnectionResponse: 'Received invalid Socks5 incoming connection response',
   Socks5ProxyRejectedIncomingBoundConnection: 'Socks5 Proxy rejected incoming bound connection',
   IPV4FormatNotCorrect: 'format of ipv4 address is not correct',
+  proxy_error: 'error while proxy to other socks server',
 };
 
 export function createError(message: string) {
@@ -183,4 +192,31 @@ export async function getInfoFromFirstChunk(reader: Socket) {
       });
     });
   });
+}
+
+export function getMatchedProxyConfig(
+  target: TargetServiceInfo,
+  config: ProxyAsSocksClientConfig
+): ProxyAsSocksClientConfig | null {
+  const {matches = [], ...clientConfig} = config;
+  const matched = matches.find(match => {
+    let address: string | RegExp = match as string | RegExp;
+    let port: number;
+    if (isPlainObject(match)) {
+      address = (match as MatchItem).address;
+      port = (match as MatchItem).port;
+    }
+    let result = true;
+    if (isRegExp(address)) {
+      result &&= (address as RegExp).test(target.address);
+    }
+    if (isNumber(port)) {
+      result &&= port === target.port;
+    }
+    return result;
+  });
+  if (matched) {
+    return config;
+  }
+  return null;
 }

@@ -42,7 +42,7 @@ export async function startSocksServer(config: ServerConfig) {
       // console.log(protocol, chunk);
       if (protocol === 'socks5') {
         socket.push(chunk);
-        const connectStatus = await handleConnection(socket, methodList);
+        const connectStatus = await handleConnection(socket, methodList, proxyAsSocketClientConfigList);
         onConnection(connectStatus);
         connectStatusList.push(connectStatus);
       } else if (protocol === 'http' && httpService) {
