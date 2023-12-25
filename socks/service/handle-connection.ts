@@ -16,11 +16,16 @@ import {
   createError,
   getAddressType,
   MethodAuthInfo,
+  ProxyAsSocksClientConfig,
 } from './';
 import {deepClone, deepEqual} from '../../node';
 import {Socket, isIP} from 'net';
 
-export async function handleConnection(socket: Socket, methodList: Array<MethodAuthInfo>) {
+export async function handleConnection(
+  socket: Socket,
+  methodList: Array<MethodAuthInfo>,
+  proxyAsSocketClientConfigList?: ProxyAsSocksClientConfig[]
+) {
   // socket.pause();
   const status: ConnectStatus = {
     state: ESocksState.connected,

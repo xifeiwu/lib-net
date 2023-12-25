@@ -99,3 +99,9 @@ export interface ClientStatus {
 export interface ConnectStatus extends ClientStatus {
   socket2Service?: Socket;
 }
+
+/** proxy to another socks server when address/port meets condition in matches list */
+export interface ProxyAsSocksClientConfig
+  extends Pick<ClientConfig, 'methodList' | 'socketConfig' | 'httpUrl'> {
+  matches: Array<{address: string | RegExp; port: number} | string | RegExp>;
+}

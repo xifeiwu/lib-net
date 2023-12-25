@@ -1,6 +1,12 @@
 import net, {ServerOpts} from 'net';
 import Koa from 'koa';
-import {ConnectStatus, getInfoFromFirstChunk, getSocketInfo, MethodAuthInfo} from './service';
+import {
+  ConnectStatus,
+  getInfoFromFirstChunk,
+  getSocketInfo,
+  MethodAuthInfo,
+  ProxyAsSocksClientConfig,
+} from './service';
 import {startDefaultServer} from '../koa';
 import {getAFreePort, isNumber, startSocketClient} from '../node';
 import {handleConnection} from './service/handle-connection';
@@ -14,12 +20,14 @@ interface ServerConfig {
   };
   /** start a http server or not(http server can be used to show status of socks server) */
   isStartHttpServer?: boolean;
+  /** proxy to other socks server */
+  proxyAsSocketClientConfigList?: ProxyAsSocksClientConfig[];
   /** on fail duration socks conversation */
   onConnection: (status: ConnectStatus) => void;
 }
 
 export async function startSocksServer(config: ServerConfig) {
-  const {methodList, serverConfig, isStartHttpServer, onConnection} = config;
+  const {methodList, serverConfig, isStartHttpServer, onConnection, proxyAsSocketClientConfigList} = config;
   const {host = '127.0.0.1', port, options} = serverConfig ?? {};
   const socksServerPort = isNumber(port) ? port : await getAFreePort();
   /** Use authorized method first */
