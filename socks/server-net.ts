@@ -12,6 +12,7 @@ import {
 } from './service/server';
 import {
   ConnectServiceInfo,
+  ConnectStatus,
   EAddressType,
   EMethod,
   ERRORS,
@@ -40,15 +41,7 @@ interface ServerConfig {
   /** on fail duration socks conversation */
   onConnection: (status: ConnectStatus) => void;
 }
-export interface ConnectStatus {
-  state: ESocksState;
-  method?: EMethod;
-  targetServiceInfo?: TargetServiceInfo;
-  replyServiceInfo?: TargetServiceInfo;
-  socket?: Socket;
-  socket2Service?: Socket;
-  error?: Error;
-}
+
 async function handleConnection(socket: Socket, methodList: Array<MethodAuthInfo>) {
   // socket.pause();
   const status: ConnectStatus = {

@@ -17,6 +17,7 @@ import {
   getAddressType,
   ESocksState,
   TargetServiceInfo,
+  ClientStatus,
 } from './service';
 
 interface ClientConfig {
@@ -24,15 +25,6 @@ interface ClientConfig {
   socketConfig: TcpNetConnectOpts;
   targetServiceInfo: Pick<ConnectServiceInfo, 'address' | 'port'>;
   replyServiceInfo?: TargetServiceInfo;
-}
-
-interface ClientStatus {
-  state: ESocksState;
-  method?: EMethod;
-  targetServiceInfo?: TargetServiceInfo;
-  replyServiceInfo?: TargetServiceInfo;
-  socket?: Socket;
-  error?: Error;
 }
 
 export async function connectToSocksServer(config: ClientConfig) {
