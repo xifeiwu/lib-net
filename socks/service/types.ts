@@ -1,4 +1,4 @@
-import {Socket} from 'net';
+import {Socket, TcpNetConnectOpts} from 'net';
 
 export enum ESocksState {
   initial = 'initial',
@@ -54,6 +54,15 @@ export enum EAddressType {
   IPV4 = 0x01,
   DOMAINNAME = 0x03,
   IPV6 = 0x04,
+}
+export interface ClientConfig {
+  methodList: Array<MethodAuthInfo>;
+  /** get tcp connection by net.createConnection */
+  socketConfig?: TcpNetConnectOpts;
+  /** get tcp connection by http upgrade */
+  httpUrl?: string;
+  targetServiceInfo: Pick<ConnectServiceInfo, 'address' | 'port'>;
+  replyServiceInfo?: TargetServiceInfo;
 }
 
 export interface TargetServiceInfo {

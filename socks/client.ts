@@ -1,35 +1,22 @@
-import net, {Socket, TcpNetConnectOpts} from 'net';
+import {Socket} from 'net';
+import {requestAndGetUpgradeInfo, startSocketClient} from '../node';
 import {
+  ECommand,
+  EMethod,
+  UserPassInfo,
+  getAddressType,
+  ESocksState,
+  TargetServiceInfo,
+  ClientStatus,
   waitMethodReplied,
   waitUsernamePasswordAuthResultReplied,
   sendMethod,
   sendTargetServiceInfo,
   sendUsernamePassword,
   waitTargetServiceInfoReplied,
-  MethodAuthInfo,
   upgradeProtocol,
-} from './service/index';
-import {requestAndGetUpgradeInfo, startSocketClient} from '../node';
-import {
-  ECommand,
-  EMethod,
-  ConnectServiceInfo,
-  UserPassInfo,
-  getAddressType,
-  ESocksState,
-  TargetServiceInfo,
-  ClientStatus,
+  ClientConfig,
 } from './service';
-
-interface ClientConfig {
-  methodList: Array<MethodAuthInfo>;
-  /** get tcp connection by net.createConnection */
-  socketConfig?: TcpNetConnectOpts;
-  /** get tcp connection by http upgrade */
-  httpUrl?: string;
-  targetServiceInfo: Pick<ConnectServiceInfo, 'address' | 'port'>;
-  replyServiceInfo?: TargetServiceInfo;
-}
 
 export async function connectToSocksServer(config: ClientConfig) {
   const {socketConfig, httpUrl, methodList, targetServiceInfo: target} = config;
