@@ -4,7 +4,7 @@ import {MethodAuthInfo} from './service/client';
 import Koa from 'koa';
 import {
   replyMethod,
-  replyTargetInfo,
+  replyTargetServiceInfo,
   replyUsernamePasswordAuthResult,
   waitMethod,
   waitTargetServiceInfo,
@@ -97,7 +97,7 @@ async function handleConnection(socket: Socket, methodList: Array<MethodAuthInfo
         replyServiceInfo.address = ip;
         replyServiceInfo.addressType = getAddressType(ip);
       } catch (err) {
-        await replyTargetInfo(socket, {
+        await replyTargetServiceInfo(socket, {
           reply: ETargetServiceConnectState.Host_unreachable,
           ...replyServiceInfo,
         });
@@ -125,7 +125,7 @@ async function handleConnection(socket: Socket, methodList: Array<MethodAuthInfo
         });
       });
     } catch (err) {
-      await replyTargetInfo(socket, {
+      await replyTargetServiceInfo(socket, {
         reply: err as ETargetServiceConnectState,
         ...replyServiceInfo,
       });
@@ -133,7 +133,7 @@ async function handleConnection(socket: Socket, methodList: Array<MethodAuthInfo
     }
 
     // const ipType = ip2Bytes(socket.localAddress || '127.0.0.1');
-    await replyTargetInfo(socket, {
+    await replyTargetServiceInfo(socket, {
       reply: ETargetServiceConnectState.succeeded,
       ...replyServiceInfo,
     });

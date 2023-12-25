@@ -106,15 +106,15 @@ export async function waitUsernamePassword(reader: Readable) {
     });
   });
 }
+
 /**
-  +----+--------+
-  |VER | STATUS |
-  +----+--------+
-  | 1  |   1    |
-  +----+--------+
-  A STATUS field of X'00' indicates success. If the server returns a
-   `failure' (STATUS value other than X'00') status, it MUST close the
-   connection.
+ * +----+--------+
+ * |VER | STATUS |
+ * +----+--------+
+ * | 1  |   1    |
+ * +----+--------+
+ * A STATUS field of X'00' indicates success.
+ * If the server returns a `failure' (STATUS value other than X'00') status, it MUST close the connection.
  */
 export async function replyUsernamePasswordAuthResult(writer: Writable, success: boolean) {
   return new Promise<void>((res, rej) => {
@@ -193,7 +193,7 @@ export async function waitTargetServiceInfo(reader: Readable) {
  *     o  RSV    RESERVED
  * o  ATYP   address type of following address
  */
-export async function replyTargetInfo(
+export async function replyTargetServiceInfo(
   writer: Writable,
   state: {
     reply: ETargetServiceConnectState;

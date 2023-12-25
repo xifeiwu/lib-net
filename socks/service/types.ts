@@ -38,6 +38,9 @@ export enum EMethod {
   UserPass = 0x02,
   NoAcceptable = 0xff,
 }
+
+export type MethodAuthInfo = {method: EMethod.NoAuth} | {method: EMethod.UserPass; info: UserPassInfo};
+
 export interface UserPassInfo {
   username: string;
   password: string;

@@ -13,24 +13,6 @@ import {
 } from '.';
 import {toBuffer} from '../../node';
 
-export type MethodAuthInfo = {method: EMethod.NoAuth} | {method: EMethod.UserPass; info: UserPassInfo};
-export enum EClientState {
-  initial = 'initial',
-  connecting = 'connecting',
-  connected = 'connected',
-  connect_fail = 'connecting fail',
-  method_negotiation = 'method negotiation',
-  method_negotiation_success = 'method negotiation',
-  method_negotiation_fail = 'method negotiation fail',
-  auth_start = 'auth by username/password',
-  auth_success = 'auth by username/password',
-  auth_fail = 'failed auth by username/password',
-  send_request_info = 'send request info',
-  send_request_info_success = 'send request info success',
-  send_request_info_fail = 'send request info fail',
-  receive_request_info_success = 'received request info success',
-}
-
 /**
  * +----+----------+----------+
  * |VER | NMETHODS | METHODS  |
@@ -69,7 +51,7 @@ export async function sendMethod(writer: Writable, methods: EMethod[]) {
  * o  X'80' to X'FE' RESERVED FOR PRIVATE METHODS
  * o  X'FF' NO ACCEPTABLE METHODS
  */
-export async function waitMethod(reader: Readable, methods: EMethod[]) {
+export async function waitMethodReplied(reader: Readable, methods: EMethod[]) {
   reader.resume();
   return new Promise<EMethod>((res, rej) => {
     reader.once('data', (chunk: Buffer) => {
@@ -123,6 +105,7 @@ export async function sendUsernamePassword(
     });
   });
 }
+
 /**
  * +----+--------+
  * |VER | STATUS |
@@ -132,7 +115,7 @@ export async function sendUsernamePassword(
  * A STATUS field of X'00' indicates success.
  * If the server returns a `failure' (STATUS value other than X'00') status, it MUST close the connection.
  */
-export async function waitUsernamePasswordAuthResult(reader: Readable) {
+export async function waitUsernamePasswordAuthResultReplied(reader: Readable) {
   reader.resume();
   return new Promise<void>((res, rej) => {
     reader.once('data', (chunk: Buffer) => {
@@ -218,7 +201,7 @@ export async function sendTargetServiceInfo(writer: Writable, info: ConnectServi
  *     o  RSV    RESERVED
  * o  ATYP   address type of following address
  */
-export async function waitTargetServiceInfo(reader: Readable) {
+export async function waitTargetServiceInfoReplied(reader: Readable) {
   reader.resume();
   return new Promise<TargetServiceInfo>((res, rej) => {
     reader.once('data', (chunk: Buffer) => {

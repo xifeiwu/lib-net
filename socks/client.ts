@@ -1,13 +1,13 @@
 import net, {Socket, TcpNetConnectOpts} from 'net';
 import {
-  MethodAuthInfo,
-  waitMethod,
-  waitUsernamePasswordAuthResult,
+  waitMethodReplied,
+  waitUsernamePasswordAuthResultReplied,
   sendMethod,
   sendTargetServiceInfo,
   sendUsernamePassword,
-  waitTargetServiceInfo,
-} from './service/client';
+  waitTargetServiceInfoReplied,
+  MethodAuthInfo,
+} from './service/index';
 import {startSocketClient} from '../node';
 import {
   ECommand,
@@ -43,7 +43,7 @@ export async function connectToSocksServer(config: ClientConfig) {
       socket,
       methodList.map(it => it.method)
     );
-    const method = await waitMethod(
+    const method = await waitMethodReplied(
       socket,
       methodList.map(it => it.method)
     );
@@ -56,7 +56,7 @@ export async function connectToSocksServer(config: ClientConfig) {
       };
       status.state = ESocksState.auth_username_password_start;
       await sendUsernamePassword(socket, methodInfo.info);
-      await waitUsernamePasswordAuthResult(socket);
+      await waitUsernamePasswordAuthResultReplied(socket);
       status.state = ESocksState.auth_username_password_success;
     }
     {
@@ -72,7 +72,7 @@ export async function connectToSocksServer(config: ClientConfig) {
       });
       status.targetServiceInfo = targetServiceInfo;
     }
-    const replyServiceInfo = await waitTargetServiceInfo(socket);
+    const replyServiceInfo = await waitTargetServiceInfoReplied(socket);
     status.replyServiceInfo = replyServiceInfo;
     socket.resume();
     status.socket = socket;

@@ -2,6 +2,8 @@ import net, {Socket} from 'net';
 import {isNumber, toBuffer} from '../../node';
 import {ConnectServiceInfo, EAddressType, EMethod} from './types';
 export * from './types';
+export * from './client';
+export * from './server';
 
 export const MethodList = Object.values(EMethod).filter(v => isNumber(v));
 
