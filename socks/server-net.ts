@@ -19,7 +19,7 @@ interface ServerConfig {
 }
 
 export async function startSocksServer(config: ServerConfig) {
-  const {methodList, serverConfig, isStartHttpServer: isStartHttpServer, onConnection} = config;
+  const {methodList, serverConfig, isStartHttpServer, onConnection} = config;
   const {host = '127.0.0.1', port, options} = serverConfig ?? {};
   const socksServerPort = isNumber(port) ? port : await getAFreePort();
   /** Use authorized method first */

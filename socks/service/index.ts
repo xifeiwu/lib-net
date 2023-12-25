@@ -5,6 +5,8 @@ export * from './types';
 export * from './client';
 export * from './server';
 
+export const upgradeProtocol = 'socks5';
+
 export const MethodList = Object.values(EMethod).filter(v => isNumber(v));
 
 export const ERRORS = {

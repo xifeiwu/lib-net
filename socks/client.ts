@@ -7,8 +7,9 @@ import {
   sendUsernamePassword,
   waitTargetServiceInfoReplied,
   MethodAuthInfo,
+  upgradeProtocol,
 } from './service/index';
-import {startSocketClient} from '../node';
+import {requestAndGetUpgradeInfo, startSocketClient} from '../node';
 import {
   ECommand,
   EMethod,
@@ -22,13 +23,16 @@ import {
 
 interface ClientConfig {
   methodList: Array<MethodAuthInfo>;
-  socketConfig: TcpNetConnectOpts;
+  /** get tcp connection by net.createConnection */
+  socketConfig?: TcpNetConnectOpts;
+  /** get tcp connection by http upgrade */
+  httpUrl?: string;
   targetServiceInfo: Pick<ConnectServiceInfo, 'address' | 'port'>;
   replyServiceInfo?: TargetServiceInfo;
 }
 
 export async function connectToSocksServer(config: ClientConfig) {
-  const {socketConfig, methodList, targetServiceInfo: target} = config;
+  const {socketConfig, httpUrl, methodList, targetServiceInfo: target} = config;
   /** Use authorized method first */
   methodList.sort((pre, next) => next.method - pre.method);
   const status: ClientStatus = {
@@ -36,7 +40,20 @@ export async function connectToSocksServer(config: ClientConfig) {
   };
   try {
     status.state = ESocksState.connecting;
-    const socket = await startSocketClient(socketConfig);
+    let socket: Socket;
+    if (socketConfig) {
+      socket = await startSocketClient(socketConfig);
+    } else if (httpUrl) {
+      const {socket: _socket} = await requestAndGetUpgradeInfo({
+        url: httpUrl,
+        headers: {
+          Connection: 'Upgrade',
+          Upgrade: upgradeProtocol,
+        },
+      });
+      socket = _socket;
+    }
+
     status.state = ESocksState.connected;
     status.state = ESocksState.method_negotiation;
     await sendMethod(

@@ -11,6 +11,7 @@ import {startSocksServer} from '../../server-net';
 import {EMethod, getSocketInfo} from '../../service';
 import {connectToSocksServer} from '../../client';
 import assert from 'assert';
+import {startHttpServer} from '../../server-http';
 
 const colors: {
   targetServer: LogColors;
@@ -37,8 +38,7 @@ export async function start() {
   logWithColor(colors.targetServer, `target service port: ${targetServerInfo.port}`);
   const host = '127.0.0.1';
   const port = await getAFreePort(targetServerInfo.port + 1);
-  const {socksService} = await startSocksServer({
-    isStartHttpServer: true,
+  const httpService = await startHttpServer({
     methodList: [
       {method: EMethod.NoAuth},
       {method: EMethod.UserPass, info: {username: 'aaa', password: 'bbb'}},
@@ -46,9 +46,6 @@ export async function start() {
     serverConfig: {
       host,
       port,
-      options: {
-        allowHalfOpen: true,
-      },
     },
     onConnection(status) {
       const {state, error, socket, socket2Service} = status;
@@ -65,13 +62,14 @@ export async function start() {
       // console.log(status);
     },
   });
-  logWithColor(colors.socksServer, `socks server port: ${socksService.port}`);
+  logWithColor(colors.socksServer, `socks server port: ${httpService.port}`);
   const clientStatus = await connectToSocksServer({
     methodList: [
       {method: EMethod.NoAuth},
       {method: EMethod.UserPass, info: {username: 'aaa', password: 'bbb'}},
     ],
-    socketConfig: {host, port, allowHalfOpen: true},
+    // socketConfig: {host, port, allowHalfOpen: true},
+    httpUrl: httpService.url,
     targetServiceInfo: {
       address: targetServerInfo.host,
       port: targetServerInfo.port,
@@ -89,7 +87,7 @@ export async function start() {
     });
   }
   const responseInfo = await requestAndGetResponseInfo({
-    url: `http://${socksService.host}:${socksService.port}/api/socks/connections`,
+    url: `${httpService.url}/api/socks/connections`,
   });
   assert.equal(responseInfo.statusCode, 200);
   assert.equal(Array.isArray(responseInfo.data), true);
