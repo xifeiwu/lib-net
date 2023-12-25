@@ -12,6 +12,7 @@ export const ERRORS = {
   InvalidSchemaFormat: 'schema format is not correct',
   invalid_methods: 'all methods is not valid',
   IPv6NotSupported: 'ipv6 not supported',
+  MethodCountNotCorrect: 'Count of METHODS is not equal to NMETHODS',
   username_password_auth_fail: 'username/password auth fail',
   MORE_THAN_255_BYTES: 'size too long (limited to 255 bytes)',
   incorrect_address_type: 'addressType is not correct',

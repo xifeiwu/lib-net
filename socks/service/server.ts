@@ -10,11 +10,7 @@ import {
   createError,
   port2Buffer,
 } from '.';
-import { toBuffer } from '../../node';
-
-const SERVER_ERRORS = {
-  MethodCountNotCorrect: 'Count of METHODS is not equal to NMETHODS',
-};
+import {toBuffer} from '../../node';
 
 /**
  * +----+----------+----------+
@@ -39,7 +35,7 @@ export async function waitMethod(reader: Readable, supportedMethods: EMethod[]) 
         return rej(createError(ERRORS.InvalidSocksVersion));
       }
       if (count !== methods.length) {
-        return rej(createError(SERVER_ERRORS.MethodCountNotCorrect));
+        return rej(createError(ERRORS.MethodCountNotCorrect));
       }
       const method = methods.find(it => supportedMethods.includes(it));
       if (method !== undefined) {
