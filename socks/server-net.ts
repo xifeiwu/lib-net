@@ -7,7 +7,7 @@ import {handleConnection} from './service/handle-connection';
 
 interface ServerConfig {
   methodList: Array<MethodAuthInfo>;
-  serverConfig: {
+  serverConfig?: {
     host?: string;
     port?: number;
     options?: ServerOpts;
@@ -19,12 +19,8 @@ interface ServerConfig {
 }
 
 export async function startSocksServer(config: ServerConfig) {
-  const {
-    methodList,
-    serverConfig: {host, port, options},
-    isStartHttpServer: isStartHttpServer,
-    onConnection,
-  } = config;
+  const {methodList, serverConfig, isStartHttpServer: isStartHttpServer, onConnection} = config;
+  const {host = '127.0.0.1', port, options} = serverConfig ?? {};
   const socksServerPort = isNumber(port) ? port : await getAFreePort();
   /** Use authorized method first */
   methodList.sort((pre, next) => next.method - pre.method);
@@ -43,11 +39,13 @@ export async function startSocksServer(config: ServerConfig) {
         connectStatusList.push(connectStatus);
       } else if (protocol === 'http' && httpService) {
         const socket2Http = await startSocketClient({
-          host: '127.0.0.1',
+          host,
           port: httpService.port,
         });
         socket2Http.write(chunk);
         socket.pipe(socket2Http).pipe(socket);
+      } else {
+        socket.end(`can not find protocol info by first chunk`);
       }
     });
     server.on('listening', () => {
@@ -81,6 +79,7 @@ export async function startSocksServer(config: ServerConfig) {
   return {
     socksService: {
       server,
+      host,
       port: socksServerPort,
     },
     httpService,

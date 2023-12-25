@@ -3,12 +3,14 @@ import {
   getAFreePort,
   handleSocketEvents,
   logWithColor,
+  requestAndGetResponseInfo,
   startSocketServer,
   writeDataByInterval,
-} from '../../node';
-import {startSocksServer} from '../server-net';
-import {EMethod, getSocketInfo} from '../service';
-import {connectToSocksServer} from '../client';
+} from '../../../node';
+import {startSocksServer} from '../../server-net';
+import {EMethod, getSocketInfo} from '../../service';
+import {connectToSocksServer} from '../../client';
+import assert from 'assert';
 
 const colors: {
   targetServer: LogColors;
@@ -36,6 +38,7 @@ export async function start() {
   const host = '127.0.0.1';
   const port = await getAFreePort(targetServerInfo.port + 1);
   const {socksService} = await startSocksServer({
+    isStartHttpServer: true,
     methodList: [
       {method: EMethod.NoAuth},
       {method: EMethod.UserPass, info: {username: 'aaa', password: 'bbb'}},
@@ -79,10 +82,13 @@ export async function start() {
   } else {
     handleSocketEvents(clientStatus.socket, {color: colors.socksClient});
     logWithColor(colors.socksClient, getSocketInfo(clientStatus.socket));
-    writeDataByInterval(clientStatus.socket, {
+    await writeDataByInterval(clientStatus.socket, {
       startChar: 'b',
       end: 'bye',
       maxCount: 3,
     });
   }
+  const responseInfo = await requestAndGetResponseInfo({url: `http://${socksService.host}:${socksService.port}/api/socks/connections`});
+  assert.equal(responseInfo.statusCode, 200);
+  assert.equal(Array.isArray(responseInfo.data), true)
 }
