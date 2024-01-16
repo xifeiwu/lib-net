@@ -4,17 +4,17 @@ import debug from './debug';
 import http from 'http';
 import Koa from 'koa';
 import session from 'koa-session';
-import {getAFreePort} from '../node';
+import {getAFreePort, isNumber} from '../node';
 import errorCatchMiddleware from './error-catch';
 
-interface Options {
+export interface CustomKoaServerOptions {
   port?: number;
   keys?: string[];
   sessionOptions?: Partial<session.opts>;
 }
 export async function startKoaServer(
   middlewareList: Koa.Middleware[] = [],
-  options: Options = {}
+  options: CustomKoaServerOptions = {}
 ): Promise<{
   url: string;
   port: number;
@@ -34,7 +34,7 @@ export async function startKoaServer(
   for (const middleware of middlewareList) {
     app.use(middleware);
   }
-  if (!port) {
+  if (!port || !isNumber(port)) {
     port = await getAFreePort(3000);
   }
   const server = app.listen(port);
@@ -56,7 +56,7 @@ export async function startKoaServer(
 }
 
 /** A wrapper for startKoaServer, add two default koa middleware: cors, debug  */
-export async function startDefaultServer(middlewareList: Koa.Middleware[] = [], options: Options = {}) {
+export async function startDefaultServer(middlewareList: Koa.Middleware[] = [], options: CustomKoaServerOptions = {}) {
   // @ts-ignore
   return await startKoaServer([cors(), ...middlewareList, debug], options);
 }
