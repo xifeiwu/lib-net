@@ -5,6 +5,7 @@ import {
   ConnectServiceInfo,
   EAddressType,
   EMethod,
+  ESocksState,
   MatchItem,
   ProxyAsSocksClientConfig,
   TargetServiceInfo,
@@ -147,7 +148,7 @@ export function bufferToTargeServiceInfo(buf: Buffer): Omit<ConnectServiceInfo, 
     const portBuf = remainBuffer.subarray(startIndex, startIndex + 2);
     address = domainBuf.toString();
     port = (portBuf[0] << 8) + portBuf[1];
-    console.log(address, port);
+    // console.log(address, port);
   } else if (addressType === EAddressType.IPV4) {
     const domainBuf = remainBuffer.subarray(0, 4);
     const portBuf = remainBuffer.subarray(4, 6);
@@ -219,4 +220,26 @@ export function getMatchedProxyConfig(
     return config;
   }
   return null;
+}
+
+export function getFailState(lastState: ESocksState) {
+  let failState: ESocksState;
+  switch (lastState) {
+    case ESocksState.connecting:
+      failState = ESocksState.connect_fail;
+      break;
+    case ESocksState.method_negotiation:
+      failState = ESocksState.method_negotiation_fail;
+      break;
+    case ESocksState.auth_username_password_start:
+      failState = ESocksState.auth_username_password_fail;
+      break;
+    case ESocksState.send_request_info:
+      failState = ESocksState.send_request_info_fail;
+      break;
+    case ESocksState.connect_to_targer_service:
+      failState = ESocksState.connect_to_targer_service_fail;
+      break;
+  }
+  return failState;
 }

@@ -16,6 +16,7 @@ import {
   waitTargetServiceInfoReplied,
   upgradeProtocol,
   ClientConfig,
+  getFailState,
 } from './service';
 
 export async function connectToSocksServer(config: ClientConfig) {
@@ -84,21 +85,7 @@ export async function connectToSocksServer(config: ClientConfig) {
     status.socket = socket;
     status.state = ESocksState.success;
   } catch (err) {
-    let failState: ESocksState;
-    switch (status.state) {
-      case ESocksState.connecting:
-        failState = ESocksState.connect_fail;
-        break;
-      case ESocksState.auth_username_password_start:
-        failState = ESocksState.auth_username_password_fail;
-        break;
-      case ESocksState.method_negotiation:
-        failState = ESocksState.method_negotiation_fail;
-        break;
-      case ESocksState.send_request_info:
-        failState = ESocksState.send_request_info_fail;
-        break;
-    }
+    const failState = getFailState(status.state);
     if (failState) {
       status.state = failState;
     }

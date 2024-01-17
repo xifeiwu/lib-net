@@ -16,10 +16,13 @@ export enum ESocksState {
   send_request_info_success = 'send request info success',
   send_request_info_fail = 'send request info fail',
   receive_request_info_success = 'received request info success',
+  /** end of client only */
   /** server only */
   wait_targer_service_info = 'waiting target service info',
-  connect_targer_service_success = 'connect target service success',
-  connect_targer_service_fail = 'connect target service fail',
+  connect_to_targer_service = 'connect target service success',
+  connect_to_targer_service_success = 'connect target service success',
+  connect_to_targer_service_fail = 'connect target service fail',
+  /** end of server only */
   success = 'success',
   finsih = 'finish',
 }

@@ -18,6 +18,7 @@ import {
   MethodAuthInfo,
   ProxyAsSocksClientConfig,
   getMatchedProxyConfig,
+  getFailState,
 } from './';
 import {deepClone, deepEqual} from '../../node';
 import {Socket, isIP} from 'net';
@@ -25,10 +26,10 @@ import {connectToSocksServer} from '../client';
 
 /**
  * Handle new connection on sock server side
- * @param socket 
+ * @param socket
  * @param methodList auth method supported
  * @param proxyAsSocketClientConfigList proxy the socket to a new socket which connect to a new socks server
- * @returns 
+ * @returns
  */
 export async function handleConnection(
   socket: Socket,
@@ -75,9 +76,11 @@ export async function handleConnection(
     const proxyAsClientConfig = (proxyAsSocketClientConfigList ?? []).find(
       getMatchedProxyConfig.bind(null, targetServiceInfo)
     );
+    status.state = ESocksState.connect_to_targer_service;
     let socket2Service: Socket;
     if (proxyAsClientConfig) {
       const proxyAsClientStatus = await connectToSocksServer({...proxyAsClientConfig, targetServiceInfo});
+      status.proxyAsClientStatus = proxyAsClientStatus;
       if (proxyAsClientStatus.error) {
         throw createError(ERRORS.proxy_error);
       }
@@ -85,7 +88,6 @@ export async function handleConnection(
         reply: ETargetServiceConnectState.succeeded,
         ...proxyAsClientStatus.replyServiceInfo,
       });
-      status.proxyAsClientStatus = proxyAsClientStatus;
       socket2Service = proxyAsClientStatus.socket;
     } else {
       const replyServiceInfo = deepClone<ConnectServiceInfo>(targetServiceInfo);
@@ -145,6 +147,7 @@ export async function handleConnection(
         ...replyServiceInfo,
       });
     }
+    status.state = ESocksState.connect_to_targer_service_success;
     socket.pipe(socket2Service).pipe(socket);
     socket.resume();
     status.socket2Service = socket2Service;
@@ -152,7 +155,15 @@ export async function handleConnection(
     socket2Service.on('close', () => {
       status.state = ESocksState.finsih;
     });
+    socket2Service.on('error', err => {
+      // status.state = ESocksState.finsih;
+      status.error = err;
+    });
   } catch (err) {
+    const failState = getFailState(status.state);
+    if (failState) {
+      status.state = failState;
+    }
     status.error = err;
   }
   return status;
