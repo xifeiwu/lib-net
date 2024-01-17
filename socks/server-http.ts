@@ -1,31 +1,17 @@
-import net, {Socket} from 'net';
+import {Socket} from 'net';
 import Koa from 'koa';
-import {ConnectStatus, getSocketInfo, MethodAuthInfo, upgradeProtocol} from './service';
+import {ConnectStatus, getSocketInfo, HttpServerConfig, upgradeProtocol} from './service';
 import {startDefaultServer} from '../koa';
-import {getAFreePort, getHttpIncomingMessageInfo, isNumber, startSocketClient} from '../node';
+import {getAFreePort, getHttpIncomingMessageInfo, isNumber} from '../node';
 import {handleConnection} from './service/handle-connection';
-import http, {ServerOptions} from 'http';
-
-interface ServerConfig {
-  methodList: Array<MethodAuthInfo>;
-  serverConfig?: {
-    host?: string;
-    port?: number;
-    // options?: ServerOptions;
-  };
-  /** start a http server or not(http server can be used to show status of socks server) */
-  // isStartHttpServer?: boolean;
-  /** on fail duration socks conversation */
-  onConnection: (status: ConnectStatus) => void;
-}
 
 /**
  * Start a http server, can use http upgrade socket to run socks protocol.
  * @param config
  * @returns
  */
-export async function startHttpServer(config: ServerConfig) {
-  const {methodList, serverConfig, onConnection} = config;
+export async function startHttpServer(config: HttpServerConfig) {
+  const {methodList, serverConfig, onConnection, proxyAsSocketClientConfigList} = config;
   const {host = '127.0.0.1', port: _port} = serverConfig ?? {};
   const port = isNumber(_port) ? _port : await getAFreePort();
   /** Use authorized method first */
@@ -67,7 +53,7 @@ export async function startHttpServer(config: ServerConfig) {
         'Connection: Upgrade\r\n' +
         '\r\n'
     );
-    const connectStatus = await handleConnection(socket as Socket, methodList);
+    const connectStatus = await handleConnection(socket as Socket, methodList, proxyAsSocketClientConfigList);
     onConnection(connectStatus);
     connectStatusList.push(connectStatus);
   });

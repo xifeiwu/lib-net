@@ -4,34 +4,18 @@ import {
   ConnectStatus,
   getInfoFromFirstChunk,
   getSocketInfo,
-  MethodAuthInfo,
-  ProxyAsSocksClientConfig,
+  SocketServerConfig,
 } from './service';
 import {startDefaultServer} from '../koa';
 import {getAFreePort, isNumber, startSocketClient} from '../node';
 import {handleConnection} from './service/handle-connection';
-
-interface ServerConfig {
-  methodList: Array<MethodAuthInfo>;
-  serverConfig?: {
-    host?: string;
-    port?: number;
-    options?: ServerOpts;
-  };
-  /** start a http server or not(http server can be used to show status of socks server) */
-  isStartHttpServer?: boolean;
-  /** proxy to other socks server */
-  proxyAsSocketClientConfigList?: ProxyAsSocksClientConfig[];
-  /** on fail duration socks conversation */
-  onConnection: (status: ConnectStatus) => void;
-}
 
 /**
  * Start a tcp server as socks server, enable a http server to expose connection status.
  * @param config
  * @returns
  */
-export async function startSocksServer(config: ServerConfig) {
+export async function startSocksServer(config: SocketServerConfig) {
   const {methodList, serverConfig, isStartHttpServer, onConnection, proxyAsSocketClientConfigList} = config;
   const {host = '127.0.0.1', port, options} = serverConfig ?? {};
   const socksServerPort = isNumber(port) ? port : await getAFreePort();

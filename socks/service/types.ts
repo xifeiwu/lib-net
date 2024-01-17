@@ -1,4 +1,4 @@
-import {Socket, TcpNetConnectOpts} from 'net';
+import {ServerOpts, Socket, TcpNetConnectOpts} from 'net';
 
 export enum ESocksState {
   initial = 'initial',
@@ -108,4 +108,29 @@ export interface MatchItem {
 export interface ProxyAsSocksClientConfig
   extends Pick<ClientConfig, 'methodList' | 'socketConfig' | 'httpUrl'> {
   matches: Array<MatchItem | string | RegExp>;
+}
+
+export interface CommonServerConfig {
+  methodList: Array<MethodAuthInfo>;
+  /** proxy to other socks server */
+  proxyAsSocketClientConfigList?: ProxyAsSocksClientConfig[];
+  /** on fail duration socks conversation */
+  onConnection: (status: ConnectStatus) => void;
+}
+
+export interface SocketServerConfig extends CommonServerConfig {
+  serverConfig?: {
+    host?: string;
+    port?: number;
+    options?: ServerOpts;
+  };
+  /** start a http server or not(http server can be used to show status of socks server) */
+  isStartHttpServer?: boolean;
+}
+
+export interface HttpServerConfig extends CommonServerConfig {
+  serverConfig?: {
+    host?: string;
+    port?: number;
+  };
 }
