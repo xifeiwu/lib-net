@@ -21,9 +21,15 @@ import {
 } from './';
 import {deepClone, deepEqual} from '../../node';
 import {Socket, isIP} from 'net';
-import {isRegExp} from 'util/types';
 import {connectToSocksServer} from '../client';
 
+/**
+ * Handle new connection on sock server side
+ * @param socket 
+ * @param methodList auth method supported
+ * @param proxyAsSocketClientConfigList proxy the socket to a new socket which connect to a new socks server
+ * @returns 
+ */
 export async function handleConnection(
   socket: Socket,
   methodList: Array<MethodAuthInfo>,

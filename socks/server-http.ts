@@ -19,6 +19,11 @@ interface ServerConfig {
   onConnection: (status: ConnectStatus) => void;
 }
 
+/**
+ * Start a http server, can use http upgrade socket to run socks protocol.
+ * @param config
+ * @returns
+ */
 export async function startHttpServer(config: ServerConfig) {
   const {methodList, serverConfig, onConnection} = config;
   const {host = '127.0.0.1', port: _port} = serverConfig ?? {};

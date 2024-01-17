@@ -26,6 +26,11 @@ interface ServerConfig {
   onConnection: (status: ConnectStatus) => void;
 }
 
+/**
+ * Start a tcp server as socks server, enable a http server to expose connection status.
+ * @param config
+ * @returns
+ */
 export async function startSocksServer(config: ServerConfig) {
   const {methodList, serverConfig, isStartHttpServer, onConnection, proxyAsSocketClientConfigList} = config;
   const {host = '127.0.0.1', port, options} = serverConfig ?? {};
