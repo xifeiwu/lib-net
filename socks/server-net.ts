@@ -1,7 +1,7 @@
 import net, {ServerOpts} from 'net';
 import Koa from 'koa';
 import {
-  ConnectStatus,
+  SocksStatusOnServerSide,
   getInfoFromFirstChunk,
   getSocketInfo,
   SocketServerConfig,
@@ -21,7 +21,7 @@ export async function startSocksServer(config: SocketServerConfig) {
   const socksServerPort = isNumber(port) ? port : await getAFreePort();
   /** Use authorized method first */
   methodList.sort((pre, next) => next.method - pre.method);
-  const connectStatusList: ConnectStatus[] = [];
+  const connectStatusList: SocksStatusOnServerSide[] = [];
   let httpService: Awaited<ReturnType<typeof startDefaultServer>>;
 
   const {server} = await new Promise<{server: net.Server}>((res, rej) => {

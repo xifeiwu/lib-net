@@ -1,6 +1,6 @@
 import {Socket} from 'net';
 import Koa from 'koa';
-import {ConnectStatus, getSocketInfo, HttpServerConfig, upgradeProtocol} from './service';
+import {SocksStatusOnServerSide, getSocketInfo, HttpServerConfig, upgradeProtocol} from './service';
 import {startDefaultServer} from '../koa';
 import {getAFreePort, getHttpIncomingMessageInfo, isNumber} from '../node';
 import {handleConnection} from './service/handle-connection';
@@ -16,7 +16,7 @@ export async function startHttpServer(config: HttpServerConfig) {
   const port = isNumber(_port) ? _port : await getAFreePort();
   /** Use authorized method first */
   methodList.sort((pre, next) => next.method - pre.method);
-  const connectStatusList: ConnectStatus[] = [];
+  const connectStatusList: SocksStatusOnServerSide[] = [];
 
   const middleware: Koa.Middleware = async (ctx, next) => {
     const {url} = ctx;

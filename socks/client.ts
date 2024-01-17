@@ -7,7 +7,7 @@ import {
   getAddressType,
   ESocksState,
   TargetServiceInfo,
-  ClientStatus,
+  SocksStatusOnClientSide,
   waitMethodReplied,
   waitUsernamePasswordAuthResultReplied,
   sendMethod,
@@ -23,7 +23,7 @@ export async function connectToSocksServer(config: ClientConfig) {
   const {socketConfig, httpUrl, methodList, targetServiceInfo: target} = config;
   /** Use authorized method first */
   methodList.sort((pre, next) => next.method - pre.method);
-  const status: ClientStatus = {
+  const status: SocksStatusOnClientSide = {
     state: ESocksState.initial,
   };
   try {

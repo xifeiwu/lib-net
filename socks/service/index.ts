@@ -3,6 +3,7 @@ import {isNumber, isPlainObject, isRegExp, toBuffer} from '../../node';
 import {
   ClientConfig,
   ConnectServiceInfo,
+  SocksStatusOnServerSide,
   EAddressType,
   EMethod,
   ESocksState,
@@ -242,4 +243,21 @@ export function getFailState(lastState: ESocksState) {
       break;
   }
   return failState;
+}
+
+export function getConnectStatusInJson(status?: SocksStatusOnServerSide) {
+  if (!status) {
+    return null;
+  }
+  const {socket, socket2Service, proxyAsClientStatus} = status;
+  const results = {
+    ...status,
+    socket: getSocketInfo(socket),
+    socket2Service: getSocketInfo(socket2Service),
+  };
+  if (proxyAsClientStatus) {
+    // @ts-ignore
+    results.proxyAsClientStatus = getConnectStatusInJson(proxyAsClientStatus);
+  }
+  return results;
 }

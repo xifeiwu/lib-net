@@ -88,7 +88,7 @@ export enum ETargetServiceConnectState {
   to_FF_unassigned = 0x09,
 }
 
-export interface ClientStatus {
+export interface SocksStatusOnClientSide {
   state: ESocksState;
   method?: EMethod;
   targetServiceInfo?: TargetServiceInfo;
@@ -98,9 +98,9 @@ export interface ClientStatus {
 }
 
 /** connect status on server side */
-export interface ConnectStatus extends ClientStatus {
+export interface SocksStatusOnServerSide extends SocksStatusOnClientSide {
   socket2Service?: Socket;
-  proxyAsClientStatus?: ClientStatus;
+  proxyAsClientStatus?: SocksStatusOnClientSide;
 }
 
 export interface MatchItem {
@@ -118,7 +118,7 @@ export interface CommonServerConfig {
   /** proxy to other socks server */
   proxyAsSocketClientConfigList?: ProxyAsSocksClientConfig[];
   /** on fail duration socks conversation */
-  onConnection: (status: ConnectStatus) => void;
+  onConnection: (status: SocksStatusOnServerSide) => void;
 }
 
 export interface SocketServerConfig extends CommonServerConfig {

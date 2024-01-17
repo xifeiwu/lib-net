@@ -7,7 +7,7 @@ import {
   waitTargetServiceInfo,
   waitUsernamePassword,
   ConnectServiceInfo,
-  ConnectStatus,
+  SocksStatusOnServerSide,
   EMethod,
   ERRORS,
   ESocksState,
@@ -37,7 +37,7 @@ export async function handleConnection(
   proxyAsSocketClientConfigList?: ProxyAsSocksClientConfig[]
 ) {
   // socket.pause();
-  const status: ConnectStatus = {
+  const status: SocksStatusOnServerSide = {
     state: ESocksState.connected,
     socket,
   };
