@@ -1,14 +1,9 @@
-import net, {ServerOpts} from 'net';
-import Koa from 'koa';
-import {
-  SocksStatusOnServerSide,
-  getInfoFromFirstChunk,
-  getSocketInfo,
-  SocketServerConfig,
-} from './service';
+import net from 'net';
+import {getInfoFromFirstChunk, SocketServerConfig} from './service';
 import {startDefaultServer} from '../koa';
 import {getAFreePort, isNumber, startSocketClient} from '../node';
 import {handleConnection} from './service/handle-connection';
+import {exposeStatusByHttp} from './service/http-server';
 
 /**
  * Start a tcp server as socks server, enable a http server to expose connection status.
@@ -16,12 +11,12 @@ import {handleConnection} from './service/handle-connection';
  * @returns
  */
 export async function startSocksServer(config: SocketServerConfig) {
-  const {methodList, serverConfig, isStartHttpServer, onConnection, proxyAsSocketClientConfigList} = config;
+  const {methodList, serverConfig, httpServerConfig, onConnection, proxyAsSocketClientConfigList} = config;
   const {host = '127.0.0.1', port, options} = serverConfig ?? {};
   const socksServerPort = isNumber(port) ? port : await getAFreePort();
   /** Use authorized method first */
   methodList.sort((pre, next) => next.method - pre.method);
-  const connectStatusList: SocksStatusOnServerSide[] = [];
+  const {pushConnectStatus, koaMiddlewareList} = exposeStatusByHttp();
   let httpService: Awaited<ReturnType<typeof startDefaultServer>>;
 
   const {server} = await new Promise<{server: net.Server}>((res, rej) => {
@@ -33,7 +28,8 @@ export async function startSocksServer(config: SocketServerConfig) {
         socket.push(chunk);
         const connectStatus = await handleConnection(socket, methodList, proxyAsSocketClientConfigList);
         onConnection(connectStatus);
-        connectStatusList.push(connectStatus);
+        // connectStatusList.push(connectStatus);
+        httpServerConfig && pushConnectStatus(connectStatus);
       } else if (protocol === 'http' && httpService) {
         const socket2Http = await startSocketClient({
           host,
@@ -53,25 +49,8 @@ export async function startSocksServer(config: SocketServerConfig) {
     });
     server.listen(socksServerPort, host);
   });
-  if (isStartHttpServer) {
-    const middleware: Koa.Middleware = async (ctx, next) => {
-      const {url} = ctx;
-      if (url === '/api/socks/connections') {
-        ctx.type = 'json';
-        ctx.body = connectStatusList.map(it => {
-          const {socket, socket2Service} = it;
-          return {
-            ...it,
-            socket: getSocketInfo(socket),
-            socket2Service: getSocketInfo(socket2Service),
-          };
-        });
-      } else {
-        await next();
-      }
-    };
-    const port = await getAFreePort(socksServerPort + 1);
-    httpService = await startDefaultServer([middleware], {port});
+  if (httpServerConfig) {
+    httpService = await startDefaultServer(koaMiddlewareList, {port: httpServerConfig.port});
   }
   return {
     socksService: {

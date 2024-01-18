@@ -127,8 +127,10 @@ export interface SocketServerConfig extends CommonServerConfig {
     port?: number;
     options?: ServerOpts;
   };
-  /** start a http server or not(http server can be used to show status of socks server) */
-  isStartHttpServer?: boolean;
+  /** start a http server to expose status of socks server by this config */
+  httpServerConfig?: {
+    port: number;
+  },
 }
 
 export interface HttpServerConfig extends CommonServerConfig {

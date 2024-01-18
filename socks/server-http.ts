@@ -1,9 +1,9 @@
 import {Socket} from 'net';
-import Koa from 'koa';
-import {SocksStatusOnServerSide, getSocketInfo, HttpServerConfig, upgradeProtocol} from './service';
+import {HttpServerConfig, upgradeProtocol} from './service';
 import {startDefaultServer} from '../koa';
 import {getAFreePort, getHttpIncomingMessageInfo, isNumber} from '../node';
 import {handleConnection} from './service/handle-connection';
+import {exposeStatusByHttp} from './service/http-server';
 
 /**
  * Start a http server, can use http upgrade socket to run socks protocol.
@@ -12,30 +12,12 @@ import {handleConnection} from './service/handle-connection';
  */
 export async function startHttpServer(config: HttpServerConfig) {
   const {methodList, serverConfig, onConnection, proxyAsSocketClientConfigList} = config;
+  const {pushConnectStatus, koaMiddlewareList} = exposeStatusByHttp();
   const {host = '127.0.0.1', port: _port} = serverConfig ?? {};
   const port = isNumber(_port) ? _port : await getAFreePort();
   /** Use authorized method first */
   methodList.sort((pre, next) => next.method - pre.method);
-  const connectStatusList: SocksStatusOnServerSide[] = [];
-
-  const middleware: Koa.Middleware = async (ctx, next) => {
-    const {url} = ctx;
-    if (url === '/api/socks/connections') {
-      ctx.type = 'json';
-      ctx.body = connectStatusList.map(it => {
-        const {socket, socket2Service} = it;
-        return {
-          ...it,
-          socket: getSocketInfo(socket),
-          socket2Service: getSocketInfo(socket2Service),
-        };
-      });
-    } else {
-      await next();
-    }
-  };
-  // const port = await getAFreePort(socksServerPort + 1);
-  const httpService = await startDefaultServer([middleware], {port});
+  const httpService = await startDefaultServer([...koaMiddlewareList], {port});
   const {server} = httpService;
   server.on('upgrade', async (req, socket, head) => {
     const {headers} = await getHttpIncomingMessageInfo(req);
@@ -55,7 +37,7 @@ export async function startHttpServer(config: HttpServerConfig) {
     );
     const connectStatus = await handleConnection(socket as Socket, methodList, proxyAsSocketClientConfigList);
     onConnection(connectStatus);
-    connectStatusList.push(connectStatus);
+    pushConnectStatus(connectStatus);
   });
   return httpService;
 }

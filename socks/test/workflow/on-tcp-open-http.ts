@@ -36,16 +36,19 @@ export async function start() {
   });
   logWithColor(colors.targetServer, `target service port: ${targetServerInfo.port}`);
   const host = '127.0.0.1';
-  const port = await getAFreePort(targetServerInfo.port + 1);
+  const socksServerPort = await getAFreePort(targetServerInfo.port + 1);
+  const httpServerPort = await getAFreePort(targetServerInfo.port + 2);
   const {socksService} = await startSocksServer({
-    isStartHttpServer: true,
+    httpServerConfig: {
+      port: httpServerPort,
+    },
     methodList: [
       {method: EMethod.NoAuth},
       {method: EMethod.UserPass, info: {username: 'aaa', password: 'bbb'}},
     ],
     serverConfig: {
       host,
-      port,
+      port: socksServerPort,
       options: {
         allowHalfOpen: true,
       },
@@ -71,7 +74,7 @@ export async function start() {
       {method: EMethod.NoAuth},
       {method: EMethod.UserPass, info: {username: 'aaa', password: 'bbb'}},
     ],
-    socketConfig: {host, port, allowHalfOpen: true},
+    socketConfig: {host, port: socksServerPort, allowHalfOpen: true},
     targetServiceInfo: {
       address: targetServerInfo.host,
       port: targetServerInfo.port,

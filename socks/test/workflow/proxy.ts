@@ -27,7 +27,9 @@ const ports = {
   targetServer1: 3300,
   targetServer2: 3301,
   socksServer1: 3302,
-  socksServer: 3304,
+  httpServerOfSocksServer1: 3303,
+  socksServer2: 3304,
+  httpServerOfSocksServer2: 3305,
 };
 
 // http://elif.site/
@@ -62,7 +64,9 @@ export async function start() {
   );
   // logWithColor(colors.targetServer, `target service port: ${targetServerInfo1.port}`);
   const {socksService: socksService1, httpService: httpService1} = await startSocksServer({
-    isStartHttpServer: true,
+    httpServerConfig: {
+      port: ports.httpServerOfSocksServer1,
+    },
     methodList: [
       {method: EMethod.NoAuth},
       {method: EMethod.UserPass, info: {username: 'aaa', password: 'socksService1'}},
@@ -78,15 +82,17 @@ export async function start() {
   });
   logWithColor('yellow', `socks service1 start http server at: ${httpService1.url}`);
 
-  const {socksService, httpService} = await startSocksServer({
-    isStartHttpServer: true,
+  const {socksService: socksService2, httpService: httpService2} = await startSocksServer({
+    httpServerConfig: {
+      port: ports.httpServerOfSocksServer2,
+    },
     methodList: [
       {method: EMethod.NoAuth},
       {method: EMethod.UserPass, info: {username: 'aaa', password: 'socksService'}},
     ],
     serverConfig: {
       host,
-      port: ports.socksServer,
+      port: ports.socksServer2,
       options: {
         allowHalfOpen: true,
       },
@@ -106,14 +112,14 @@ export async function start() {
     ],
     onConnection(status) {},
   });
-  logWithColor('yellow', `socks service start http server at: ${httpService.url}`);
+  logWithColor('yellow', `socks service start http server at: ${httpService2.url}`);
 
   const client1 = await connectToSocksServer({
     methodList: [
       {method: EMethod.NoAuth},
       {method: EMethod.UserPass, info: {username: 'aaa', password: 'socksService'}},
     ],
-    socketConfig: {host, port: socksService.port, allowHalfOpen: true},
+    socketConfig: {host, port: socksService2.port, allowHalfOpen: true},
     targetServiceInfo: {
       address: targetServerInfo1.host,
       port: targetServerInfo1.port,
@@ -135,7 +141,7 @@ export async function start() {
       {method: EMethod.NoAuth},
       {method: EMethod.UserPass, info: {username: 'aaa', password: 'socksService'}},
     ],
-    socketConfig: {host, port: socksService.port, allowHalfOpen: true},
+    socketConfig: {host, port: socksService2.port, allowHalfOpen: true},
     targetServiceInfo: {
       address: targetServerInfo2.host,
       port: targetServerInfo2.port,

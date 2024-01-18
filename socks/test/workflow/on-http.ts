@@ -7,7 +7,6 @@ import {
   startSocketServer,
   writeDataByInterval,
 } from '../../../node';
-import {startSocksServer} from '../../server-net';
 import {EMethod, getSocketInfo} from '../../service';
 import {connectToSocksServer} from '../../client';
 import assert from 'assert';
