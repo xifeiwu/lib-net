@@ -24,6 +24,7 @@ import {
 import {deepClone, deepEqual} from '../external';
 import {Socket, isIP} from 'net';
 import {connectToSocksServer} from '../client';
+import {pipeline} from 'stream';
 
 /**
  * Handle new connection on sock server side
@@ -149,13 +150,20 @@ export async function handleConnection(
       });
     }
     status.state = ESocksState.connect_to_targer_service_success;
-    if (socket.writable) {
-      socket.pipe(socket2Service).pipe(socket);
+    if (socket.writable && socket2Service.writable) {
+      // socket.pipe(socket2Service).pipe(socket);
+      pipeline(socket, socket2Service, err => {
+        status.state = ESocksState.connecting_fail;
+        status.error = err;
+      });
+      pipeline(socket2Service, socket, err => {
+        status.state = ESocksState.connecting_fail;
+        status.error = err;
+      });
       socket.resume();
     } else {
-      if (socket2Service.writable) {
-        socket2Service.end();
-      }
+      socket.writable && socket.end();
+      socket2Service.writable && socket2Service.end();
     }
     status.socket2Service = socket2Service;
     status.state = ESocksState.success;
