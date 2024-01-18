@@ -1,4 +1,4 @@
-import { LogColors } from "../../../node";
+import { LogColors } from "../../external";
 
 export const colors: {
   targetServer: LogColors;

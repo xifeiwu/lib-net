@@ -1,4 +1,4 @@
-import {toBuffer} from '../../node';
+import {toBuffer} from '../external';
 import {address2Buffer, port2Buffer} from '../service';
 
 export async function bufferConvert() {

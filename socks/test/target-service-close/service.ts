@@ -1,14 +1,6 @@
-import {
-  LogColors,
-  getAFreePort,
-  handleSocketEvents,
-  killByPort,
-  logWithColor,
-  startSocketServer,
-  writeDataByInterval,
-} from '../../../node';
-import { getSocketInfo } from '../../service';
-import { colors, targetServerInfo } from './utils';
+import {handleSocketEvents, logWithColor, startSocketServer} from '../../external';
+import {getSocketInfo} from '../../service';
+import {colors, targetServerInfo} from './utils';
 
 export async function start() {
   const {host, port} = targetServerInfo;

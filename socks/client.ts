@@ -1,13 +1,7 @@
 import {Socket} from 'net';
-import {requestAndGetUpgradeInfo, startSocketClient} from '../node';
+import {requestAndGetUpgradeInfo, startSocketClient} from './external';
 import {
-  ECommand,
-  EMethod,
-  UserPassInfo,
   getAddressType,
-  ESocksState,
-  TargetServiceInfo,
-  SocksStatusOnClientSide,
   waitMethodReplied,
   waitUsernamePasswordAuthResultReplied,
   sendMethod,
@@ -15,9 +9,17 @@ import {
   sendUsernamePassword,
   waitTargetServiceInfoReplied,
   upgradeProtocol,
-  ClientConfig,
   getFailState,
 } from './service';
+import {
+  ECommand,
+  EMethod,
+  UserPassInfo,
+  ESocksState,
+  TargetServiceInfo,
+  SocksStatusOnClientSide,
+  ClientConfig,
+} from './service/types';
 
 export async function connectToSocksServer(config: ClientConfig) {
   const {socketConfig, httpUrl, methodList, targetServiceInfo: target} = config;

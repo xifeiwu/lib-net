@@ -1,5 +1,5 @@
 import path from 'path';
-import {spawnTsFile, waitFor} from '../../../node';
+import {spawnTsFile, waitFor} from '../../external';
 
 /**
  * Check what happened when target service stopped

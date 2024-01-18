@@ -6,21 +6,22 @@ import {
   waitMethod,
   waitTargetServiceInfo,
   waitUsernamePassword,
+  ERRORS,
+  createError,
+  getAddressType,
+} from './protocol';
+import {getMatchedProxyConfig, getFailState} from './utils';
+import {
   ConnectServiceInfo,
   SocksStatusOnServerSide,
   EMethod,
-  ERRORS,
   ESocksState,
   ETargetServiceConnectState,
   UserPassInfo,
-  createError,
-  getAddressType,
   MethodAuthInfo,
   ProxyAsSocksClientConfig,
-  getMatchedProxyConfig,
-  getFailState,
-} from './';
-import {deepClone, deepEqual} from '../../node';
+} from './types';
+import {deepClone, deepEqual} from '../external';
 import {Socket, isIP} from 'net';
 import {connectToSocksServer} from '../client';
 

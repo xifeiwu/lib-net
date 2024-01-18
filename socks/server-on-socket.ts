@@ -1,7 +1,8 @@
 import net from 'net';
-import {getInfoFromFirstChunk, SocketServerConfig} from './service';
+import {getInfoFromFirstChunk} from './service';
+import {SocketServerConfig} from './service/types';
 import {startDefaultServer} from '../koa';
-import {getAFreePort, isNumber, startSocketClient} from '../node';
+import {getAFreePort, isNumber, startSocketClient} from './external';
 import {handleConnection} from './service/handle-connection';
 import {exposeStatusByHttp} from './service/http-server';
 

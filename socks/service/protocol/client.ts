@@ -1,17 +1,7 @@
 import {Readable, Writable} from 'stream';
-import {
-  EMethod,
-  ERRORS,
-  ETargetServiceConnectState,
-  ConnectServiceInfo,
-  UserPassInfo,
-  address2Buffer,
-  bufferToTargeServiceInfo,
-  createError,
-  port2Buffer,
-  TargetServiceInfo,
-} from '.';
-import {toBuffer} from '../../node';
+import {ERRORS, address2Buffer, bufferToTargeServiceInfo, createError, port2Buffer} from './utils';
+import {EMethod, ETargetServiceConnectState, ConnectServiceInfo, TargetServiceInfo} from './types';
+import {toBuffer} from '../../external';
 
 /**
  * +----+----------+----------+

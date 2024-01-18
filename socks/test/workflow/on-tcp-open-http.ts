@@ -6,9 +6,10 @@ import {
   requestAndGetResponseInfo,
   startSocketServer,
   writeDataByInterval,
-} from '../../../node';
-import {runSocksServerOnSocket} from '../../server-net';
-import {EMethod, getSocketInfo} from '../../service';
+} from '../../external';
+import {runSocksServerOnSocket} from '../../server-on-socket';
+import {getSocketInfo} from '../../service';
+import {EMethod} from '../../service/types';
 import {connectToSocksServer} from '../../client';
 import assert from 'assert';
 

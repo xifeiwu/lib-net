@@ -1,4 +1,6 @@
 import {ServerOpts, Socket, TcpNetConnectOpts} from 'net';
+import { ConnectServiceInfo, EMethod, MethodAuthInfo, TargetServiceInfo } from './protocol/types';
+export * from './protocol/types';
 
 export enum ESocksState {
   initial = 'initial',
@@ -27,37 +29,6 @@ export enum ESocksState {
   finsih = 'finish',
 }
 
-/**
- * o  X'00' NO AUTHENTICATION REQUIRED
- * o  X'01' GSSAPI
- * o  X'02' USERNAME/PASSWORD
- * o  X'03' to X'7F' IANA ASSIGNED
- * o  X'80' to X'FE' RESERVED FOR PRIVATE METHODS
- * o  X'FF' NO ACCEPTABLE METHODS
- */
-export enum EMethod {
-  NoAuth = 0x00,
-  GSSApi = 0x01,
-  UserPass = 0x02,
-  NoAcceptable = 0xff,
-}
-
-export type MethodAuthInfo = {method: EMethod.NoAuth} | {method: EMethod.UserPass; info: UserPassInfo};
-
-export interface UserPassInfo {
-  username: string;
-  password: string;
-}
-export enum ECommand {
-  CONNECT = 0x01,
-  BIND = 0x02,
-  UDP = 0x03,
-}
-export enum EAddressType {
-  IPV4 = 0x01,
-  DOMAINNAME = 0x03,
-  IPV6 = 0x04,
-}
 export interface ClientConfig {
   methodList: Array<MethodAuthInfo>;
   /** get tcp connection by net.createConnection */
@@ -65,27 +36,6 @@ export interface ClientConfig {
   /** get tcp connection by http upgrade */
   httpUrl?: string;
   targetServiceInfo: Pick<ConnectServiceInfo, 'address' | 'port'>;
-}
-
-export interface TargetServiceInfo {
-  addressType: EAddressType;
-  address: string;
-  port: number;
-}
-export interface ConnectServiceInfo extends TargetServiceInfo {
-  command: ECommand;
-}
-export enum ETargetServiceConnectState {
-  succeeded = 0x00,
-  general_SOCKS_server_failure = 0x01,
-  connection_not_allowed_by_ruleset = 0x02,
-  Network_unreachable = 0x03,
-  Host_unreachable = 0x04,
-  Connection_refused = 0x05,
-  TTL_expired = 0x06,
-  Command_not_supported = 0x07,
-  Address_type_not_supported = 0x08,
-  to_FF_unassigned = 0x09,
 }
 
 export interface SocksStatusOnClientSide {

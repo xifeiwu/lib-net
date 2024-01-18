@@ -1,3 +1,4 @@
+import assert from 'assert';
 import {
   LogColors,
   getAFreePort,
@@ -6,11 +7,11 @@ import {
   requestAndGetResponseInfo,
   startSocketServer,
   writeDataByInterval,
-} from '../../../node';
-import {EMethod, getSocketInfo} from '../../service';
+} from '../../external';
+import {getSocketInfo} from '../../service';
+import {EMethod} from '../../service/types';
 import {connectToSocksServer} from '../../client';
-import assert from 'assert';
-import {runSocksServerOnHttp} from '../../server-http';
+import {runSocksServerOnHttp} from '../../server-on-http';
 
 const colors: {
   targetServer: LogColors;

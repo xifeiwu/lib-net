@@ -1,13 +1,9 @@
-import {
-  getAFreePort,
-  handleSocketEvents,
-  logWithColor,
-  writeDataByInterval,
-} from '../../../node';
-import {runSocksServerOnSocket} from '../../server-net';
-import {EMethod, getSocketInfo} from '../../service';
+import {getAFreePort, handleSocketEvents, logWithColor, writeDataByInterval} from '../../external';
+import {runSocksServerOnSocket} from '../../server-on-socket';
+import {getSocketInfo} from '../../service';
+import {EMethod} from '../../service/types';
 import {connectToSocksServer} from '../../client';
-import { colors, targetServerInfo } from './utils';
+import {colors, targetServerInfo} from './utils';
 
 export async function start() {
   const host = '127.0.0.1';

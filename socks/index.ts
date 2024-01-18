@@ -1,3 +1,3 @@
-export {runSocksServerOnSocket as runSocksServeronSocket} from './server-net';
-export {runSocksServerOnHttp} from './server-http';
+export {runSocksServerOnSocket as runSocksServeronSocket} from './server-on-socket';
+export {runSocksServerOnHttp} from './server-on-http';
 export * from './service';

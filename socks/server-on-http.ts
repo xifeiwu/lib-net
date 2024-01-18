@@ -1,7 +1,8 @@
 import {Socket} from 'net';
-import {HttpServerConfig, upgradeProtocol} from './service';
+import {upgradeProtocol} from './service';
+import {HttpServerConfig} from './service/types';
 import {startDefaultServer} from '../koa';
-import {getAFreePort, getHttpIncomingMessageInfo, isNumber} from '../node';
+import {getAFreePort, getHttpIncomingMessageInfo, isNumber} from './external';
 import {handleConnection} from './service/handle-connection';
 import {exposeStatusByHttp} from './service/http-server';
 
