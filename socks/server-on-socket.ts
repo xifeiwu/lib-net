@@ -15,7 +15,7 @@ export async function runSocksServerOnSocket(config: SocketServerConfig) {
   const {methodList, serverConfig, httpServerConfig, onConnection, proxyAsSocketClientConfigList} = config;
   await checkPort(serverConfig.port);
   httpServerConfig && await checkPort(httpServerConfig.port);
-  const {host = '127.0.0.1', port, options} = serverConfig ?? {};
+  const {host = '0.0.0.0', port, options} = serverConfig ?? {};
   const socksServerPort = isNumber(port) ? port : await getAFreePort();
   /** Use authorized method first */
   methodList.sort((pre, next) => next.method - pre.method);

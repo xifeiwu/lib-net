@@ -8,6 +8,7 @@ import {
   ProxyAsSocksClientConfig,
   TargetServiceInfo,
 } from './types';
+import { isString } from '../../node';
 
 export const upgradeProtocol = 'socks5';
 
@@ -65,6 +66,10 @@ export function getMatchedProxyConfig(
     let result = true;
     if (isRegExp(address)) {
       result &&= (address as RegExp).test(target.address);
+    } else if (isString(address)) {
+      result &&= address === target.address;
+    } else {
+      result = false;
     }
     if (isNumber(port)) {
       result &&= port === target.port;
