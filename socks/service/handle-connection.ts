@@ -149,8 +149,14 @@ export async function handleConnection(
       });
     }
     status.state = ESocksState.connect_to_targer_service_success;
-    socket.pipe(socket2Service).pipe(socket);
-    socket.resume();
+    if (socket.writable) {
+      socket.pipe(socket2Service).pipe(socket);
+      socket.resume();
+    } else {
+      if (socket2Service.writable) {
+        socket2Service.end();
+      }
+    }
     status.socket2Service = socket2Service;
     status.state = ESocksState.success;
     socket2Service.on('close', () => {
@@ -158,6 +164,9 @@ export async function handleConnection(
     });
     socket2Service.on('error', err => {
       // status.state = ESocksState.finsih;
+      if (socket2Service.writable) {
+        socket2Service.end();
+      }
       status.error = err;
     });
   } catch (err) {

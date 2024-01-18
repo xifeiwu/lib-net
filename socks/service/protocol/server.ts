@@ -53,6 +53,9 @@ export async function waitMethod(reader: Readable, supportedMethods: EMethod[]) 
  */
 export async function replyMethod(writer: Writable, method: EMethod) {
   return new Promise<void>((res, rej) => {
+    if (!writer.writable) {
+      return rej(createError(ERRORS.SocketUnWritable));
+    }
     writer.write(Buffer.from([5, method]), err => {
       if (err) {
         rej(err);
@@ -105,6 +108,9 @@ export async function waitUsernamePassword(reader: Readable) {
  */
 export async function replyUsernamePasswordAuthResult(writer: Writable, success: boolean) {
   return new Promise<void>((res, rej) => {
+    if (!writer.writable) {
+      return rej(createError(ERRORS.SocketUnWritable));
+    }
     writer.write(Buffer.from([1, success ? 0 : 1]), err => {
       if (err) {
         rej(err);
@@ -191,6 +197,9 @@ export async function replyTargetServiceInfo(
 ) {
   const {reply, addressType, address, port} = state;
   return new Promise<void>((res, rej) => {
+    if (!writer.writable) {
+      return rej(createError(ERRORS.SocketUnWritable));
+    }
     writer.write(
       toBuffer([5, reply, 0, addressType, address2Buffer(address, addressType), port2Buffer(port)]),
       err => {

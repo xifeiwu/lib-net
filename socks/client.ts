@@ -45,6 +45,11 @@ export async function connectToSocksServer(config: ClientConfig) {
     } else {
       throw new Error(`Error: both socketConfig and httpUrl are not set.`);
     }
+    socket.on('error', () => {
+      if (socket.writable) {
+        socket.end();
+      }
+    });
 
     status.state = ESocksState.connected;
     status.state = ESocksState.method_negotiation;

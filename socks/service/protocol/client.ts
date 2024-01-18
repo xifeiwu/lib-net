@@ -18,6 +18,9 @@ import {toBuffer} from '../../external';
  */
 export async function sendMethod(writer: Writable, methods: EMethod[]) {
   return new Promise<void>((res, rej) => {
+    if (!writer.writable) {
+      return rej(createError(ERRORS.SocketUnWritable));
+    }
     writer.write(Buffer.from([5, methods.length, ...methods]), err => {
       if (err) {
         rej(err);
@@ -86,6 +89,9 @@ export async function sendUsernamePassword(
     throw createError(ERRORS.MORE_THAN_255_BYTES);
   }
   return new Promise<void>(async (res, rej) => {
+    if (!writer.writable) {
+      return rej(createError(ERRORS.SocketUnWritable));
+    }
     writer.write(toBuffer([1, usernameLength, username, passwordLength, password]), err => {
       if (err) {
         rej(err);
@@ -159,6 +165,9 @@ export async function sendTargetServiceInfo(writer: Writable, info: ConnectServi
       address2Buffer(address, addressType),
       port2Buffer(port),
     ]);
+    if (!writer.writable) {
+      return rej(createError(ERRORS.SocketUnWritable));
+    }
     writer.write(buffer, err => {
       if (err) {
         rej(err);

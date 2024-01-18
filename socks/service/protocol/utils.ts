@@ -26,6 +26,7 @@ export const ERRORS = {
   InvalidSocksClientOptionsProxiesLength: 'At least two socks proxies must be provided for chaining.',
   NegotiationError: 'Negotiation error',
   SocketClosed: 'Socket closed',
+  SocketUnWritable: 'Socket can not write',
   ProxyConnectionTimedOut: 'Proxy connection timed out',
   InternalError: 'SocksClient internal error (this should not happen)',
   InvalidSocks4HandshakeResponse: 'Received invalid Socks4 handshake response',
