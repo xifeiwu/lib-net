@@ -1,13 +1,10 @@
 import {
-  LogColors,
   getAFreePort,
   handleSocketEvents,
-  killByPort,
   logWithColor,
-  startSocketServer,
   writeDataByInterval,
 } from '../../../node';
-import {startSocksServer} from '../../server-net';
+import {runSocksServerOnSocket} from '../../server-net';
 import {EMethod, getSocketInfo} from '../../service';
 import {connectToSocksServer} from '../../client';
 import { colors, targetServerInfo } from './utils';
@@ -15,7 +12,7 @@ import { colors, targetServerInfo } from './utils';
 export async function start() {
   const host = '127.0.0.1';
   const port = await getAFreePort(targetServerInfo.port + 1);
-  const {socksService} = await startSocksServer({
+  const {socksService} = await runSocksServerOnSocket({
     methodList: [
       {method: EMethod.NoAuth},
       {method: EMethod.UserPass, info: {username: 'aaa', password: 'bbb'}},

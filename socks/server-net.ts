@@ -10,7 +10,7 @@ import {exposeStatusByHttp} from './service/http-server';
  * @param config
  * @returns
  */
-export async function startSocksServer(config: SocketServerConfig) {
+export async function runSocksServerOnSocket(config: SocketServerConfig) {
   const {methodList, serverConfig, httpServerConfig, onConnection, proxyAsSocketClientConfigList} = config;
   const {host = '127.0.0.1', port, options} = serverConfig ?? {};
   const socksServerPort = isNumber(port) ? port : await getAFreePort();

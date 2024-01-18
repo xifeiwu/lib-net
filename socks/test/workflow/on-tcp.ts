@@ -6,7 +6,7 @@ import {
   startSocketServer,
   writeDataByInterval,
 } from '../../../node';
-import {startSocksServer} from '../../server-net';
+import {runSocksServerOnSocket} from '../../server-net';
 import {EMethod, getSocketInfo} from '../../service';
 import {connectToSocksServer} from '../../client';
 
@@ -35,7 +35,7 @@ export async function start() {
   logWithColor(colors.targetServer, `target service port: ${targetServerInfo.port}`);
   const host = '127.0.0.1';
   const port = await getAFreePort(targetServerInfo.port + 1);
-  const {socksService} = await startSocksServer({
+  const {socksService} = await runSocksServerOnSocket({
     methodList: [
       {method: EMethod.NoAuth},
       {method: EMethod.UserPass, info: {username: 'aaa', password: 'bbb'}},

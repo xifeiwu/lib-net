@@ -10,7 +10,7 @@ import {
 import {EMethod, getSocketInfo} from '../../service';
 import {connectToSocksServer} from '../../client';
 import assert from 'assert';
-import {startHttpServer} from '../../server-http';
+import {runSocksServerOnHttp} from '../../server-http';
 
 const colors: {
   targetServer: LogColors;
@@ -37,7 +37,7 @@ export async function start() {
   logWithColor(colors.targetServer, `target service port: ${targetServerInfo.port}`);
   const host = '127.0.0.1';
   const port = await getAFreePort(targetServerInfo.port + 1);
-  const httpService = await startHttpServer({
+  const httpService = await runSocksServerOnHttp({
     methodList: [
       {method: EMethod.NoAuth},
       {method: EMethod.UserPass, info: {username: 'aaa', password: 'bbb'}},

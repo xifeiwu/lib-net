@@ -6,7 +6,7 @@ import {
   toBuffer,
   writeDataByInterval,
 } from '../../../node';
-import {startSocksServer} from '../../server-net';
+import {runSocksServerOnSocket} from '../../server-net';
 import {EMethod, getSocketInfo} from '../../service';
 import {connectToSocksServer} from '../../client';
 
@@ -63,7 +63,7 @@ export async function start() {
     }
   );
   // logWithColor(colors.targetServer, `target service port: ${targetServerInfo1.port}`);
-  const {socksService: socksService1, httpService: httpService1} = await startSocksServer({
+  const {socksService: socksService1, httpService: httpService1} = await runSocksServerOnSocket({
     httpServerConfig: {
       port: ports.httpServerOfSocksServer1,
     },
@@ -82,7 +82,7 @@ export async function start() {
   });
   logWithColor('yellow', `socks service1 start http server at: ${httpService1.url}`);
 
-  const {socksService: socksService2, httpService: httpService2} = await startSocksServer({
+  const {socksService: socksService2, httpService: httpService2} = await runSocksServerOnSocket({
     httpServerConfig: {
       port: ports.httpServerOfSocksServer2,
     },

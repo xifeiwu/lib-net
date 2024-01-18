@@ -10,7 +10,7 @@ import {exposeStatusByHttp} from './service/http-server';
  * @param config
  * @returns
  */
-export async function startHttpServer(config: HttpServerConfig) {
+export async function runSocksServerOnHttp(config: HttpServerConfig) {
   const {methodList, serverConfig, onConnection, proxyAsSocketClientConfigList} = config;
   const {pushConnectStatus, koaMiddlewareList} = exposeStatusByHttp();
   const {host = '127.0.0.1', port: _port} = serverConfig ?? {};
