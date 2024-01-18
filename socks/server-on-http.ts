@@ -1,8 +1,8 @@
 import {Socket} from 'net';
-import {upgradeProtocol} from './service';
+import {checkPort, upgradeProtocol} from './service';
 import {HttpServerConfig} from './service/types';
 import {startDefaultServer} from '../koa';
-import {getAFreePort, getHttpIncomingMessageInfo, isNumber} from './external';
+import {getHttpIncomingMessageInfo} from './external';
 import {handleConnection} from './service/handle-connection';
 import {exposeStatusByHttp} from './service/http-server';
 
@@ -13,9 +13,9 @@ import {exposeStatusByHttp} from './service/http-server';
  */
 export async function runSocksServerOnHttp(config: HttpServerConfig) {
   const {methodList, serverConfig, onConnection, proxyAsSocketClientConfigList} = config;
+  await checkPort(serverConfig.port);
   const {pushConnectStatus, koaMiddlewareList} = exposeStatusByHttp();
-  const {host = '127.0.0.1', port: _port} = serverConfig ?? {};
-  const port = isNumber(_port) ? _port : await getAFreePort();
+  const {host = '127.0.0.1', port} = serverConfig ?? {};
   /** Use authorized method first */
   methodList.sort((pre, next) => next.method - pre.method);
   const httpService = await startDefaultServer([...koaMiddlewareList], {port});

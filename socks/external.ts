@@ -7,6 +7,7 @@ export {
   deepEqual,
   requestAndGetUpgradeInfo,
   startSocketClient,
+  isPortOpen,
   getAFreePort,
   getHttpIncomingMessageInfo,
   spawnTsFile,

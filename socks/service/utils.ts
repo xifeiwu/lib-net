@@ -1,5 +1,5 @@
 import {Socket} from 'net';
-import {isNumber, isPlainObject, isRegExp} from '../external';
+import {isNumber, isPlainObject, isPortOpen, isRegExp} from '../external';
 import {
   SocksStatusOnServerSide,
   EMethod,
@@ -114,4 +114,10 @@ export function getConnectStatusInJson(status?: SocksStatusOnServerSide) {
     results.proxyAsClientStatus = getConnectStatusInJson(proxyAsClientStatus);
   }
   return results;
+}
+
+export async function checkPort(port: number) {
+  if (await isPortOpen(port)) {
+    throw new Error(`Port ${port}is alreay in use`);
+  }
 }

@@ -86,6 +86,6 @@ export interface SocketServerConfig extends CommonServerConfig {
 export interface HttpServerConfig extends CommonServerConfig {
   serverConfig?: {
     host?: string;
-    port?: number;
+    port: number;
   };
 }

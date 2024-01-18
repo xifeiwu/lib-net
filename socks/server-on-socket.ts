@@ -1,5 +1,5 @@
 import net from 'net';
-import {getInfoFromFirstChunk} from './service';
+import {checkPort, getInfoFromFirstChunk} from './service';
 import {SocketServerConfig} from './service/types';
 import {startDefaultServer} from '../koa';
 import {getAFreePort, isNumber, startSocketClient} from './external';
@@ -13,6 +13,8 @@ import {exposeStatusByHttp} from './service/http-server';
  */
 export async function runSocksServerOnSocket(config: SocketServerConfig) {
   const {methodList, serverConfig, httpServerConfig, onConnection, proxyAsSocketClientConfigList} = config;
+  await checkPort(serverConfig.port);
+  httpServerConfig && await checkPort(httpServerConfig.port);
   const {host = '127.0.0.1', port, options} = serverConfig ?? {};
   const socksServerPort = isNumber(port) ? port : await getAFreePort();
   /** Use authorized method first */
