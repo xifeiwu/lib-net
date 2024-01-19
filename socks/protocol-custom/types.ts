@@ -10,3 +10,10 @@ export interface ConnectionInfo {
   auth: UserPassInfo;
   targetServiceInfo: SocksStatusOnClientSide['targetServiceInfo'];
 }
+
+export interface CustomProtocol {
+  cipher?: {
+    algorithm?: string;
+    password?: string;
+  };
+}

@@ -21,7 +21,7 @@ import {getIv, ivLength} from './cipher';
  * NOTICE:
  * Close socket on socket error events of any error thrown during the logic process
  */
-export async function connectToSocksServer(config: ClientConfig) {
+export async function connectToCustomSocksServer(config: ClientConfig) {
   const {socketConfig, httpUrl, methodList, targetServiceInfo: target} = config;
   const authMethod = methodList.find(it => it.method === EMethod.UserPass);
   if (!authMethod) {

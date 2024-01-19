@@ -4,6 +4,7 @@ import {SocketServerConfig} from './service/types';
 import {startDefaultServer} from '../koa';
 import {getAFreePort, isNumber, startSocketClient} from './external';
 import {handleConnection} from './service/server';
+import {handleCustomConnection} from './protocol-custom';
 import {exposeStatusByHttp} from './service/http-server';
 
 /**
@@ -12,7 +13,7 @@ import {exposeStatusByHttp} from './service/http-server';
  * @returns
  */
 export async function runSocksServerOnSocket(config: SocketServerConfig) {
-  const {methodList, serverConfig, httpServerConfig, onConnection, proxyAsSocketClientConfigList} = config;
+  const {cipher, methodList, serverConfig, httpServerConfig, onConnection, proxyAsSocketClientConfigList} = config;
   await checkPort(serverConfig.port);
   httpServerConfig && await checkPort(httpServerConfig.port);
   const {host = '0.0.0.0', port, options} = serverConfig ?? {};
@@ -21,6 +22,7 @@ export async function runSocksServerOnSocket(config: SocketServerConfig) {
   methodList.sort((pre, next) => next.method - pre.method);
   const {pushConnectStatus, koaMiddlewareList} = exposeStatusByHttp();
   let httpService: Awaited<ReturnType<typeof startDefaultServer>>;
+  const handleConnectionFinal = cipher ? handleCustomConnection : handleConnection;
 
   const {server} = await new Promise<{server: net.Server}>((res, rej) => {
     const server = net.createServer(options, async socket => {
@@ -29,7 +31,7 @@ export async function runSocksServerOnSocket(config: SocketServerConfig) {
       // console.log(protocol, chunk);
       if (protocol === 'socks5') {
         socket.push(chunk);
-        const connectStatus = await handleConnection(socket, methodList, proxyAsSocketClientConfigList);
+        const connectStatus = await handleConnectionFinal(socket, methodList, proxyAsSocketClientConfigList);
         onConnection(connectStatus);
         // connectStatusList.push(connectStatus);
         httpServerConfig && pushConnectStatus(connectStatus);

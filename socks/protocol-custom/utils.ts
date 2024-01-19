@@ -39,11 +39,11 @@ import {BinaryLike} from 'crypto';
  * o  DST.PORT desired destination port in network octet order
  *
  * combine auth and targetServerInfo together
- * +-----+------+----------+------+----------+-----+-------+------+----------+----------+
- * | IV  | ULEN |  UNAME   | PLEN |  PASSWD  | CMD |  RSV  | ATYP | DST.ADDR | DST.PORT |
- * +-----+------+----------+------+----------+-----+-------+------+----------+----------+
- * | 16  |  1   | 1 to 255 |  1   | 1 to 255 |  1  | X'00' |  1   | Variable |    2     |
- * +-----+------+----------+------+----------+-----+-------+------+----------+----------+
+ * +----+-----+------+----------+------+----------+-----+-------+------+----------+----------+
+ * |VER | IV  | ULEN |  UNAME   | PLEN |  PASSWD  | CMD |  RSV  | ATYP | DST.ADDR | DST.PORT |
+ * +----+-----+------+----------+------+----------+-----+-------+------+----------+----------+
+ * | 1  | 16  |  1   | 1 to 255 |  1   | 1 to 255 |  1  | X'00' |  1   | Variable |    2     |
+ * +----+-----+------+----------+------+----------+-----+-------+------+----------+----------+
  */
 export async function sendConnectionInfo(writer: Writable, info: ConnectionInfo) {
   const {iv, auth, targetServiceInfo} = info;
@@ -55,7 +55,7 @@ export async function sendConnectionInfo(writer: Writable, info: ConnectionInfo)
     addressType = getAddressType(address),
   } = targetServiceInfo;
   return new Promise<void>(async (res, rej) => {
-    const encryptedInfo = encrypt(
+    const {data} = encrypt(
       toBuffer([
         username.length,
         username,
@@ -73,7 +73,8 @@ export async function sendConnectionInfo(writer: Writable, info: ConnectionInfo)
     if (!writer.writable) {
       return rej(createError(ERRORS.SocketUnWritable));
     }
-    writer.write(toBuffer([iv, encryptedInfo]), err => {
+    const buf = toBuffer([5, iv, data]);
+    writer.write(buf, err => {
       if (err) {
         rej(err);
       } else {
@@ -88,9 +89,13 @@ export async function waitConectionInfo(reader: Readable) {
   return new Promise<ConnectionInfo>((res, rej) => {
     reader.once('data', (chunk: Buffer) => {
       reader.pause();
-      const iv = chunk.subarray(0, ivLength);
-      const buffer = decript(chunk.subarray(ivLength), iv);
       let baseIndex = 0;
+      const version = chunk[baseIndex];
+      baseIndex += 1;
+      const iv = chunk.subarray(baseIndex, baseIndex + ivLength);
+      baseIndex += ivLength;
+      const buffer = decript(chunk.subarray(baseIndex), iv);
+      baseIndex = 0;
       const usernameLength = buffer[baseIndex];
       baseIndex += 1;
       const username = buffer.subarray(baseIndex, baseIndex + usernameLength);
@@ -160,19 +165,17 @@ export async function replyTargetServiceInfo(
     if (!writer.writable) {
       return rej(createError(ERRORS.SocketUnWritable));
     }
-    writer.write(
-      encrypt(
-        toBuffer([5, reply, 0, addressType, address2Buffer(address, addressType), port2Buffer(port)]),
-        iv
-      ),
-      err => {
-        if (err) {
-          rej(err);
-        } else {
-          res();
-        }
-      }
+    const {data} = encrypt(
+      toBuffer([5, reply, 0, addressType, address2Buffer(address, addressType), port2Buffer(port)]),
+      iv
     );
+    writer.write(data, err => {
+      if (err) {
+        rej(err);
+      } else {
+        res();
+      }
+    });
   });
 }
 

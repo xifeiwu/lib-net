@@ -28,7 +28,7 @@ import {getCipher, getDcipher} from './cipher';
  * Notice:
  * Close socket on socket error events of any error thrown during the logic process
  */
-export async function handleConnection(
+export async function handleCustomConnection(
   socket: Socket,
   methodList: Array<MethodAuthInfo>,
   proxyAsSocketClientConfigList?: ProxyAsSocksClientConfig[]
@@ -50,6 +50,9 @@ export async function handleConnection(
     status.state = ESocksState.wait_targer_service_info;
     const {iv, auth, targetServiceInfo} = await waitConectionInfo(socket);
     const authSuccess = deepEqual(authMethod.info, auth);
+    if (!authSuccess) {
+      throw createError(ERRORS.username_password_auth_fail);
+    }
     status.targetServiceInfo = targetServiceInfo;
     const proxyAsClientConfig = (proxyAsSocketClientConfigList ?? []).find(
       getMatchedProxyConfig.bind(null, targetServiceInfo)

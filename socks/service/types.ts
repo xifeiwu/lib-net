@@ -1,5 +1,6 @@
 import {ServerOpts, Socket, TcpNetConnectOpts} from 'net';
 import {TargetServiceInfo, EMethod, MethodAuthInfo} from './protocol/types';
+import {CustomProtocol} from '../protocol-custom/types';
 export * from './protocol/types';
 
 export enum ESocksState {
@@ -32,7 +33,7 @@ export enum ESocksState {
   finsih = 'finish',
 }
 
-export interface ClientConfig {
+export interface ClientConfig extends CustomProtocol {
   /** get tcp connection by net.createConnection */
   socketConfig?: TcpNetConnectOpts;
   /** get tcp connection by http upgrade */
@@ -61,8 +62,7 @@ export interface MatchItem {
   port: number;
 }
 /** proxy to another socks server when address/port meets condition in matches list */
-export interface ProxyAsSocksClientConfig
-  extends Pick<ClientConfig, 'methodList' | 'socketConfig' | 'httpUrl'> {
+export interface ProxyAsSocksClientConfig extends Pick<ClientConfig, 'targetServiceInfo'> {
   matches: Array<MatchItem | string | RegExp>;
 }
 
@@ -74,7 +74,7 @@ export interface CommonServerConfig {
   onConnection: (status: SocksStatusOnServerSide) => void;
 }
 
-export interface SocketServerConfig extends CommonServerConfig {
+export interface SocketServerConfig extends CommonServerConfig, CustomProtocol {
   serverConfig?: {
     host?: string;
     port?: number;
@@ -86,7 +86,7 @@ export interface SocketServerConfig extends CommonServerConfig {
   };
 }
 
-export interface HttpServerConfig extends CommonServerConfig {
+export interface HttpServerConfig extends CommonServerConfig, CustomProtocol {
   serverConfig?: {
     host?: string;
     port: number;

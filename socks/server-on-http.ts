@@ -5,6 +5,7 @@ import {startDefaultServer} from '../koa';
 import {getHttpIncomingMessageInfo} from './external';
 import {handleConnection} from './service/server';
 import {exposeStatusByHttp} from './service/http-server';
+import { handleCustomConnection } from './protocol-custom';
 
 /**
  * Start a http server, can use http upgrade socket to run socks protocol.
@@ -12,10 +13,11 @@ import {exposeStatusByHttp} from './service/http-server';
  * @returns
  */
 export async function runSocksServerOnHttp(config: HttpServerConfig) {
-  const {methodList, serverConfig, onConnection, proxyAsSocketClientConfigList} = config;
+  const {cipher, methodList, serverConfig, onConnection, proxyAsSocketClientConfigList} = config;
   await checkPort(serverConfig.port);
   const {pushConnectStatus, koaMiddlewareList} = exposeStatusByHttp();
   const {host = '127.0.0.1', port} = serverConfig ?? {};
+  const handleConnectionFinal = cipher ? handleCustomConnection : handleConnection;
   /** Use authorized method first */
   methodList.sort((pre, next) => next.method - pre.method);
   const httpService = await startDefaultServer([...koaMiddlewareList], {port});
@@ -36,7 +38,7 @@ export async function runSocksServerOnHttp(config: HttpServerConfig) {
         'Connection: Upgrade\r\n' +
         '\r\n'
     );
-    const connectStatus = await handleConnection(socket as Socket, methodList, proxyAsSocketClientConfigList);
+    const connectStatus = await handleConnectionFinal(socket as Socket, methodList, proxyAsSocketClientConfigList);
     onConnection(connectStatus);
     pushConnectStatus(connectStatus);
   });
