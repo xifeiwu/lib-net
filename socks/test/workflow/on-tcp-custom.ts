@@ -7,9 +7,8 @@ import {
   writeDataByInterval,
 } from '../../external';
 import {runSocksServerOnSocket} from '../../server-on-socket';
-import {getSocketInfo} from '../../service';
+import {connectToSocksServer, getSocketInfo} from '../../service';
 import {EMethod} from '../../service/types';
-import {connectToCustomSocksServer} from '../../protocol-custom';
 
 const colors: {
   targetServer: LogColors;
@@ -65,7 +64,7 @@ export async function start() {
     },
   });
   logWithColor(colors.socksServer, `socks server port: ${socksService.port}`);
-  const clientStatus = await connectToCustomSocksServer({
+  const clientStatus = await connectToSocksServer({
     cipher: {},
     methodList: [
       {method: EMethod.NoAuth},

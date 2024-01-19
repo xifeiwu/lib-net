@@ -19,6 +19,7 @@ import {
   SocksStatusOnClientSide,
   ClientConfig,
 } from './types';
+import {connectToCustomSocksServer} from '../protocol-custom';
 
 /**
  * Connect to socks server by socket from tcp connect or http upgrade
@@ -28,7 +29,10 @@ import {
  * Close socket on socket error events of any error thrown during the logic process
  */
 export async function connectToSocksServer(config: ClientConfig) {
-  const {socketConfig, httpUrl, methodList, targetServiceInfo: target} = config;
+  const {cipher, socketConfig, httpUrl, methodList, targetServiceInfo: target} = config;
+  if (cipher) {
+    return connectToCustomSocksServer(config);
+  }
   /** Use authorized method first */
   methodList.sort((pre, next) => next.method - pre.method);
   const status: SocksStatusOnClientSide = {

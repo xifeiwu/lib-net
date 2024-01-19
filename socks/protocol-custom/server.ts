@@ -3,7 +3,7 @@ import {waitConectionInfo, replyTargetServiceInfo} from './utils';
 
 import {deepClone, deepEqual} from '../external';
 import {Socket, isIP} from 'net';
-import {connectToSocksServer} from './client';
+// import {connectToSocksServer} from './client';
 import {pipeline} from 'stream';
 import {
   EMethod,
@@ -15,7 +15,7 @@ import {
   TargetServiceInfo,
   UserPassInfo,
 } from '../service/types';
-import {getMatchedProxyConfig} from '../service';
+import {connectToSocksServer, getMatchedProxyConfig} from '../service';
 import {ERRORS, createError, getAddressType} from '../service/protocol';
 import {getCipher, getDcipher} from './cipher';
 

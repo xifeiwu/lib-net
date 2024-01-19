@@ -62,9 +62,10 @@ export interface MatchItem {
   port: number;
 }
 /** proxy to another socks server when address/port meets condition in matches list */
-export interface ProxyAsSocksClientConfig extends Pick<ClientConfig, 'targetServiceInfo'> {
+export interface ProxyAsSocksClientConfig extends Omit<ClientConfig, 'targetServiceInfo'> {
   matches: Array<MatchItem | string | RegExp>;
 }
+
 
 export interface CommonServerConfig {
   methodList: Array<MethodAuthInfo>;
