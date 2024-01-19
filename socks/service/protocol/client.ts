@@ -1,6 +1,6 @@
 import {Readable, Writable} from 'stream';
 import {ERRORS, address2Buffer, bufferToTargeServiceInfo, createError, port2Buffer} from './utils';
-import {EMethod, ETargetServiceConnectState, ConnectServiceInfo, TargetServiceInfo} from './types';
+import {EMethod, ETargetServiceConnectState, TargetServiceInfo} from './types';
 import {toBuffer} from '../../external';
 
 /**
@@ -152,7 +152,7 @@ export async function waitUsernamePasswordAuthResultReplied(reader: Readable) {
  *     o  DST.ADDR       desired destination address
  * o  DST.PORT desired destination port in network octet order
  */
-export async function sendTargetServiceInfo(writer: Writable, info: ConnectServiceInfo) {
+export async function sendTargetServiceInfo(writer: Writable, info: TargetServiceInfo) {
   const {command, addressType, address, port} = info;
   return new Promise<void>(async (res, rej) => {
     // const high = (port >> 8) & 0xff;

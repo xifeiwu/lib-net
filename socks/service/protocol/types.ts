@@ -31,12 +31,10 @@ export enum EAddressType {
 }
 
 export interface TargetServiceInfo {
-  addressType: EAddressType;
+  command?: ECommand;
+  addressType?: EAddressType;
   address: string;
   port: number;
-}
-export interface ConnectServiceInfo extends TargetServiceInfo {
-  command: ECommand;
 }
 
 /**

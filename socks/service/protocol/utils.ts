@@ -1,5 +1,5 @@
 import net from 'net';
-import {ConnectServiceInfo, EAddressType} from './types';
+import {TargetServiceInfo, EAddressType} from './types';
 import {toBuffer} from '../../external';
 
 export const ERRORS = {
@@ -113,7 +113,7 @@ export function port2Buffer(port: number) {
   return toBuffer([high, low]);
 }
 
-export function bufferToTargeServiceInfo(buf: Buffer): Omit<ConnectServiceInfo, 'command'> {
+export function bufferToTargeServiceInfo(buf: Buffer): Omit<TargetServiceInfo, 'command'> {
   const [addressType] = buf;
   const remainBuffer = buf.subarray(1);
   if (!Object.values(EAddressType).includes(addressType)) {

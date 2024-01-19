@@ -12,7 +12,7 @@ import {
 } from './protocol';
 import {getMatchedProxyConfig, getFailState} from './utils';
 import {
-  ConnectServiceInfo,
+  TargetServiceInfo,
   SocksStatusOnServerSide,
   EMethod,
   ESocksState,
@@ -99,7 +99,7 @@ export async function handleConnection(
       });
       socket2Service = proxyAsClientStatus.socket;
     } else {
-      const replyServiceInfo = deepClone<ConnectServiceInfo>(targetServiceInfo);
+      const replyServiceInfo = deepClone<TargetServiceInfo>(targetServiceInfo);
 
       const isDomain = isIP(targetServiceInfo.address) === 0;
       if (isDomain) {

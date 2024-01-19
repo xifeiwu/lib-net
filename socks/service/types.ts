@@ -1,5 +1,5 @@
 import {ServerOpts, Socket, TcpNetConnectOpts} from 'net';
-import { ConnectServiceInfo, EMethod, MethodAuthInfo, TargetServiceInfo } from './protocol/types';
+import {TargetServiceInfo, EMethod, MethodAuthInfo} from './protocol/types';
 export * from './protocol/types';
 
 export enum ESocksState {
@@ -33,12 +33,12 @@ export enum ESocksState {
 }
 
 export interface ClientConfig {
-  methodList: Array<MethodAuthInfo>;
   /** get tcp connection by net.createConnection */
   socketConfig?: TcpNetConnectOpts;
   /** get tcp connection by http upgrade */
   httpUrl?: string;
-  targetServiceInfo: Pick<ConnectServiceInfo, 'address' | 'port'>;
+  methodList: Array<MethodAuthInfo>;
+  targetServiceInfo: TargetServiceInfo;
 }
 
 export interface SocksStatusOnClientSide {
@@ -83,7 +83,7 @@ export interface SocketServerConfig extends CommonServerConfig {
   /** start a http server to expose status of socks server by this config */
   httpServerConfig?: {
     port: number;
-  },
+  };
 }
 
 export interface HttpServerConfig extends CommonServerConfig {

@@ -1,6 +1,6 @@
 import {Readable, Writable} from 'stream';
 import {ERRORS, address2Buffer, bufferToTargeServiceInfo, createError, port2Buffer} from './utils';
-import {EMethod, ETargetServiceConnectState, ConnectServiceInfo, EAddressType} from './types';
+import {EMethod, ETargetServiceConnectState, TargetServiceInfo, EAddressType} from './types';
 import {toBuffer} from '../../external';
 
 /**
@@ -143,7 +143,7 @@ export async function replyUsernamePasswordAuthResult(writer: Writable, success:
  */
 export async function waitTargetServiceInfo(reader: Readable) {
   reader.resume();
-  return new Promise<ConnectServiceInfo>((res, rej) => {
+  return new Promise<TargetServiceInfo>((res, rej) => {
     reader.once('data', (chunk: Buffer) => {
       reader.pause();
       const [version, command, _reserve] = chunk;
@@ -190,12 +190,12 @@ export async function replyTargetServiceInfo(
   writer: Writable,
   state: {
     reply: ETargetServiceConnectState;
-    addressType: EAddressType;
+    addressType?: EAddressType;
     address: string;
     port: number;
   }
 ) {
-  const {reply, addressType, address, port} = state;
+  const {reply, addressType = EAddressType.IPV4, address, port} = state;
   return new Promise<void>((res, rej) => {
     if (!writer.writable) {
       return rej(createError(ERRORS.SocketUnWritable));
