@@ -42,9 +42,14 @@ export async function handleConnection(
 ) {
   // socket.pause();
   const status: SocksStatusOnServerSide = {
-    state: ESocksState.connected,
+    state: ESocksState.initial,
     socket,
   };
+  // function setStatusState(state: ESocksState) {
+  //   if (status.state === undefined) {
+  //     status.state = state;
+  //   }
+  // }
   try {
     status.state = ESocksState.method_negotiation;
     const method = await waitMethod(
@@ -123,13 +128,13 @@ export async function handleConnection(
       try {
         socket2Service = await new Promise((res, rej) => {
           const socket = new Socket();
-          socket.on('connect', () => {
+          socket.once('connect', () => {
             res(socket);
           });
-          socket.on('error', err => {
+          socket.once('error', err => {
             rej(ETargetServiceConnectState.general_SOCKS_server_failure);
           });
-          socket.on('timeout', err => {
+          socket.once('timeout', err => {
             rej(ETargetServiceConnectState.general_SOCKS_server_failure);
           });
           socket.connect({
@@ -152,20 +157,11 @@ export async function handleConnection(
       });
     }
     status.state = ESocksState.connect_to_targer_service_success;
-    pipeline(socket, socket2Service, err => {
-      status.state = ESocksState.connect_between_targer_service_fail;
-      status.error = err;
-    });
-    pipeline(socket2Service, socket, err => {
-      status.state = ESocksState.connect_between_targer_service_fail;
-      status.error = err;
-    });
-    socket.resume();
     status.socket2Service = socket2Service;
-    status.state = ESocksState.success;
     socket2Service.once('close', () => {
       status.state = ESocksState.finsih;
     });
+    // useful or not?
     socket2Service.once('error', err => {
       status.state = ESocksState.connect_to_targer_service_fail;
       if (socket2Service.writable) {
@@ -173,14 +169,32 @@ export async function handleConnection(
       }
       status.error = err;
     });
+    if (socket.writable && socket2Service.writable) {
+      pipeline(socket, socket2Service, err => {
+        status.state = ESocksState.socket_connect_between_client_target_fail;
+        status.error = err;
+      });
+      pipeline(socket2Service, socket, err => {
+        status.state = ESocksState.socket_connect_between_client_target_fail;
+        status.error = err;
+      });
+      socket.resume();
+      status.state = ESocksState.success;
+    } else {
+      if (!socket.writable) {
+        status.state = ESocksState.client_socket_unwritable;
+      } else {
+        status.state = ESocksState.target_socket_unwritable;
+      }
+    }
   } catch (err) {
     const {socket, socket2Service} = status;
     socket2Service && socket2Service.writable && socket2Service.end();
     socket && socket.writable && socket.end();
-    const failState = getFailState(status.state);
-    if (failState) {
-      status.state = failState;
-    }
+    // const failState = getFailState(status.state);
+    // if (failState) {
+    //   status.state = failState;
+    // }
     status.error = err;
   }
   return status;

@@ -21,10 +21,12 @@ export enum ESocksState {
   /** end of client only */
   /** server only */
   wait_targer_service_info = 'waiting target service info',
-  connect_to_targer_service = 'connect target service success',
+  connect_to_targer_service = 'connect target service',
   connect_to_targer_service_success = 'connect target service success',
   connect_to_targer_service_fail = 'connect target service fail',
-  connect_between_targer_service_fail = 'connect between target service fail',
+  socket_connect_between_client_target_fail = 'socket connect between client and target fail',
+  client_socket_unwritable = 'origin socket unwritable',
+  target_socket_unwritable = 'target socket unwritable',
   /** end of server only */
   success = 'success',
   finsih = 'finish',
@@ -40,7 +42,7 @@ export interface ClientConfig {
 }
 
 export interface SocksStatusOnClientSide {
-  state: ESocksState;
+  state?: ESocksState;
   method?: EMethod;
   targetServiceInfo?: TargetServiceInfo;
   replyServiceInfo?: TargetServiceInfo;

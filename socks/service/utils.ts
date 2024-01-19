@@ -8,7 +8,7 @@ import {
   ProxyAsSocksClientConfig,
   TargetServiceInfo,
 } from './types';
-import { isString } from '../../node';
+import {isString} from '../../node';
 
 export const upgradeProtocol = 'socks5';
 
@@ -112,14 +112,17 @@ export function getConnectStatusInJson(status?: SocksStatusOnServerSide) {
   const results = {
     ...status,
     socket: getSocketInfo(socket),
-    socket2Service: getSocketInfo(socket2Service),
   };
+  if (socket2Service) {
+    // @ts-ignore
+    results.socket2Service = getSocketInfo(socket2Service);
+  }
   if (error) {
     results.error = {
       name: error.name,
       message: error.message,
       stack: error.stack,
-    }
+    };
   }
   if (proxyAsClientStatus) {
     // @ts-ignore
