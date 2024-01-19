@@ -24,7 +24,7 @@ export enum ESocksState {
   connect_to_targer_service = 'connect target service success',
   connect_to_targer_service_success = 'connect target service success',
   connect_to_targer_service_fail = 'connect target service fail',
-  connecting_fail = 'fail connecting',
+  connect_between_targer_service_fail = 'connect between target service fail',
   /** end of server only */
   success = 'success',
   finsih = 'finish',

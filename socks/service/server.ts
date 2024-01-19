@@ -32,6 +32,8 @@ import {pipeline} from 'stream';
  * @param methodList auth method supported
  * @param proxyAsSocketClientConfigList proxy the socket to a new socket which connect to a new socks server
  * @returns
+ * Notice:
+ * Close socket on socket error events of any error thrown during the logic process
  */
 export async function handleConnection(
   socket: Socket,
@@ -150,34 +152,30 @@ export async function handleConnection(
       });
     }
     status.state = ESocksState.connect_to_targer_service_success;
-    if (socket.writable && socket2Service.writable) {
-      // socket.pipe(socket2Service).pipe(socket);
-      pipeline(socket, socket2Service, err => {
-        status.state = ESocksState.connecting_fail;
-        status.error = err;
-      });
-      pipeline(socket2Service, socket, err => {
-        status.state = ESocksState.connecting_fail;
-        status.error = err;
-      });
-      socket.resume();
-    } else {
-      socket.writable && socket.end();
-      socket2Service.writable && socket2Service.end();
-    }
+    pipeline(socket, socket2Service, err => {
+      status.state = ESocksState.connect_between_targer_service_fail;
+      status.error = err;
+    });
+    pipeline(socket2Service, socket, err => {
+      status.state = ESocksState.connect_between_targer_service_fail;
+      status.error = err;
+    });
+    socket.resume();
     status.socket2Service = socket2Service;
     status.state = ESocksState.success;
     socket2Service.on('close', () => {
       status.state = ESocksState.finsih;
     });
     socket2Service.on('error', err => {
-      // status.state = ESocksState.finsih;
+      status.state = ESocksState.connect_to_targer_service_fail;
       if (socket2Service.writable) {
         socket2Service.end();
       }
       status.error = err;
     });
   } catch (err) {
+    const {socket, socket2Service} = status;
+    socket2Service.writable && socket2Service.end();
     socket.writable && socket.end();
     const failState = getFailState(status.state);
     if (failState) {

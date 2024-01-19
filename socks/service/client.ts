@@ -8,9 +8,8 @@ import {
   sendTargetServiceInfo,
   sendUsernamePassword,
   waitTargetServiceInfoReplied,
-  upgradeProtocol,
-  getFailState,
-} from './';
+} from './protocol';
+import {upgradeProtocol, getFailState} from './utils';
 import {
   ECommand,
   EMethod,
@@ -21,6 +20,13 @@ import {
   ClientConfig,
 } from './types';
 
+/**
+ * Connect to socks server by socket from tcp connect or http upgrade
+ * @param config
+ * @returns
+ * NOTICE:
+ * Close socket on socket error events of any error thrown during the logic process
+ */
 export async function connectToSocksServer(config: ClientConfig) {
   const {socketConfig, httpUrl, methodList, targetServiceInfo: target} = config;
   /** Use authorized method first */
