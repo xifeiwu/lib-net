@@ -8,7 +8,7 @@ export function exposeStatusByHttp() {
   const connectStatusList: SocksStatusOnServerSide[] = [];
   function pushConnectStatus(status: SocksStatusOnServerSide) {
     if (connectStatusList.length > maxStatusLength) {
-      connectStatusList.splice(0, 500);
+      connectStatusList.splice(0, Math.ceil(maxStatusLength / 4));
     }
     connectStatusList.push(status);
   }

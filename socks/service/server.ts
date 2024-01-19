@@ -163,10 +163,10 @@ export async function handleConnection(
     socket.resume();
     status.socket2Service = socket2Service;
     status.state = ESocksState.success;
-    socket2Service.on('close', () => {
+    socket2Service.once('close', () => {
       status.state = ESocksState.finsih;
     });
-    socket2Service.on('error', err => {
+    socket2Service.once('error', err => {
       status.state = ESocksState.connect_to_targer_service_fail;
       if (socket2Service.writable) {
         socket2Service.end();
@@ -175,8 +175,8 @@ export async function handleConnection(
     });
   } catch (err) {
     const {socket, socket2Service} = status;
-    socket2Service.writable && socket2Service.end();
-    socket.writable && socket.end();
+    socket2Service && socket2Service.writable && socket2Service.end();
+    socket && socket.writable && socket.end();
     const failState = getFailState(status.state);
     if (failState) {
       status.state = failState;

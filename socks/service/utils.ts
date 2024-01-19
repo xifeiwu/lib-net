@@ -108,12 +108,19 @@ export function getConnectStatusInJson(status?: SocksStatusOnServerSide) {
   if (!status) {
     return null;
   }
-  const {socket, socket2Service, proxyAsClientStatus} = status;
+  const {error, socket, socket2Service, proxyAsClientStatus} = status;
   const results = {
     ...status,
     socket: getSocketInfo(socket),
     socket2Service: getSocketInfo(socket2Service),
   };
+  if (error) {
+    results.error = {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    }
+  }
   if (proxyAsClientStatus) {
     // @ts-ignore
     results.proxyAsClientStatus = getConnectStatusInJson(proxyAsClientStatus);
