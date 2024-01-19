@@ -100,10 +100,10 @@ export async function connectToSocksServer(config: ClientConfig) {
   } catch (err) {
     const {socket} = status;
     socket && socket.writable && socket.end();
-    const failState = getFailState(status.state);
-    if (failState) {
-      status.state = failState;
-    }
+    // const failState = getFailState(status.state);
+    // if (failState) {
+    //   status.state = failState;
+    // }
     status.error = err;
   }
   return status;

@@ -82,6 +82,11 @@ export function getMatchedProxyConfig(
   return null;
 }
 
+/**
+ * @deprecated maybe not used
+ * @param lastState
+ * @returns
+ */
 export function getFailState(lastState: ESocksState) {
   let failState: ESocksState;
   switch (lastState) {
