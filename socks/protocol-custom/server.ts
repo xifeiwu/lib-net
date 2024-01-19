@@ -49,6 +49,7 @@ export async function handleCustomConnection(
   try {
     status.state = ESocksState.wait_targer_service_info;
     const {iv, auth, targetServiceInfo} = await waitConectionInfo(socket);
+    status.iv = iv;
     const authSuccess = deepEqual(authMethod.info, auth);
     if (!authSuccess) {
       throw createError(ERRORS.username_password_auth_fail);

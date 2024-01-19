@@ -25,6 +25,7 @@ import {deepClone, deepEqual} from '../external';
 import {Socket, isIP} from 'net';
 import {connectToSocksServer} from './client';
 import {pipeline} from 'stream';
+import {getCipher, getDcipher} from '../protocol-custom/cipher';
 
 /**
  * Handle new connection on sock server side
@@ -170,14 +171,28 @@ export async function handleConnection(
       status.error = err;
     });
     if (socket.writable && socket2Service.writable) {
-      pipeline(socket, socket2Service, err => {
-        status.state = ESocksState.socket_connect_between_client_target_fail;
-        status.error = err;
-      });
-      pipeline(socket2Service, socket, err => {
-        status.state = ESocksState.socket_connect_between_client_target_fail;
-        status.error = err;
-      });
+      const {proxyAsClientStatus} = status;
+      if (proxyAsClientStatus && proxyAsClientStatus.iv) {
+        const {cipher} = getCipher(status.proxyAsClientStatus.iv);
+        const dcipher = getDcipher(status.proxyAsClientStatus.iv);
+        pipeline(socket, cipher, socket2Service, err => {
+          status.state = ESocksState.socket_connect_between_client_target_fail;
+          status.error = err;
+        });
+        pipeline(socket2Service, dcipher, socket, err => {
+          status.state = ESocksState.socket_connect_between_client_target_fail;
+          status.error = err;
+        });
+      } else {
+        pipeline(socket, socket2Service, err => {
+          status.state = ESocksState.socket_connect_between_client_target_fail;
+          status.error = err;
+        });
+        pipeline(socket2Service, socket, err => {
+          status.state = ESocksState.socket_connect_between_client_target_fail;
+          status.error = err;
+        });
+      }
       socket.resume();
       status.state = ESocksState.success;
     } else {

@@ -75,6 +75,7 @@ export async function connectToCustomSocksServer(config: ClientConfig) {
     status.replyServiceInfo = replyServiceInfo;
     socket.resume();
     status.socket = socket;
+    status.iv = iv;
     status.state = ESocksState.success;
   } catch (err) {
     const {socket} = status;

@@ -12,7 +12,6 @@ import {
 } from '../service/protocol';
 import {decript, encrypt, ivLength} from './cipher';
 import {BinaryLike} from 'crypto';
-import {toConsole} from '../../node';
 
 /**
  * +----+------+----------+------+----------+
@@ -94,7 +93,6 @@ export async function waitConectionInfo(reader: Readable) {
       const version = chunk[baseIndex];
       baseIndex += 1;
       const iv = chunk.subarray(baseIndex, baseIndex + ivLength);
-      toConsole(iv);
       baseIndex += ivLength;
       const buffer = decript(chunk.subarray(baseIndex), iv);
       baseIndex = 0;

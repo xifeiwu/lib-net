@@ -1,6 +1,7 @@
 import {ServerOpts, Socket, TcpNetConnectOpts} from 'net';
 import {TargetServiceInfo, EMethod, MethodAuthInfo} from './protocol/types';
 import {CustomProtocol} from '../protocol-custom/types';
+import {BinaryLike} from 'crypto';
 export * from './protocol/types';
 
 export enum ESocksState {
@@ -44,6 +45,7 @@ export interface ClientConfig extends CustomProtocol {
 
 export interface SocksStatusOnClientSide {
   state?: ESocksState;
+  iv?: BinaryLike;
   method?: EMethod;
   targetServiceInfo?: TargetServiceInfo;
   replyServiceInfo?: TargetServiceInfo;
@@ -65,7 +67,6 @@ export interface MatchItem {
 export interface ProxyAsSocksClientConfig extends Omit<ClientConfig, 'targetServiceInfo'> {
   matches: Array<MatchItem | string | RegExp>;
 }
-
 
 export interface CommonServerConfig {
   methodList: Array<MethodAuthInfo>;
