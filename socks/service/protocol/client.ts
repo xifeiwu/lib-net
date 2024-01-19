@@ -157,7 +157,7 @@ export async function sendTargetServiceInfo(writer: Writable, info: TargetServic
   return new Promise<void>(async (res, rej) => {
     // const high = (port >> 8) & 0xff;
     // const low = port & 0xff;
-    const buffer = await toBuffer([
+    const buffer = toBuffer([
       5,
       command,
       0,
