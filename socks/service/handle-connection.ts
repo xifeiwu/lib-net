@@ -178,6 +178,7 @@ export async function handleConnection(
       status.error = err;
     });
   } catch (err) {
+    socket.writable && socket.end();
     const failState = getFailState(status.state);
     if (failState) {
       status.state = failState;
