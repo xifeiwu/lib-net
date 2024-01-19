@@ -3,7 +3,7 @@ import {checkPort, upgradeProtocol} from './service';
 import {HttpServerConfig} from './service/types';
 import {startDefaultServer} from '../koa';
 import {getHttpIncomingMessageInfo} from './external';
-import {handleConnection} from './service/handle-connection';
+import {handleConnection} from './service/server';
 import {exposeStatusByHttp} from './service/http-server';
 
 /**

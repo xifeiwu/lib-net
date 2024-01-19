@@ -3,7 +3,7 @@ import {checkPort, getInfoFromFirstChunk} from './service';
 import {SocketServerConfig} from './service/types';
 import {startDefaultServer} from '../koa';
 import {getAFreePort, isNumber, startSocketClient} from './external';
-import {handleConnection} from './service/handle-connection';
+import {handleConnection} from './service/server';
 import {exposeStatusByHttp} from './service/http-server';
 
 /**
