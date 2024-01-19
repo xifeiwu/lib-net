@@ -2,7 +2,7 @@ import {getAFreePort, handleSocketEvents, logWithColor, writeDataByInterval} fro
 import {runSocksServerOnSocket} from '../../server-on-socket';
 import {getSocketInfo} from '../../service';
 import {EMethod} from '../../service/types';
-import {connectToSocksServer} from '../../client';
+import {connectToSocksServer} from '../../service/client';
 import {colors, targetServerInfo} from './utils';
 
 export async function start() {

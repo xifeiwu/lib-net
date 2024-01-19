@@ -10,7 +10,7 @@ import {
 } from '../../external';
 import {getSocketInfo} from '../../service';
 import {EMethod} from '../../service/types';
-import {connectToSocksServer} from '../../client';
+import {connectToSocksServer} from '../../service/client';
 import {runSocksServerOnHttp} from '../../server-on-http';
 
 const colors: {

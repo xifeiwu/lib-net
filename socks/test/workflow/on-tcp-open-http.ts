@@ -10,7 +10,7 @@ import {
 import {runSocksServerOnSocket} from '../../server-on-socket';
 import {getSocketInfo} from '../../service';
 import {EMethod} from '../../service/types';
-import {connectToSocksServer} from '../../client';
+import {connectToSocksServer} from '../../service/client';
 import assert from 'assert';
 
 const colors: {

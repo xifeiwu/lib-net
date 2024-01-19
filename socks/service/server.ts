@@ -23,7 +23,7 @@ import {
 } from './types';
 import {deepClone, deepEqual} from '../external';
 import {Socket, isIP} from 'net';
-import {connectToSocksServer} from '../client';
+import {connectToSocksServer} from './client';
 import {pipeline} from 'stream';
 
 /**

@@ -1,5 +1,5 @@
 import {Socket} from 'net';
-import {requestAndGetUpgradeInfo, startSocketClient} from './external';
+import {requestAndGetUpgradeInfo, startSocketClient} from '../external';
 import {
   getAddressType,
   waitMethodReplied,
@@ -10,7 +10,7 @@ import {
   waitTargetServiceInfoReplied,
   upgradeProtocol,
   getFailState,
-} from './service';
+} from './';
 import {
   ECommand,
   EMethod,
@@ -19,7 +19,7 @@ import {
   TargetServiceInfo,
   SocksStatusOnClientSide,
   ClientConfig,
-} from './service/types';
+} from './types';
 
 export async function connectToSocksServer(config: ClientConfig) {
   const {socketConfig, httpUrl, methodList, targetServiceInfo: target} = config;
