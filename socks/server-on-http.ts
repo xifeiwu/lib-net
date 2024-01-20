@@ -5,7 +5,16 @@ import {startDefaultServer} from '../koa';
 import {getHttpIncomingMessageInfo} from './external';
 import {handleConnection} from './service/server';
 import {exposeStatusByHttp} from './service/http-server';
-import { handleCustomConnection } from './protocol-custom';
+import {handleCustomConnection} from './protocol-custom';
+
+/**
+ * used to catch error, such as:
+ * node Error: read ECONNRESET
+ */
+process.on('uncaughtException', function (err) {
+  console.log(err.stack);
+  console.log('NOT exit...');
+});
 
 /**
  * Start a http server, can use http upgrade socket to run socks protocol.
@@ -38,7 +47,11 @@ export async function runSocksServerOnHttp(config: HttpServerConfig) {
         'Connection: Upgrade\r\n' +
         '\r\n'
     );
-    const connectStatus = await handleConnectionFinal(socket as Socket, methodList, proxyAsSocketClientConfigList);
+    const connectStatus = await handleConnectionFinal(
+      socket as Socket,
+      methodList,
+      proxyAsSocketClientConfigList
+    );
     onConnection(connectStatus);
     pushConnectStatus(connectStatus);
   });

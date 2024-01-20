@@ -8,14 +8,24 @@ import {handleCustomConnection} from './protocol-custom';
 import {exposeStatusByHttp} from './service/http-server';
 
 /**
+ * used to catch error, such as:
+ * node Error: read ECONNRESET
+ */
+process.on('uncaughtException', function (err) {
+  console.log(err.stack);
+  console.log('NOT exit...');
+});
+
+/**
  * Start a tcp server as socks server, enable a http server to expose connection status.
  * @param config
  * @returns
  */
 export async function runSocksServerOnSocket(config: SocketServerConfig) {
-  const {cipher, methodList, serverConfig, httpServerConfig, onConnection, proxyAsSocketClientConfigList} = config;
+  const {cipher, methodList, serverConfig, httpServerConfig, onConnection, proxyAsSocketClientConfigList} =
+    config;
   await checkPort(serverConfig.port);
-  httpServerConfig && await checkPort(httpServerConfig.port);
+  httpServerConfig && (await checkPort(httpServerConfig.port));
   const {host = '0.0.0.0', port, options} = serverConfig ?? {};
   const socksServerPort = isNumber(port) ? port : await getAFreePort();
   /** Use authorized method first */
@@ -30,11 +40,15 @@ export async function runSocksServerOnSocket(config: SocketServerConfig) {
       // console.log(`protocol, chunk`);
       // console.log(protocol, chunk);
       if (protocol === 'socks5') {
-        socket.push(chunk);
+        socket.readable && socket.push(chunk);
         const connectStatus = await handleConnectionFinal(socket, methodList, proxyAsSocketClientConfigList);
-        onConnection(connectStatus);
-        // connectStatusList.push(connectStatus);
         httpServerConfig && pushConnectStatus(connectStatus);
+        try {
+          onConnection(connectStatus);
+        } catch (err) {
+          /** Ignore */
+        }
+        // connectStatusList.push(connectStatus);
       } else if (protocol === 'http' && httpService) {
         const socket2Http = await startSocketClient({
           host,

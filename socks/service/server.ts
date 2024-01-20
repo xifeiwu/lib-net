@@ -136,7 +136,7 @@ export async function handleConnection(
             rej(ETargetServiceConnectState.general_SOCKS_server_failure);
           });
           socket.once('timeout', err => {
-            rej(ETargetServiceConnectState.general_SOCKS_server_failure);
+            rej(ETargetServiceConnectState.TTL_expired);
           });
           socket.connect({
             host: replyServiceInfo.address,
