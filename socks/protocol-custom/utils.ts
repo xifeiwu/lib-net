@@ -42,7 +42,7 @@ import {BinaryLike} from 'crypto';
  * +----+-----+------+----------+------+----------+-----+-------+------+----------+----------+
  * |VER | IV  | ULEN |  UNAME   | PLEN |  PASSWD  | CMD |  RSV  | ATYP | DST.ADDR | DST.PORT |
  * +----+-----+------+----------+------+----------+-----+-------+------+----------+----------+
- * | 1  | 16  |  1   | 1 to 255 |  1   | 1 to 255 |  1  | X'00' |  1   | Variable |    2     |
+ * | 1  | iv  |  1   | 1 to 255 |  1   | 1 to 255 |  1  | X'00' |  1   | Variable |    2     |
  * +----+-----+------+----------+------+----------+-----+-------+------+----------+----------+
  */
 export async function sendConnectionInfo(writer: Writable, info: ConnectionInfo) {

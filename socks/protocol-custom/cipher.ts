@@ -1,13 +1,7 @@
-import {BinaryLike, createCipheriv, createDecipheriv, randomFillSync, scryptSync} from 'crypto';
+import {BinaryLike, randomFillSync} from 'crypto';
+import {Transform} from 'stream';
 
-const algorithm = 'aes-192-cbc';
-const password = 'Password used to generate key';
-const salt = 'the-salt';
-
-// const iv = randomFillSync(new Uint8Array(16));
-export const ivLength = 16;
-
-const key = scryptSync(password, salt, 24);
+export const ivLength = 1;
 
 export function getIv(ivLength: number) {
   return randomFillSync(new Uint8Array(ivLength));
@@ -16,24 +10,48 @@ export function getCipher(iv?: BinaryLike) {
   if (!iv) {
     iv = getIv(ivLength);
   }
-  const cipher = createCipheriv(algorithm, key, iv);
+  const cipher = new Transform({
+    transform(chunks, enc, cb) {
+      const output = Buffer.alloc(chunks.length);
+      for (let i = 0; i < chunks.length; i++) {
+        output[i] = chunks[i] ^ iv[0];
+      }
+      this.push(output);
+      cb && cb();
+    },
+  });
   return {cipher, iv};
 }
 
 export function getDcipher(iv: BinaryLike) {
-  const dcipher = createDecipheriv(algorithm, key, iv);
+  const dcipher = new Transform({
+    transform(chunks, enc, cb) {
+      const output = Buffer.alloc(chunks.length);
+      for (let i = 0; i < chunks.length; i++) {
+        output[i] = chunks[i] ^ iv[0];
+      }
+      this.push(output);
+      cb && cb();
+    },
+  });
   return dcipher;
 }
 
 export function encrypt(data: Buffer, iv?: BinaryLike) {
-  const {cipher} = getCipher(iv);
-  const p1 = cipher.update(data);
-  const p2 = cipher.final();
-  return {data: Buffer.concat([p1, p2]), iv};
+  if (!iv) {
+    iv = getIv(ivLength);
+  }
+  const output = Buffer.alloc(data.length);
+  for (let i = 0; i < data.length; i++) {
+    output[i] = data[i] ^ iv[0];
+  }
+  return {data: output, iv};
+  // const {cipher} = getCipher(iv);
 }
-export function decript(data: Buffer, iv: BinaryLike) {
-  const dcipher = getDcipher(iv);
-  const p1 = dcipher.update(data);
-  const p2 = dcipher.final();
-  return Buffer.concat([p1, p2]);
+export function decript(chunks: Buffer, iv: BinaryLike) {
+  const output = Buffer.alloc(chunks.length);
+  for (let i = 0; i < chunks.length; i++) {
+    output[i] = chunks[i] ^ iv[0];
+  }
+  return output;
 }
