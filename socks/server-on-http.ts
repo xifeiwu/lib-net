@@ -16,7 +16,7 @@ export async function runSocksServerOnHttp(config: HttpServerConfig) {
   const {cipher, methodList, serverConfig, onConnection, proxyAsSocketClientConfigList} = config;
   await checkPort(serverConfig.port);
   const {pushConnectStatus, koaMiddlewareList} = exposeStatusByHttp();
-  const {host = '127.0.0.1', port} = serverConfig ?? {};
+  const {port} = serverConfig ?? {};
   const handleConnectionFinal = cipher ? handleCustomConnection : handleConnection;
   /** Use authorized method first */
   methodList.sort((pre, next) => next.method - pre.method);

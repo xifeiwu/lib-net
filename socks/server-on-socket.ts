@@ -55,7 +55,7 @@ export async function runSocksServerOnSocket(config: SocketServerConfig) {
     server.listen(socksServerPort, host);
   });
   if (httpServerConfig) {
-    httpService = await startDefaultServer(koaMiddlewareList, {port: httpServerConfig.port});
+    httpService = await startDefaultServer(koaMiddlewareList, httpServerConfig);
   }
   return {
     socksService: {

@@ -8,6 +8,7 @@ import {getAFreePort, isNumber} from '../node';
 import errorCatchMiddleware from './error-catch';
 
 export interface CustomKoaServerOptions {
+  host?: string;
   port?: number;
   keys?: string[];
   sessionOptions?: Partial<session.opts>;
@@ -21,7 +22,7 @@ export async function startKoaServer(
   server: http.Server;
   app: Koa;
 }> {
-  let {port, keys, sessionOptions} = options;
+  let {host = '0.0.0.0', port, keys, sessionOptions} = options;
   const app = new Koa();
   if (Array.isArray(keys)) {
     app.keys = keys;
@@ -37,7 +38,7 @@ export async function startKoaServer(
   if (!port || !isNumber(port)) {
     port = await getAFreePort(3000);
   }
-  const server = app.listen(port);
+  const server = app.listen(port, host);
   return new Promise((res, rej) => {
     server.on('listening', () => {
       const url = `http://127.0.0.1:${port}`;

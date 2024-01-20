@@ -84,6 +84,7 @@ export interface SocketServerConfig extends CommonServerConfig, CustomProtocol {
   };
   /** start a http server to expose status of socks server by this config */
   httpServerConfig?: {
+    host?: string;
     port: number;
   };
 }
