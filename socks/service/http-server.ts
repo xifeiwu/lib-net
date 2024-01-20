@@ -2,7 +2,7 @@ import Koa from 'koa';
 import {SocksStatusOnServerSide} from './types';
 import {getConnectStatusInJson} from '.';
 
-const maxStatusLength = 2000;
+const maxStatusLength = 200;
 
 export function exposeStatusByHttp() {
   const connectStatusList: SocksStatusOnServerSide[] = [];
