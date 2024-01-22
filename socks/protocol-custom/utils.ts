@@ -1,14 +1,12 @@
 import {Readable, Writable} from 'stream';
 import {ConnectionInfo} from './types';
 import {toBuffer} from '../external';
-import {EAddressType, ECommand, ETargetServiceConnectState, TargetServiceInfo} from '../service/types';
+import {ECommand, ETargetServiceConnectState, TargetServiceInfo} from '../service/types';
 import {
   ERRORS,
-  address2Buffer,
   bufferToTargeServiceInfo,
   createError,
-  getAddressType,
-  port2Buffer,
+  targetServiceInfoToBuffer,
 } from '../service/protocol';
 import {decript, encrypt, ivLength} from './cipher';
 import {BinaryLike} from 'crypto';
@@ -50,9 +48,6 @@ export async function sendConnectionInfo(writer: Writable, info: ConnectionInfo)
   const {username, password} = auth;
   const {
     command = ECommand.CONNECT,
-    address,
-    port,
-    addressType = getAddressType(address),
   } = targetServiceInfo;
   return new Promise<void>(async (res, rej) => {
     const {data} = encrypt(
@@ -63,9 +58,7 @@ export async function sendConnectionInfo(writer: Writable, info: ConnectionInfo)
         password,
         command,
         0,
-        addressType,
-        address2Buffer(address, addressType),
-        port2Buffer(port),
+        targetServiceInfoToBuffer(targetServiceInfo)
       ]),
       iv
     );
@@ -154,19 +147,20 @@ export async function replyTargetServiceInfo(
   writer: Writable,
   state: {
     reply: ETargetServiceConnectState;
-    addressType?: EAddressType;
     address: string;
     port: number;
   },
   iv: BinaryLike
 ) {
-  const {reply, addressType = EAddressType.IPV4, address, port} = state;
+  const {reply, address, port} = state;
   return new Promise<void>((res, rej) => {
     if (!writer.writable) {
       return rej(createError(ERRORS.SocketUnWritable));
     }
     const {data} = encrypt(
-      toBuffer([5, reply, 0, addressType, address2Buffer(address, addressType), port2Buffer(port)]),
+      toBuffer([5, reply, 0, targetServiceInfoToBuffer({
+        address, port
+      })]),
       iv
     );
     writer.write(data, err => {

@@ -1,5 +1,5 @@
 import {Readable, Writable} from 'stream';
-import {ERRORS, address2Buffer, bufferToTargeServiceInfo, createError, port2Buffer} from './utils';
+import {ERRORS, bufferToTargeServiceInfo, createError, targetServiceInfoToBuffer} from './utils';
 import {EMethod, ETargetServiceConnectState, TargetServiceInfo} from './types';
 import {toBuffer} from '../../external';
 
@@ -30,6 +30,27 @@ export async function sendMethod(writer: Writable, methods: EMethod[]) {
     });
   });
 }
+export async function waitMethod(reader: Readable, supportedMethods: EMethod[]) {
+  reader.resume();
+  return new Promise<EMethod>((res, rej) => {
+    reader.once('data', (chunk: Buffer) => {
+      reader.pause();
+      const [version, count, ...methods] = chunk;
+      if (version !== 0x05) {
+        return rej(createError(ERRORS.InvalidSocksVersion));
+      }
+      if (count !== methods.length) {
+        return rej(createError(ERRORS.MethodCountNotCorrect));
+      }
+      const method = methods.find(it => supportedMethods.includes(it));
+      if (method !== undefined) {
+        res(method);
+      } else {
+        return rej(createError(ERRORS.invalid_methods));
+      }
+    });
+  });
+}
 
 /**
  * +----+--------+
@@ -44,7 +65,21 @@ export async function sendMethod(writer: Writable, methods: EMethod[]) {
  * o  X'80' to X'FE' RESERVED FOR PRIVATE METHODS
  * o  X'FF' NO ACCEPTABLE METHODS
  */
-export async function waitMethodReplied(reader: Readable, methods: EMethod[]) {
+export async function replyMethod(writer: Writable, method: EMethod) {
+  return new Promise<void>((res, rej) => {
+    if (!writer.writable) {
+      return rej(createError(ERRORS.SocketUnWritable));
+    }
+    writer.write(Buffer.from([5, method]), err => {
+      if (err) {
+        rej(err);
+      } else {
+        res();
+      }
+    });
+  });
+}
+export async function waitReplyMethod(reader: Readable, methods: EMethod[]) {
   reader.resume();
   return new Promise<EMethod>((res, rej) => {
     reader.once('data', (chunk: Buffer) => {
@@ -101,6 +136,29 @@ export async function sendUsernamePassword(
     });
   });
 }
+export async function waitUsernamePassword(reader: Readable) {
+  return new Promise<{
+    username: Buffer;
+    password: Buffer;
+  }>((res, rej) => {
+    reader.resume();
+    reader.once('data', (chunk: Buffer) => {
+      reader.pause();
+      const _version = chunk[0];
+      const usernameLength = chunk[1];
+      let baseIndex = 2;
+      const username = chunk.subarray(baseIndex, baseIndex + usernameLength);
+      baseIndex += usernameLength;
+      const passwordLength = chunk[baseIndex];
+      baseIndex += 1;
+      const password = chunk.subarray(baseIndex, baseIndex + passwordLength);
+      res({
+        username,
+        password,
+      });
+    });
+  });
+}
 
 /**
  * +----+--------+
@@ -111,7 +169,21 @@ export async function sendUsernamePassword(
  * A STATUS field of X'00' indicates success.
  * If the server returns a `failure' (STATUS value other than X'00') status, it MUST close the connection.
  */
-export async function waitUsernamePasswordAuthResultReplied(reader: Readable) {
+export async function replyUsernamePasswordAuth(writer: Writable, success: boolean) {
+  return new Promise<void>((res, rej) => {
+    if (!writer.writable) {
+      return rej(createError(ERRORS.SocketUnWritable));
+    }
+    writer.write(Buffer.from([1, success ? 0 : 1]), err => {
+      if (err) {
+        rej(err);
+      } else {
+        res();
+      }
+    });
+  });
+}
+export async function waitReplyUsernamePasswordAuth(reader: Readable) {
   reader.resume();
   return new Promise<void>((res, rej) => {
     reader.once('data', (chunk: Buffer) => {
@@ -155,15 +227,11 @@ export async function waitUsernamePasswordAuthResultReplied(reader: Readable) {
 export async function sendTargetServiceInfo(writer: Writable, info: TargetServiceInfo) {
   const {command, addressType, address, port} = info;
   return new Promise<void>(async (res, rej) => {
-    // const high = (port >> 8) & 0xff;
-    // const low = port & 0xff;
     const buffer = toBuffer([
       5,
       command,
       0,
-      addressType,
-      address2Buffer(address, addressType),
-      port2Buffer(port),
+      targetServiceInfoToBuffer(info),
     ]);
     if (!writer.writable) {
       return rej(createError(ERRORS.SocketUnWritable));
@@ -174,6 +242,28 @@ export async function sendTargetServiceInfo(writer: Writable, info: TargetServic
       } else {
         res();
       }
+    });
+  });
+}
+export async function waitTargetServiceInfo(reader: Readable) {
+  reader.resume();
+  return new Promise<TargetServiceInfo>((res, rej) => {
+    reader.once('data', (chunk: Buffer) => {
+      reader.pause();
+      const [version, command, _reserve] = chunk;
+      if (version !== 0x05) {
+        return rej(createError(ERRORS.InvalidSocksVersion));
+      }
+      const {addressType, address, port} = bufferToTargeServiceInfo(chunk.subarray(3));
+      if (address === undefined || port === undefined) {
+        return rej(createError('Can not get domain/port info'));
+      }
+      res({
+        command,
+        addressType,
+        address,
+        port,
+      });
     });
   });
 }
@@ -200,7 +290,34 @@ export async function sendTargetServiceInfo(writer: Writable, info: TargetServic
  *     o  RSV    RESERVED
  * o  ATYP   address type of following address
  */
-export async function waitTargetServiceInfoReplied(reader: Readable) {
+export async function replyTargetServiceInfo(
+  writer: Writable,
+  state: {
+    reply: ETargetServiceConnectState;
+    address: string;
+    port: number;
+  }
+) {
+  const {reply, address, port} = state;
+  return new Promise<void>((res, rej) => {
+    if (!writer.writable) {
+      return rej(createError(ERRORS.SocketUnWritable));
+    }
+    writer.write(
+      toBuffer([5, reply, 0, targetServiceInfoToBuffer({
+        address, port
+      })]),
+      err => {
+        if (err) {
+          rej(err);
+        } else {
+          res();
+        }
+      }
+    );
+  });
+}
+export async function waitReplyTargetServiceInfo(reader: Readable) {
   reader.resume();
   return new Promise<TargetServiceInfo>((res, rej) => {
     reader.once('data', (chunk: Buffer) => {

@@ -58,48 +58,21 @@ export function getAddressType(host: string): EAddressType {
   }
   return EAddressType.DOMAINNAME;
 }
-export function ip2Bytes(str: string) {
-  var type = net.isIP(str),
-    nums,
-    bytes,
-    i;
 
-  if (type === 4) {
-    nums = str.split('.', 4);
-    bytes = new Array(4);
-    for (i = 0; i < 4; ++i) {
-      if (isNaN((bytes[i] = +nums[i]))) throw new Error('Error parsing IP: ' + str);
-    }
-  } else if (type === 6) {
-    // var addr = new ipv6.Address(str),
-    //     b = 0,
-    //     group;
-    // if (!addr.valid)
-    //   throw new Error('Error parsing IP: ' + str);
-    // nums = addr.parsedAddress;
-    // bytes = new Array(16);
-    // for (i = 0; i < 8; ++i, b += 2) {
-    //   group = parseInt(nums[i], 16);
-    //   bytes[b] = group >>> 8;
-    //   bytes[b + 1] = group & 0xFF;
-    // }
+function address2Buffer(address: string, addressType?: EAddressType) {
+  if (!addressType) {
+    addressType = getAddressType(address);
   }
-  return bytes;
-}
-
-export function address2Buffer(address: string, addressType: EAddressType) {
-  // const type = net.isIP(address);
-  const type = addressType;
-  if (type === EAddressType.IPV4) {
+  if (addressType === EAddressType.IPV4) {
     const nums = address.split('.', 4);
     const bytes = new Array(4);
     for (let i = 0; i < 4; ++i) {
       if (isNaN((bytes[i] = +nums[i]))) throw new Error('Error parsing IP: ' + address);
     }
     return Buffer.from(bytes);
-  } else if (type === EAddressType.IPV6) {
+  } else if (addressType === EAddressType.IPV6) {
     throw new Error(`ipv6 not support yet`);
-  } else if (type === EAddressType.DOMAINNAME) {
+  } else if (addressType === EAddressType.DOMAINNAME) {
     const length = address.length;
     if (length > 255) {
       throw createError(ERRORS.MORE_THAN_255_BYTES);
@@ -107,13 +80,22 @@ export function address2Buffer(address: string, addressType: EAddressType) {
     return toBuffer([length, address]);
   }
 }
-export function port2Buffer(port: number) {
+function port2Buffer(port: number) {
   const high = (port >> 8) & 0xff;
   const low = port & 0xff;
   return toBuffer([high, low]);
 }
 
-export function bufferToTargeServiceInfo(buf: Buffer): Omit<TargetServiceInfo, 'command'> {
+export function targetServiceInfoToBuffer(targetServiceInfo: Omit<TargetServiceInfo, 'command'>): Buffer {
+  const {address, port} = targetServiceInfo;
+  let addressType = targetServiceInfo.addressType;
+  if (!addressType) {
+    addressType = getAddressType(address);
+  }
+  return toBuffer([addressType, address2Buffer(address), port2Buffer(port)]);
+}
+
+export function bufferToTargeServiceInfo(buf: Buffer): Required<Omit<TargetServiceInfo, 'command'>> {
   const [addressType] = buf;
   const remainBuffer = buf.subarray(1);
   if (!Object.values(EAddressType).includes(addressType)) {

@@ -10,7 +10,6 @@ import {
   UserPassInfo,
 } from '../service/types';
 import {upgradeProtocol} from '../service';
-import {getAddressType} from '../service/protocol/utils';
 import {sendConnectionInfo, waitTargetServiceInfoReplied} from './utils';
 import {getIv, ivLength} from './cipher';
 
@@ -60,7 +59,6 @@ export async function connectToCustomSocksServer(config: ClientConfig) {
     const targetServiceInfo: TargetServiceInfo = {
       address,
       port,
-      addressType: getAddressType(address),
     };
     await sendConnectionInfo(socket, {
       iv,

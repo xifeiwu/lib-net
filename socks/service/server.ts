@@ -2,7 +2,7 @@ import dns from 'dns';
 import {
   replyMethod,
   replyTargetServiceInfo,
-  replyUsernamePasswordAuthResult,
+  replyUsernamePasswordAuth,
   waitMethod,
   waitTargetServiceInfo,
   waitUsernamePassword,
@@ -77,7 +77,7 @@ export async function handleConnection(
       if (!authSuccess) {
         throw createError(ERRORS.username_password_auth_fail);
       }
-      await replyUsernamePasswordAuthResult(socket, authSuccess);
+      await replyUsernamePasswordAuth(socket, authSuccess);
       status.state = ESocksState.auth_username_password_success;
     }
     status.state = ESocksState.wait_targer_service_info;

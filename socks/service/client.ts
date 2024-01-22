@@ -1,13 +1,12 @@
 import {Socket} from 'net';
 import {requestAndGetUpgradeInfo, startSocketClient} from '../external';
 import {
-  getAddressType,
-  waitMethodReplied,
-  waitUsernamePasswordAuthResultReplied,
+  waitReplyMethod,
+  waitReplyUsernamePasswordAuth,
   sendMethod,
   sendTargetServiceInfo,
   sendUsernamePassword,
-  waitTargetServiceInfoReplied,
+  waitReplyTargetServiceInfo,
 } from './protocol';
 import {upgradeProtocol, getFailState} from './utils';
 import {
@@ -67,7 +66,7 @@ export async function connectToSocksServer(config: ClientConfig) {
       socket,
       methodList.map(it => it.method)
     );
-    const method = await waitMethodReplied(
+    const method = await waitReplyMethod(
       socket,
       methodList.map(it => it.method)
     );
@@ -80,7 +79,7 @@ export async function connectToSocksServer(config: ClientConfig) {
       };
       status.state = ESocksState.auth_username_password_start;
       await sendUsernamePassword(socket, methodInfo.info);
-      await waitUsernamePasswordAuthResultReplied(socket);
+      await waitReplyUsernamePasswordAuth(socket);
       status.state = ESocksState.auth_username_password_success;
     }
     {
@@ -88,7 +87,6 @@ export async function connectToSocksServer(config: ClientConfig) {
       const targetServiceInfo: TargetServiceInfo = {
         address,
         port,
-        addressType: getAddressType(address),
       };
       await sendTargetServiceInfo(socket, {
         command: ECommand.CONNECT,
@@ -96,7 +94,7 @@ export async function connectToSocksServer(config: ClientConfig) {
       });
       status.targetServiceInfo = targetServiceInfo;
     }
-    const replyServiceInfo = await waitTargetServiceInfoReplied(socket);
+    const replyServiceInfo = await waitReplyTargetServiceInfo(socket);
     status.replyServiceInfo = replyServiceInfo;
     socket.resume();
     status.socket = socket;
