@@ -13,17 +13,22 @@ export enum EMethod {
   NoAcceptable = 0xff,
 }
 
-export type MethodAuthInfo = {method: EMethod.NoAuth} | {method: EMethod.UserPass; info: UserPassInfo};
-
 export interface UserPassInfo {
   username: string;
   password: string;
 }
+export interface MethodUserPass {
+  method: EMethod.UserPass;
+  info: UserPassInfo;
+}
+export type MethodAuthInfo = {method: EMethod.NoAuth} | MethodUserPass;
+
 export enum ECommand {
   CONNECT = 0x01,
   BIND = 0x02,
   UDP = 0x03,
 }
+
 export enum EAddressType {
   IPV4 = 0x01,
   DOMAINNAME = 0x03,
