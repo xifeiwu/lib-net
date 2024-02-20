@@ -21,6 +21,9 @@ export function prettyConsoleAxiosError(err: AxiosError | Error, v1: boolean = t
       throw err;
     }
   } else {
+    if (!config) {
+      throw err;
+    }
     const {data} = config;
     if (request) {
       const {method, host, path, protocol} = request;
