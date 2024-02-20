@@ -1,6 +1,6 @@
 import http from 'http';
-import {logWithColor} from '../node';
-import {AxiosError} from 'axios';
+import {GeneralRequestConfig, logWithColor, toUrl} from '../node';
+import axios, {AxiosError, AxiosRequestConfig} from 'axios';
 
 export function prettyConsoleAxiosError(err: AxiosError | Error, v1: boolean = true) {
   if (v1 && !(err as AxiosError).isAxiosError) {
@@ -37,4 +37,29 @@ export function prettyConsoleAxiosError(err: AxiosError | Error, v1: boolean = t
   } else {
     logWithColor('red', 'No response');
   }
+}
+
+export type IRequestConfig = GeneralRequestConfig<AxiosRequestConfig>;
+
+/**
+ * generate custom axios request
+ */
+export function axiosRequestFactory(defaultConfig: IRequestConfig = {}) {
+  const instance = axios.create(defaultConfig);
+  return async function request<T>(requestConfig: IRequestConfig) {
+    const {url, urlParams, query} = requestConfig;
+    requestConfig.url = toUrl({
+      path: url,
+      params: urlParams,
+      query,
+    });
+    if (urlParams) {
+      delete requestConfig.urlParams;
+    }
+    try {
+      return await instance.request<T>(requestConfig);
+    } catch (err) {
+      throw err;
+    }
+  };
 }
