@@ -18,7 +18,7 @@ export async function startKoaServer(
   middlewareList: Koa.Middleware[] = [],
   options: CustomKoaServerOptions = {}
 ): Promise<{
-  url: string;
+  origin: string;
   port: number;
   server: http.Server;
   app: Koa;
@@ -42,10 +42,10 @@ export async function startKoaServer(
   const server = app.listen(port, host);
   return new Promise((res, rej) => {
     server.on('listening', () => {
-      const url = `http://127.0.0.1:${port}`;
-      printUrl && console.log(`http server start on ${url}`);
+      const origin = `http://127.0.0.1:${port}`;
+      printUrl && console.log(`http server start on ${origin}`);
       res({
-        url,
+        origin,
         port,
         server,
         app,
@@ -58,7 +58,10 @@ export async function startKoaServer(
 }
 
 /** A wrapper for startKoaServer, add two default koa middleware: cors, debug  */
-export async function startDefaultServer(middlewareList: Koa.Middleware[] = [], options: CustomKoaServerOptions = {}) {
+export async function startDefaultServer(
+  middlewareList: Koa.Middleware[] = [],
+  options: CustomKoaServerOptions = {}
+) {
   // @ts-ignore
   return await startKoaServer([cors(), ...middlewareList, debug], options);
 }
