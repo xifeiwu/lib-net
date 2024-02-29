@@ -75,5 +75,5 @@ export async function startDebugServer(
   return await startKoaServer([cors(), ...middlewareList, debug], options);
 }
 
-/** start a koa server with some basic feature: */
-export async function startBasicServer() {}
+/** start a koa server with all middlewares that this module have */
+export async function startFullFeatureServer() {}
