@@ -12,6 +12,7 @@ export interface CustomKoaServerOptions {
   port?: number;
   keys?: string[];
   sessionOptions?: Partial<session.opts>;
+  printUrl?: boolean;
 }
 export async function startKoaServer(
   middlewareList: Koa.Middleware[] = [],
@@ -22,7 +23,7 @@ export async function startKoaServer(
   server: http.Server;
   app: Koa;
 }> {
-  let {host = '0.0.0.0', port, keys, sessionOptions} = options;
+  let {host = '0.0.0.0', port, keys, sessionOptions, printUrl} = options;
   const app = new Koa();
   if (Array.isArray(keys)) {
     app.keys = keys;
@@ -42,7 +43,7 @@ export async function startKoaServer(
   return new Promise((res, rej) => {
     server.on('listening', () => {
       const url = `http://127.0.0.1:${port}`;
-      console.log(`server start on ${url}`);
+      printUrl && console.log(`http server start on ${url}`);
       res({
         url,
         port,
