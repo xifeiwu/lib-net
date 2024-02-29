@@ -14,6 +14,13 @@ export interface CustomKoaServerOptions {
   sessionOptions?: Partial<session.opts>;
   printUrl?: boolean;
 }
+
+/**
+ * Start a http server based on Koa
+ * @param middlewareList
+ * @param options
+ * @returns
+ */
 export async function startKoaServer(
   middlewareList: Koa.Middleware[] = [],
   options: CustomKoaServerOptions = {}
@@ -42,8 +49,8 @@ export async function startKoaServer(
   const server = app.listen(port, host);
   return new Promise((res, rej) => {
     server.on('listening', () => {
-      const origin = `http://127.0.0.1:${port}`;
-      printUrl && console.log(`http server start on ${origin}`);
+      const origin = `http://${host}:${port}`;
+      printUrl && console.log(`http server started on ${origin}`);
       res({
         origin,
         port,
@@ -57,11 +64,16 @@ export async function startKoaServer(
   });
 }
 
-/** A wrapper for startKoaServer, add two default koa middleware: cors, debug  */
-export async function startDefaultServer(
+/**
+ * A http server mainly used for debug, with two koa middleware: cors, debug.
+ */
+export async function startDebugServer(
   middlewareList: Koa.Middleware[] = [],
   options: CustomKoaServerOptions = {}
 ) {
   // @ts-ignore
   return await startKoaServer([cors(), ...middlewareList, debug], options);
 }
+
+/** start a koa server with some basic feature: */
+export async function startBasicServer() {}

@@ -1,5 +1,5 @@
 import {deepEqual, requestAndGetResponseInfo, requestAndGetUpgradeInfo, toUrl, uuid} from '../../node';
-import {startDefaultServer} from '../server';
+import {startDebugServer} from '../server';
 import {users, posts} from './mock-data';
 import middlewareForum, {handleUpgrade} from './index';
 import assert from 'assert';
@@ -14,7 +14,7 @@ import {WebSocket} from 'ws';
 export async function getPosts() {
   // const [, secondUser] = users;
   const url = `${prefix}/posts`;
-  const {url: href, server} = await startDefaultServer([
+  const {url: href, server} = await startDebugServer([
     async (ctx, next) => {
       const {url} = ctx;
       // console.log(url);
@@ -34,7 +34,7 @@ export async function getPosts() {
 export async function getPostById() {
   const [, secondPost] = posts;
   const pathname = `${prefix}/posts/:postId`;
-  const {url: href, server} = await startDefaultServer([middlewareForum]);
+  const {url: href, server} = await startDebugServer([middlewareForum]);
   {
     const {statusCode, headers, data} = await requestAndGetResponseInfo({
       url: href,
@@ -67,7 +67,7 @@ export async function getPostById() {
 
 export async function postPost() {
   const pathname = `${prefix}/posts`;
-  const {url: href, server} = await startDefaultServer([middlewareForum]);
+  const {url: href, server} = await startDebugServer([middlewareForum]);
   /** data is not passed */
   {
     const {statusCode, headers, data} = await requestAndGetResponseInfo(
@@ -120,7 +120,7 @@ export async function postPost() {
 
 export async function testValidate() {
   const pathname = `${prefix}/posts`;
-  const {url: href, server} = await startDefaultServer([middlewareForum]);
+  const {url: href, server} = await startDebugServer([middlewareForum]);
   /** validate post payload */
   {
     const post: Post = {
@@ -157,7 +157,7 @@ export async function testValidate() {
 
 export async function patchPost() {
   const pathname = `${prefix}/posts`;
-  const {url, server} = await startDefaultServer([middlewareForum]);
+  const {url, server} = await startDebugServer([middlewareForum]);
   const [firstPost] = posts;
   firstPost.title = `modified: ${firstPost.title}`;
   /** data is not passed */
@@ -182,7 +182,7 @@ export async function patchPost() {
 
 export async function testReaction() {
   const pathname = `${prefix}/posts/:postId/reactions`;
-  const {url, server} = await startDefaultServer([middlewareForum]);
+  const {url, server} = await startDebugServer([middlewareForum]);
   const [firstPost] = posts;
   {
     const {id: postId} = firstPost;
@@ -212,7 +212,7 @@ export async function testReaction() {
 }
 
 export async function testWsNotification() {
-  const {url, server} = await startDefaultServer(
+  const {url, server} = await startDebugServer(
     [
       async (ctx, next) => {
         const {url} = ctx;
@@ -282,7 +282,7 @@ export async function testWsNotification() {
 
 /** start koa http server with forum middleware */
 export async function startForumServer() {
-  const {url, server} = await startDefaultServer(
+  const {url, server} = await startDebugServer(
     [
       async (ctx, next) => {
         const {url} = ctx;

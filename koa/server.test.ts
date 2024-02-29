@@ -1,11 +1,11 @@
 import http from 'http';
 import assert from 'assert';
-import {startDefaultServer} from './server';
+import {startDebugServer} from './server';
 import {getStreamData, requestAndGetResponse} from '../node';
 import middlewareForum from './forum';
 
 export async function testDebugEcho() {
-  const {url, server} = await startDefaultServer();
+  const {url, server} = await startDebugServer();
   const response = await requestAndGetResponse({
     url,
     path: '/api/debug/echo',
