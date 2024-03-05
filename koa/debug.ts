@@ -17,6 +17,7 @@ router.all('/echo', async (ctx, next) => {
   ctx.body = {
     method,
     path,
+    httpVersion: req.httpVersion,
     query,
     headers,
     data,
