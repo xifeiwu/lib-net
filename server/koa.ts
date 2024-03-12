@@ -1,11 +1,17 @@
-import cors from './cors';
-import log from './log';
-import debug from './debug';
 import http from 'http';
 import Koa from 'koa';
 import session from 'koa-session';
+import cors from '../koa-middleware/cors';
+import log from '../koa-middleware/log';
+import debug from '../koa-middleware/debug';
 import {getAFreePort, isNumber} from '../external';
-import errorCatchMiddleware from './error-catch';
+import errorCatchMiddleware from '../koa-middleware/error-catch';
+
+const middlewareMap = {
+  cors,
+  debug,
+};
+type MiddlewareName = keyof typeof middlewareMap;
 
 export interface CustomKoaServerOptions {
   host?: string;
@@ -22,7 +28,7 @@ export interface CustomKoaServerOptions {
  * @returns
  */
 export async function startKoaServer(
-  middlewareList: Koa.Middleware[] = [],
+  middlewareList: Array<Koa.Middleware | MiddlewareName> = [],
   options: CustomKoaServerOptions = {}
 ): Promise<{
   origin: string;
@@ -41,7 +47,11 @@ export async function startKoaServer(
     app.use(session(sessionOptions, app));
   }
   for (const middleware of middlewareList) {
-    app.use(middleware);
+    if (Object.prototype.hasOwnProperty.call(middlewareMap, middleware)) {
+      app.use(middlewareMap[middleware as MiddlewareName]);
+    } else {
+      app.use(middleware as Koa.Middleware);
+    }
   }
   if (!port || !isNumber(port)) {
     port = await getAFreePort(3000);
@@ -72,7 +82,7 @@ export async function startDebugServer(
   options: CustomKoaServerOptions = {}
 ) {
   // @ts-ignore
-  return await startKoaServer([cors(), ...middlewareList, debug], options);
+  return await startKoaServer(['cors', ...middlewareList, 'debug'], options);
 }
 
 /** start a koa server with all middlewares that this module have */

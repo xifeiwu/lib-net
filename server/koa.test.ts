@@ -1,13 +1,13 @@
 import http from 'http';
 import assert from 'assert';
-import {startDebugServer} from './server';
+import {startDebugServer} from './koa';
 import {getStreamData, requestAndGetResponse} from '../external';
-import middlewareForum from './forum';
+// import middlewareForum from './forum';
 
 export async function testDebugEcho() {
-  const {url, server} = await startDebugServer();
+  const {origin, server} = await startDebugServer();
   const response = await requestAndGetResponse({
-    url,
+    url: origin,
     path: '/api/debug/echo',
     method: 'post',
     headers: {
