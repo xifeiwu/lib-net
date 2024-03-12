@@ -1,7 +1,7 @@
 import KoaRouter from 'koa-router';
 import {notifications, posts, users} from './mock-data';
 import Koa from 'koa';
-import {formatDate, getStreamData, toBuffer, uuid} from '../../node';
+import {formatDate, getStreamData, toBuffer, uuid} from '../../external';
 import {Post} from './types/backend';
 import {postValidator, reactionValidator} from './rules';
 import {Reaction} from './types/frontend';

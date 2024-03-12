@@ -1,5 +1,5 @@
 import http from 'http';
-import {GeneralRequestConfig, logWithColor, toUrl} from '../node';
+import {GeneralRequestConfig, logWithColor, toUrl} from '../external';
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 
 export type IRequestConfig = GeneralRequestConfig<AxiosRequestConfig>;

@@ -8,7 +8,7 @@ import {
   ProxyAsSocksClientConfig,
   TargetServiceInfo,
 } from './types';
-import {isString} from '../../node';
+import {isString} from '../../external';
 
 export const upgradeProtocol = 'socks5';
 

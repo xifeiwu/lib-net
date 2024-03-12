@@ -1,4 +1,4 @@
-import {deepEqual, requestAndGetResponseInfo, requestAndGetUpgradeInfo, toUrl, uuid} from '../../node';
+import {deepEqual, requestAndGetResponseInfo, requestAndGetUpgradeInfo, toUrl, uuid} from '../../external';
 import {startDebugServer} from '../server';
 import {users, posts} from './mock-data';
 import middlewareForum, {handleUpgrade} from './index';

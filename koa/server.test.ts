@@ -1,7 +1,7 @@
 import http from 'http';
 import assert from 'assert';
 import {startDebugServer} from './server';
-import {getStreamData, requestAndGetResponse} from '../node';
+import {getStreamData, requestAndGetResponse} from '../external';
 import middlewareForum from './forum';
 
 export async function testDebugEcho() {

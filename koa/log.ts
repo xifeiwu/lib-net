@@ -1,5 +1,5 @@
 import Koa from 'koa';
-import {logWithColor} from '../node';
+import {logWithColor} from '../external';
 
 export default function(options: {
   prefix?: string;

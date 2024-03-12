@@ -2,10 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import zlib from 'zlib';
 import stream = require('stream');
-import {readDirRecursive} from '../node';
+import {readDirRecursive} from '../external';
 import Koa from 'koa';
-import {toStream} from '../node';
-import {compressible} from '../node';
+import {toStream} from '../external';
+import {compressible} from '../external';
 
 /**
  * Key points:

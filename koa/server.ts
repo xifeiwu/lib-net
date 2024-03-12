@@ -4,7 +4,7 @@ import debug from './debug';
 import http from 'http';
 import Koa from 'koa';
 import session from 'koa-session';
-import {getAFreePort, isNumber} from '../node';
+import {getAFreePort, isNumber} from '../external';
 import errorCatchMiddleware from './error-catch';
 
 export interface CustomKoaServerOptions {

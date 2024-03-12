@@ -1,5 +1,5 @@
 import KoaRouter from 'koa-router';
-import {getStreamData} from '../node';
+import {getStreamData} from '../external';
 
 const router = new KoaRouter({
   prefix: '/api/debug',
