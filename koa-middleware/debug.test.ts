@@ -1,12 +1,15 @@
-import http from 'http';
 import assert from 'assert';
-import {startDebugServer} from './koa';
-import {getStreamData, requestAndGetResponse} from '../external';
+import {startKoaServer} from '../server/koa';
+import {requestAndGetResponseInfo} from '../external';
 // import middlewareForum from './forum';
 
-export async function testDebugEcho() {
-  const {origin, server} = await startDebugServer();
-  const response = await requestAndGetResponse({
+export async function testEcho() {
+  const {origin, server} = await startKoaServer(['debug']);
+  const {
+    statusCode,
+    headers,
+    data: resData,
+  } = await requestAndGetResponseInfo({
     url: origin,
     path: '/api/debug/echo',
     method: 'post',
@@ -15,11 +18,9 @@ export async function testDebugEcho() {
     },
     data: Buffer.from('abc'),
   });
-  const {statusCode, headers} = response;
   assert.equal(statusCode, 200);
-  const resData = await getStreamData(response);
   try {
-    const {method, path, headers, data} = JSON.parse(resData.toString());
+    const {method, path, headers, data} = resData;
     assert.equal(method, 'POST');
     assert.equal(path, '/api/debug/echo');
     assert.equal(headers.agent, 'node');
