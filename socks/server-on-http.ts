@@ -1,7 +1,7 @@
 import {Socket} from 'net';
 import {checkPort, upgradeProtocol} from './service';
 import {HttpServerConfig} from './service/types';
-import {startDebugServer} from '../koa';
+import {startDebugServer} from '../koa-middleware';
 import {getHttpIncomingMessageInfo} from './external';
 import {handleConnection} from './service/server';
 import {exposeStatusByHttp} from './service/http-server';
