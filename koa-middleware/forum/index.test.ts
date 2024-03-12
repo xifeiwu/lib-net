@@ -1,20 +1,18 @@
 import {deepEqual, requestAndGetResponseInfo, requestAndGetUpgradeInfo, toUrl, uuid} from '../../external';
-import {startDebugServer} from '../server';
+import {startKoaServer} from '../../server/koa';
 import {users, posts} from './mock-data';
 import middlewareForum, {handleUpgrade} from './index';
 import assert from 'assert';
 import {Post, Reaction} from './types/frontend';
 import {ErrorBody, INVALIDATE_PAYLOAD} from '../error-catch';
 import {prefix} from './service';
-import http from 'http';
 import {wsPath} from './websocket';
-import {Socket} from 'dgram';
 import {WebSocket} from 'ws';
 
 export async function getPosts() {
   // const [, secondUser] = users;
   const url = `${prefix}/posts`;
-  const {url: href, server} = await startDebugServer([
+  const {origin, server} = await startKoaServer([
     async (ctx, next) => {
       const {url} = ctx;
       // console.log(url);
@@ -23,7 +21,11 @@ export async function getPosts() {
     },
     middlewareForum,
   ]);
-  const {statusCode, headers, data} = await requestAndGetResponseInfo({url: href, method: 'get', path: url});
+  const {statusCode, headers, data} = await requestAndGetResponseInfo({
+    url: origin,
+    method: 'get',
+    path: url,
+  });
   const parsedData = JSON.parse(data as string);
   // console.log({statusCode, headers, data});
   assert.equal(statusCode, 200);
@@ -34,10 +36,10 @@ export async function getPosts() {
 export async function getPostById() {
   const [, secondPost] = posts;
   const pathname = `${prefix}/posts/:postId`;
-  const {url: href, server} = await startDebugServer([middlewareForum]);
+  const {origin, server} = await startKoaServer([middlewareForum]);
   {
     const {statusCode, headers, data} = await requestAndGetResponseInfo({
-      url: href,
+      url: origin,
       method: 'get',
       path: toUrl({
         path: pathname,
@@ -51,7 +53,7 @@ export async function getPostById() {
   }
   {
     const {statusCode, headers, data} = await requestAndGetResponseInfo<ErrorBody>({
-      url: href,
+      url: origin,
       method: 'get',
       path: toUrl({
         path: pathname,
@@ -67,12 +69,12 @@ export async function getPostById() {
 
 export async function postPost() {
   const pathname = `${prefix}/posts`;
-  const {url: href, server} = await startDebugServer([middlewareForum]);
+  const {origin, server} = await startKoaServer([middlewareForum]);
   /** data is not passed */
   {
     const {statusCode, headers, data} = await requestAndGetResponseInfo(
       {
-        url: href,
+        url: origin,
         method: 'post',
         path: toUrl({
           path: pathname,
@@ -100,7 +102,7 @@ export async function postPost() {
     };
     const {statusCode, headers, data} = await requestAndGetResponseInfo(
       {
-        url: href,
+        url: origin,
         method: 'post',
         path: toUrl({
           path: pathname,
@@ -120,7 +122,7 @@ export async function postPost() {
 
 export async function testValidate() {
   const pathname = `${prefix}/posts`;
-  const {url: href, server} = await startDebugServer([middlewareForum]);
+  const {origin, server} = await startKoaServer([middlewareForum]);
   /** validate post payload */
   {
     const post: Post = {
@@ -138,7 +140,7 @@ export async function testValidate() {
     };
     const {statusCode, headers, data} = await requestAndGetResponseInfo<ErrorBody, Post>(
       {
-        url: href,
+        url: origin,
         method: 'post',
         path: toUrl({
           path: pathname,
@@ -157,14 +159,14 @@ export async function testValidate() {
 
 export async function patchPost() {
   const pathname = `${prefix}/posts`;
-  const {url, server} = await startDebugServer([middlewareForum]);
+  const {origin, server} = await startKoaServer([middlewareForum]);
   const [firstPost] = posts;
   firstPost.title = `modified: ${firstPost.title}`;
   /** data is not passed */
   {
     const {statusCode, headers, data} = await requestAndGetResponseInfo<Post, Partial<Post>>(
       {
-        url,
+        url: origin,
         method: 'patch',
         path: toUrl({
           path: pathname,
@@ -182,13 +184,13 @@ export async function patchPost() {
 
 export async function testReaction() {
   const pathname = `${prefix}/posts/:postId/reactions`;
-  const {url, server} = await startDebugServer([middlewareForum]);
+  const {origin, server} = await startKoaServer([middlewareForum]);
   const [firstPost] = posts;
   {
     const {id: postId} = firstPost;
     const {statusCode, headers, data} = await requestAndGetResponseInfo<Reaction, Partial<Reaction>>(
       {
-        url,
+        url: origin,
         method: 'post',
         path: toUrl({
           path: pathname,
@@ -212,7 +214,7 @@ export async function testReaction() {
 }
 
 export async function testWsNotification() {
-  const {url, server} = await startDebugServer(
+  const {origin, server} = await startKoaServer(
     [
       async (ctx, next) => {
         const {url} = ctx;
@@ -228,7 +230,7 @@ export async function testWsNotification() {
   );
   server.on('upgrade', handleUpgrade);
   const {socket, head} = await requestAndGetUpgradeInfo({
-    url,
+    url: origin,
     path: wsPath,
     headers: {
       'Accept-Encoding': 'gzip, deflate, br',
@@ -274,7 +276,7 @@ export async function testWsNotification() {
   // });
 
   const res = await requestAndGetResponseInfo({
-    url,
+    url: origin,
     path: `${prefix}/ws/notifications/broadcast`,
   });
   console.log(res);
@@ -282,7 +284,7 @@ export async function testWsNotification() {
 
 /** start koa http server with forum middleware */
 export async function startForumServer() {
-  const {url, server} = await startDebugServer(
+  const {origin, server} = await startKoaServer(
     [
       async (ctx, next) => {
         const {url} = ctx;
@@ -297,7 +299,7 @@ export async function startForumServer() {
     }
   );
   server.on('upgrade', handleUpgrade);
-  console.log(`start server: ${url}`);
+  console.log(`start server: ${origin}`);
   await new Promise(res => setTimeout(res, 24 * 3600 * 1000));
   server.close();
 }
