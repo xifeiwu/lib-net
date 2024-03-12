@@ -4,12 +4,14 @@ import session from 'koa-session';
 import cors from '../koa-middleware/cors';
 import log from '../koa-middleware/log';
 import debug from '../koa-middleware/debug';
+import assist from '../koa-middleware/assist';
 import {getAFreePort, isNumber} from '../external';
 import errorCatchMiddleware from '../koa-middleware/error-catch';
 
 const middlewareMap = {
   cors,
   debug,
+  assist,
 };
 type MiddlewareName = keyof typeof middlewareMap;
 

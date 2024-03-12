@@ -1,1 +1,2 @@
-export * from '../node';
+export {formatDate, isNumber} from '../fe';
+export {fromBuffer, getAFreePort, getStreamData} from '../node';
