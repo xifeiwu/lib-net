@@ -48,6 +48,12 @@ router.get('/data/list', async (ctx, next) => {
   ctx.type = 'json';
   ctx.body = resData;
 });
+router.get('/data/clear', async (ctx, next) => {
+  const originLength = dataList.length;
+  dataList.length = 0;
+  ctx.type = 'json';
+  ctx.body = originLength;
+});
 
 const middlewareDebug = router.routes();
 

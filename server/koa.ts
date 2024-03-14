@@ -8,11 +8,12 @@ import assist from '../koa-middleware/assist';
 import {getAFreePort, isNumber} from '../external';
 import errorCatchMiddleware from '../koa-middleware/error-catch';
 
+export {cors, log};
 const middlewareMap = {
-  cors,
   debug,
   assist,
 };
+
 type MiddlewareName = keyof typeof middlewareMap;
 
 export interface CustomKoaServerOptions {
@@ -83,8 +84,7 @@ export async function startDebugServer(
   middlewareList: Koa.Middleware[] = [],
   options: CustomKoaServerOptions = {}
 ) {
-  // @ts-ignore
-  return await startKoaServer(['cors', ...middlewareList, 'debug'], options);
+  return await startKoaServer([...middlewareList, 'debug'], options);
 }
 
 /** start a koa server with all middlewares that this module have */
