@@ -1,4 +1,4 @@
-import {deepEqual, requestAndGetResponseInfo, requestAndGetUpgradeInfo, toUrl, uuid} from '../../external';
+import {deepEqual, requestAndGetResponseInfo, requestAndGetUpgradeInfo, configToUrlStr, uuid} from '../../external';
 import {startKoaServer} from '../../server/koa';
 import {users, posts} from './mock-data';
 import middlewareForum, {handleUpgrade} from './index';
@@ -41,7 +41,7 @@ export async function getPostById() {
     const {statusCode, headers, data} = await requestAndGetResponseInfo({
       url: origin,
       method: 'get',
-      path: toUrl({
+      path: configToUrlStr({
         path: pathname,
         params: {
           postId: secondPost.id,
@@ -55,7 +55,7 @@ export async function getPostById() {
     const {statusCode, headers, data} = await requestAndGetResponseInfo<ErrorBody>({
       url: origin,
       method: 'get',
-      path: toUrl({
+      path: configToUrlStr({
         path: pathname,
         params: {
           postId: `secondPost.id`,
@@ -76,7 +76,7 @@ export async function postPost() {
       {
         url: origin,
         method: 'post',
-        path: toUrl({
+        path: configToUrlStr({
           path: pathname,
         }),
       },
@@ -104,7 +104,7 @@ export async function postPost() {
       {
         url: origin,
         method: 'post',
-        path: toUrl({
+        path: configToUrlStr({
           path: pathname,
         }),
         data: post,
@@ -142,7 +142,7 @@ export async function testValidate() {
       {
         url: origin,
         method: 'post',
-        path: toUrl({
+        path: configToUrlStr({
           path: pathname,
         }),
         data: post,
@@ -168,7 +168,7 @@ export async function patchPost() {
       {
         url: origin,
         method: 'patch',
-        path: toUrl({
+        path: configToUrlStr({
           path: pathname,
         }),
         data: firstPost,
@@ -192,7 +192,7 @@ export async function testReaction() {
       {
         url: origin,
         method: 'post',
-        path: toUrl({
+        path: configToUrlStr({
           path: pathname,
           params: {
             postId,

@@ -1,5 +1,5 @@
 import http from 'http';
-import {GeneralRequestConfig, logWithColor, toUrl} from '../external';
+import {GeneralRequestConfig, logWithColor, configToUrlStr} from '../external';
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 
 export type IRequestConfig = GeneralRequestConfig<AxiosRequestConfig>;
@@ -11,11 +11,7 @@ export function axiosRequestFactory(defaultConfig: IRequestConfig = {}): Request
   const instance = axios.create(defaultConfig);
   return async function request<T>(requestConfig: IRequestConfig) {
     const {url, urlParams, query} = requestConfig;
-    requestConfig.url = toUrl({
-      path: url,
-      params: urlParams,
-      query,
-    });
+    requestConfig.url = configToUrlStr(requestConfig);
     if (urlParams) {
       delete requestConfig.urlParams;
     }

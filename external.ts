@@ -1,2 +1,2 @@
 export {formatDate, isNumber} from '../fe';
-export {fromBuffer, getAFreePort, getStreamData, GeneralRequestConfig, logWithColor, toUrl} from '../node';
+export {fromBuffer, getAFreePort, getStreamData, GeneralRequestConfig, logWithColor, configToUrlStr} from '../node';
