@@ -1,5 +1,5 @@
 import http from 'http';
-import {GeneralRequestConfig, logWithColor, configToUrlStr} from '../external';
+import {GeneralRequestConfig, logWithColor, urlPropsToHref} from '../external';
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 
 export type IRequestConfig = GeneralRequestConfig<AxiosRequestConfig>;
@@ -7,16 +7,17 @@ export type RequestFunc = <T>(config: IRequestConfig) => Promise<AxiosResponse<T
 /**
  * generate custom axios request
  */
-export function axiosRequestFactory(defaultConfig: IRequestConfig = {}): RequestFunc {
+export function axiosRequestFactory(defaultConfig: IRequestConfig = {}) {
   const instance = axios.create(defaultConfig);
   return async function request<T>(requestConfig: IRequestConfig) {
-    const {url, urlParams, query} = requestConfig;
-    requestConfig.url = configToUrlStr(requestConfig);
-    if (urlParams) {
-      delete requestConfig.urlParams;
-    }
+    const {url, pathname, pathnameParams, query, ...rest} = requestConfig;
+    const finalUrl = urlPropsToHref({
+      pathname: url ? url : pathname,
+      pathnameParams,
+      query,
+    });
     try {
-      return await instance.request<T>(requestConfig);
+      return await instance.request<T>({...rest, url: finalUrl});
     } catch (err) {
       throw err;
     }
