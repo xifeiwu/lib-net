@@ -60,9 +60,9 @@ export function prettyConsoleAxiosError(err: AxiosError | Error, v1: boolean = t
 }
 
 export function axiosConfigToCurlCommand(
-  config: Pick<AxiosRequestConfig<any>, 'url' | 'method' | 'headers' | 'auth' | 'params' | 'data'>
+  config: Pick<AxiosRequestConfig<any>, 'baseURL' | 'url' | 'method' | 'headers' | 'auth' | 'params' | 'data'>
 ) {
-  const {url, method = 'GET', headers, auth, params, data} = config;
+  const {baseURL, url, method = 'GET', headers, auth, params, data} = config;
   if (auth) {
     const {username, password} = auth;
     headers.Authorization = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');
@@ -70,10 +70,11 @@ export function axiosConfigToCurlCommand(
   if (params) {
     logWithColor('red', 'curl command may be error with params', params);
   }
+  urlPropsToHref;
   const command = [
     'curl',
     `-X ${method.toUpperCase()}`,
-    url,
+    urlPropsToHref({origin: baseURL, pathname: url}),
     ...Object.entries(headers).map(([k, v]) => {
       return `-H '${k}: ${v}'`;
     }),
