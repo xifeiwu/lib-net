@@ -62,7 +62,7 @@ export function prettyConsoleAxiosError(err: AxiosError | Error, v1: boolean = t
 export function axiosConfigToCurlCommand(
   config: Pick<AxiosRequestConfig<any>, 'url' | 'method' | 'headers' | 'auth' | 'params' | 'data'>
 ) {
-  const {url, method, headers, auth, params, data} = config;
+  const {url, method = 'GET', headers, auth, params, data} = config;
   if (auth) {
     const {username, password} = auth;
     headers['Authorization'] = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');
@@ -72,7 +72,7 @@ export function axiosConfigToCurlCommand(
   }
   const command = [
     'curl',
-    `-X ${method}`,
+    `-X ${method.toUpperCase()}`,
     url,
     ...Object.entries(headers).map(([k, v]) => {
       return `-H '${k}: ${v}'`;
