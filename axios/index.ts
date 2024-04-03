@@ -78,7 +78,7 @@ export function axiosConfigToCurlCommand(
     ...Object.entries(headers).map(([k, v]) => {
       return `-H '${k}: ${v}'`;
     }),
-    data ? `-d '${JSON.stringify(data)}'` : '',
+    data ? `-d ${JSON.stringify(data)}` : '',
   ].join(' ');
   return command;
 }
