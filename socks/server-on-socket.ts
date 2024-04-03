@@ -11,7 +11,7 @@ import {exposeStatusByHttp} from './service/http-server';
  * used to catch error, such as:
  * node Error: read ECONNRESET
  */
-process.on('uncaughtException', function (err) {
+process.on('uncaughtException', function(err) {
   console.log(err.stack);
   console.log('NOT exit...');
 });

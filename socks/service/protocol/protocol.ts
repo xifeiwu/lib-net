@@ -118,8 +118,8 @@ export async function sendUsernamePassword(
   }
 ) {
   const {username, password} = info;
-  var usernameLength = Buffer.byteLength(username);
-  var passwordLength = Buffer.byteLength(password);
+  const usernameLength = Buffer.byteLength(username);
+  const passwordLength = Buffer.byteLength(password);
   if (usernameLength > 255 || passwordLength > 255) {
     throw createError(ERRORS.MORE_THAN_255_BYTES);
   }

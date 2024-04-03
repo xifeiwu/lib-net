@@ -11,7 +11,7 @@ import {handleCustomConnection} from './protocol-custom';
  * used to catch error, such as:
  * node Error: read ECONNRESET
  */
-process.on('uncaughtException', function (err) {
+process.on('uncaughtException', function(err) {
   console.log(err.stack);
   console.log('NOT exit...');
 });
@@ -36,7 +36,7 @@ export async function runSocksServerOnHttp(config: HttpServerConfig) {
     const upgrade = Object.entries(headers).reduce<object>((sum, [key, value]) => {
       sum[key.toLocaleLowerCase()] = value;
       return sum;
-    }, {})['upgrade'];
+    }, {}).upgrade;
     if (upgrade !== upgradeProtocol) {
       socket.destroy();
       return;

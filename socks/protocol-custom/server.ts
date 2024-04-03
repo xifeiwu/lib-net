@@ -82,7 +82,7 @@ export async function handleCustomConnection(
       if (isDomain) {
         try {
           const ip = await new Promise<string>((resolve, reject) => {
-            dns.lookup(targetServiceInfo.address, function (err, ip) {
+            dns.lookup(targetServiceInfo.address, function(err, ip) {
               if (err) {
                 reject(err);
               } else {

@@ -67,7 +67,7 @@ function address2Buffer(address: string, addressType?: EAddressType) {
     const nums = address.split('.', 4);
     const bytes = new Array(4);
     for (let i = 0; i < 4; ++i) {
-      if (isNaN((bytes[i] = +nums[i]))) throw new Error('Error parsing IP: ' + address);
+      if (isNaN((bytes[i] = +nums[i]))) { throw new Error('Error parsing IP: ' + address); }
     }
     return Buffer.from(bytes);
   } else if (addressType === EAddressType.IPV6) {

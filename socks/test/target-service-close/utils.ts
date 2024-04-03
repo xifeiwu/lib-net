@@ -1,4 +1,4 @@
-import { LogColors } from "../../external";
+import { LogColors } from '../../external';
 
 export const colors: {
   targetServer: LogColors;
@@ -17,4 +17,4 @@ export const colors: {
 export const targetServerInfo = {
   host: '127.0.0.1',
   port: 3300,
-}
+};

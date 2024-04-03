@@ -1,6 +1,6 @@
-import { Transform, pipeline } from "stream";
-import { getCipher, getDcipher, getIv, ivLength } from "./cipher";
-import { toBuffer } from "../external";
+import { Transform, pipeline } from 'stream';
+import { getCipher, getDcipher, getIv, ivLength } from './cipher';
+import { toBuffer } from '../external';
 
 export async function test() {
   const iv = getIv(ivLength);
@@ -41,13 +41,13 @@ export async function test() {
   // socket.pipe(socket2Service).pipe(process.stdout);
   // socket.pipe(socket2Service).pipe(socket);
   // socket.pipe(cipher).pipe(process.stdout);
-  socket.push("abc");
-  socket.push("def");
+  socket.push('abc');
+  socket.push('def');
   socket.push(null);
   // socket.write('abc');
 }
 
 export async function asStream() {
   // getRea
-  
+
 }

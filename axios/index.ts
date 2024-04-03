@@ -65,7 +65,7 @@ export function axiosConfigToCurlCommand(
   const {url, method = 'GET', headers, auth, params, data} = config;
   if (auth) {
     const {username, password} = auth;
-    headers['Authorization'] = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');
+    headers.Authorization = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');
   }
   if (params) {
     logWithColor('red', 'curl command may be error with params', params);
