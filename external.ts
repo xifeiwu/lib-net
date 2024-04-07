@@ -7,5 +7,6 @@ export {
   urlPropsToHref,
   deepEqual,
   isPlainObject,
+  toInt,
 } from '../fe';
 export {fromBuffer, getAFreePort, getStreamData, logWithColor} from '../node';

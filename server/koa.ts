@@ -5,7 +5,7 @@ import cors from '../koa-middleware/cors';
 import log from '../koa-middleware/log';
 import debug from '../koa-middleware/debug';
 import assist from '../koa-middleware/assist';
-import {getAFreePort, isNumber} from '../external';
+import {getAFreePort, isNumber, toInt} from '../external';
 import errorCatchMiddleware from '../koa-middleware/error-catch';
 
 export {cors, log};
@@ -39,7 +39,8 @@ export async function startKoaServer(
   server: http.Server;
   app: Koa;
 }> {
-  let {host = '0.0.0.0', port, keys, sessionOptions, printUrl} = options;
+  const {host = '0.0.0.0', keys, sessionOptions, printUrl} = options;
+  let {port} = options;
   const app = new Koa();
   if (Array.isArray(keys)) {
     app.keys = keys;
@@ -56,7 +57,8 @@ export async function startKoaServer(
       app.use(middleware as Koa.Middleware);
     }
   }
-  if (!port || !isNumber(port)) {
+  port = toInt(port);
+  if (!isNumber(port)) {
     port = await getAFreePort(3000);
   }
   const server = app.listen(port, host);
