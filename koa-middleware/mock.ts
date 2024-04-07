@@ -1,0 +1,78 @@
+import fs from 'fs';
+import path from 'path';
+import Application from 'koa';
+import {MockFileContent, ParamsForFindMockInfoInDir, RequestConfig, getMockInfoFinderByDir} from '../../node';
+import {MockFileFinder} from '../../node/http/mock/find';
+// import {deepEqual} from '@modules/lib/fe/common';
+// import {GeneralDataToSave} from '@modules/conviva/service/request-by-select-config';
+// import {IRequestConfig} from '@src/service/axios-wrapper';
+// const {mock} = serverConfig;
+
+// export interface MockFileExport extends GeneralDataToSave<any, any, any>, PayloadCompare {}
+// export interface MockFileInfo extends MockFileExport {
+//   relativePath: string;
+// }
+
+// function getMockFileInfo(relativePath: string): MockFileInfo {
+//   const fullPath = path.resolve(__dirname, 'data', relativePath);
+//   // console.log(fullPath);
+//   if (!fs.existsSync(fullPath)) {
+//     return null;
+//   }
+//   const mockFileExport = require(fullPath) as MockFileExport;
+//   return {
+//     ...mockFileExport,
+//     relativePath,
+//   };
+// }
+// export function getMockFileInfoList() {
+//   return mock.fileList.map(getMockFileInfo).filter(it => it);
+// }
+
+function getRequestConfigFromKoaCtx(ctx: Application.ParameterizedContext<any, any, any>): RequestConfig {
+  const {
+    method = 'get',
+    path,
+    query,
+    state: {payload},
+  } = ctx;
+  return {
+    method: method.toLowerCase(),
+    pathname: path,
+    query: {...query},
+    data: payload,
+  };
+}
+
+/**
+ * This middleware should append to koa after bodyparser, as payload is got from ctx.state.payload
+ */
+export function getMockMiddleware() {}
+export const mockMiddleware = async (mockParams: ParamsForFindMockInfoInDir[]) => {
+  const finderList: MockFileFinder[] = [];
+  const mockFileList: MockFileContent[] = [];
+  for (const {mockFileList: mockContentList, finder} of mockParams.map(param =>
+    getMockInfoFinderByDir(param)
+  )) {
+    mockFileList.push(...mockFileList);
+    finderList.push(finder);
+  }
+  return async (ctx, next) => {
+    const requestConfig = getRequestConfigFromKoaCtx(ctx);
+    let target: (MockFileContent & {relativePath?: string}) | null = null;
+    for (const finder of finderList) {
+      target = finder(requestConfig);
+      if (target) {
+        break;
+      }
+    }
+    if (target) {
+      ctx.status = 200;
+      ctx.type = 'json';
+      ctx.set('z-mock-source', `mock-${target.relativePath}`);
+      ctx.body = target.resData;
+    } else {
+      await next();
+    }
+  };
+};
