@@ -1,11 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import zlib from 'zlib';
-import stream = require('stream');
-import {readDirRecursive} from '../external';
 import Koa from 'koa';
-import {toStream} from '../external';
-import {compressible} from '../external';
+import stream = require('stream');
+import {toStream, mime, getFileList} from '../../external';
 
 /**
  * Key points:
@@ -202,7 +200,7 @@ export default function staticCache(options: IStaticMiddlewareOptions) {
     const acceptGzip = ctx.acceptsEncodings('gzip') === 'gzip';
 
     const shouldGzip =
-      enableGzip && fileInfo.size > 1024 && acceptGzip && compressible(getContentType(fileInfo));
+      enableGzip && fileInfo.size > 1024 && acceptGzip && mime.compressible(getContentType(fileInfo));
 
     let stream: stream.Readable;
     if ((fileInfo as LocalFileInfo).fullPath) {
@@ -303,15 +301,15 @@ export function preLoadDir(
   dirInfo: {
     fullPath: string;
     includeDir?: boolean;
-    dirFilter?: (fullpath: string) => boolean;
-    fileFilter?: (fullpath: string) => boolean;
+    // dirFilter?: (fullpath: string) => boolean;
+    // fileFilter?: (fullpath: string) => boolean;
   },
   urlPrefix: string
 ) {
   if (!urlPrefix) {
     urlPrefix = '';
   }
-  const {fullPath, dirFilter, fileFilter, includeDir} = dirInfo;
+  const {fullPath, includeDir} = dirInfo;
   if (!fs.existsSync(fullPath)) {
     throw new Error(`dir "${fullPath}" not exist`);
   }
@@ -319,9 +317,7 @@ export function preLoadDir(
   if (!stat.isDirectory()) {
     throw new Error(`dir "${fullPath}" is not a directory`);
   }
-  readDirRecursive(fullPath, {
-    dirFilter,
-    fileFilter,
+  getFileList(fullPath, {
     includeDir,
   }).forEach(relativePath => {
     const fileInfo = getFileInfo(path.join(fullPath, relativePath));

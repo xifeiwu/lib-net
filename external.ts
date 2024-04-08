@@ -9,4 +9,16 @@ export {
   isPlainObject,
   toInt,
 } from '../fe';
-export {fromBuffer, getAFreePort, getStreamData, logWithColor} from '../node';
+export type {MockFileFinder, MockFileContent, ParamsForFindMockInfoInDir, RequestConfig} from '../node';
+export {
+  fromBuffer,
+  getAFreePort,
+  getStreamData,
+  logWithColor,
+  requestAndGetResponseInfo,
+  getMockFileFinderByDir,
+  readDirRecursive,
+  toStream,
+  getFileList,
+  mime
+} from '../node';

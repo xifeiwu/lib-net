@@ -1,7 +1,7 @@
 import net from 'net';
 import {checkPort, getInfoFromFirstChunk} from './service';
 import {SocketServerConfig} from './service/types';
-import {startDebugServer} from '../koa-middleware';
+import {startDebugServer} from '../koa';
 import {getAFreePort, isNumber, startSocketClient} from './external';
 import {handleConnection} from './service/server';
 import {handleCustomConnection} from './protocol-custom';

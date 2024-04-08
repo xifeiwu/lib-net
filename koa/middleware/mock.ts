@@ -1,8 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import Application from 'koa';
-import {MockFileContent, ParamsForFindMockInfoInDir, RequestConfig, getMockInfoFinderByDir} from '../../node';
-import {MockFileFinder} from '../../node/http/mock/find';
+import {
+  MockFileFinder,
+  MockFileContent,
+  ParamsForFindMockInfoInDir,
+  RequestConfig,
+  getMockFileFinderByDir,
+} from '../../external';
+// import {MockFileFinder} from '../../node/http/mock/find';
 // import {deepEqual} from '@modules/lib/fe/common';
 // import {GeneralDataToSave} from '@modules/conviva/service/request-by-select-config';
 // import {IRequestConfig} from '@src/service/axios-wrapper';
@@ -47,12 +53,11 @@ function getRequestConfigFromKoaCtx(ctx: Application.ParameterizedContext<any, a
 /**
  * This middleware should append to koa after bodyparser, as payload is got from ctx.state.payload
  */
-export function getMockMiddleware() {}
-export const mockMiddleware = async (mockParams: ParamsForFindMockInfoInDir[]) => {
+export const getMockMiddleware = (mockParams: ParamsForFindMockInfoInDir[]) => {
   const finderList: MockFileFinder[] = [];
   const mockFileList: MockFileContent[] = [];
   for (const {mockFileList: mockContentList, finder} of mockParams.map(param =>
-    getMockInfoFinderByDir(param)
+    getMockFileFinderByDir(param)
   )) {
     mockFileList.push(...mockFileList);
     finderList.push(finder);

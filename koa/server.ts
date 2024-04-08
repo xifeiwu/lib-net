@@ -1,14 +1,13 @@
 import http from 'http';
 import Koa from 'koa';
 import session from 'koa-session';
-import cors from '../koa-middleware/cors';
-import log from '../koa-middleware/log';
-import debug from '../koa-middleware/debug';
-import assist from '../koa-middleware/assist';
+import cors from './middleware/cors';
+import log from './middleware/log';
+import debug from './middleware/debug';
+import assist from './middleware/assist';
+import errorCatchMiddleware from './middleware/error-catch';
 import {getAFreePort, isNumber, toInt} from '../external';
-import errorCatchMiddleware from '../koa-middleware/error-catch';
 
-export {cors, log};
 const middlewareMap = {
   debug,
   assist,

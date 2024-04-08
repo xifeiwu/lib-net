@@ -1,6 +1,6 @@
 import assert from 'assert';
-import {requestAndGetResponseInfo} from '../../node';
-import {startKoaServer} from '../server/koa';
+import {startKoaServer} from '../server';
+import {requestAndGetResponseInfo} from '../../external';
 
 export async function testUploadData() {
   const {origin, server} = await startKoaServer(['assist'], {printUrl: true});

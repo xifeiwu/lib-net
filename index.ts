@@ -1,2 +1,2 @@
-export * from './server/koa';
+export * from './koa';
 export * from './axios';

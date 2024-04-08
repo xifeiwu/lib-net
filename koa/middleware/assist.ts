@@ -1,5 +1,5 @@
 import KoaRouter from 'koa-router';
-import {formatDate, fromBuffer, getStreamData} from '../external';
+import {formatDate, fromBuffer, getStreamData} from '../../external';
 
 const router = new KoaRouter({
   prefix: '/api/assist',
