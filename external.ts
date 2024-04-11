@@ -8,6 +8,7 @@ export {
   deepEqual,
   isPlainObject,
   toInt,
+  getUrlPropsFromConfig,
 } from '../fe';
 export type {MockFileFinder, MockFileContent, ParamsForFindMockInfoInDir, RequestConfig} from '../node';
 export {

@@ -1,23 +1,19 @@
-import http from 'http';
-import {GeneralRequestConfig, logWithColor, urlPropsToHref} from '../external';
+import {GeneralRequestConfig, getUrlPropsFromConfig, logWithColor, urlPropsToHref} from '../external';
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 
-export type IRequestConfig = GeneralRequestConfig<AxiosRequestConfig>;
-export type RequestFunc = <T>(config: IRequestConfig) => Promise<AxiosResponse<T>>;
+export type CustomizedAxiosRequestConfig = GeneralRequestConfig<AxiosRequestConfig>;
+export type AxiosRequestFunc = <T>(config: CustomizedAxiosRequestConfig) => Promise<AxiosResponse<T>>;
+
 /**
  * generate custom axios request
  */
-export function axiosRequestFactory(defaultConfig: IRequestConfig = {}) {
+export function axiosRequestFactory(defaultConfig: CustomizedAxiosRequestConfig = {}) {
   const instance = axios.create(defaultConfig);
-  return async function request<T>(requestConfig: IRequestConfig) {
-    const {url, pathname, pathnameParams, query, ...rest} = requestConfig;
-    const finalUrl = urlPropsToHref({
-      pathname: url ? url : pathname,
-      pathnameParams,
-      query,
-    });
+  return async function request<T>(requestConfig: CustomizedAxiosRequestConfig) {
+    const {urlProps, restProps} = getUrlPropsFromConfig(requestConfig);
+    const finalUrl = urlPropsToHref(urlProps);
     try {
-      return await instance.request<T>({...rest, url: finalUrl});
+      return await instance.request<T>({...restProps, url: finalUrl});
     } catch (err) {
       throw err;
     }

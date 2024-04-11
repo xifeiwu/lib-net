@@ -51,7 +51,7 @@ function getRequestConfigFromKoaCtx(ctx: Application.ParameterizedContext<any, a
 }
 
 /**
- * This middleware should append to koa after bodyparser, as payload is got from ctx.state.payload
+ * Notice: This middleware should append to koa after bodyparser, as payload is got from ctx.state.payload
  */
 export const getMockMiddleware = (mockParams: ParamsForFindMockInfoInDir[]) => {
   const finderList: MockFileFinder[] = [];
