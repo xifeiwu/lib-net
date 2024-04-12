@@ -7,6 +7,7 @@ import {
   ParamsForFindMockInfoInDir,
   RequestConfig,
   getMockFileFinderByDir,
+  MockFileContentWithRelativePath,
 } from '../../external';
 // import {MockFileFinder} from '../../node/http/mock/find';
 // import {deepEqual} from '@modules/lib/fe/common';
@@ -53,16 +54,19 @@ function getRequestConfigFromKoaCtx(ctx: Application.ParameterizedContext<any, a
 /**
  * Notice: This middleware should append to koa after bodyparser, as payload is got from ctx.state.payload
  */
-export const getMockMiddleware = (mockParams: ParamsForFindMockInfoInDir[]) => {
+export const getMockMiddleware = (
+  mockParams: ParamsForFindMockInfoInDir[],
+  options?: {
+    allMockFileList: MockFileContentWithRelativePath[];
+  }
+) => {
+  const {allMockFileList = []} = options ?? {};
   const finderList: MockFileFinder[] = [];
-  const mockFileList: MockFileContent[] = [];
-  for (const {mockFileList: mockContentList, finder} of mockParams.map(param =>
-    getMockFileFinderByDir(param)
-  )) {
-    mockFileList.push(...mockFileList);
+  for (const {mockFileList, finder} of mockParams.map(param => getMockFileFinderByDir(param))) {
+    allMockFileList.push(...mockFileList);
     finderList.push(finder);
   }
-  return async (ctx, next) => {
+  const middleware = async (ctx, next) => {
     const requestConfig = getRequestConfigFromKoaCtx(ctx);
     let target: (MockFileContent & {relativePath?: string}) | null = null;
     for (const finder of finderList) {
@@ -74,10 +78,11 @@ export const getMockMiddleware = (mockParams: ParamsForFindMockInfoInDir[]) => {
     if (target) {
       ctx.status = 200;
       ctx.type = 'json';
-      ctx.set('z-mock-source', `mock-${target.relativePath}`);
+      ctx.set('z-mock-source', `${target.relativePath}`);
       ctx.body = target.resData;
     } else {
       await next();
     }
   };
+  return middleware;
 };

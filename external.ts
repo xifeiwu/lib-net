@@ -21,5 +21,6 @@ export {
   readDirRecursive,
   toStream,
   getFileList,
-  mime
+  mime,
+  MockFileContentWithRelativePath,
 } from '../node';
