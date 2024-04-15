@@ -9,6 +9,7 @@ export {
   isPlainObject,
   toInt,
   getUrlPropsFromConfig,
+  waitFor,
 } from '../fe';
 export type {MockFileFinder, MockFileContent, ParamsForFindMockInfoInDir, RequestConfig} from '../node';
 export {

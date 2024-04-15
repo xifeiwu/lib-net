@@ -1,19 +1,26 @@
 import KoaRouter from 'koa-router';
-import {getStreamData} from '../../external';
+import {getStreamData, isNumber, toInt, waitFor} from '../../external';
 
 const router = new KoaRouter({
   prefix: '/api/debug',
 });
 
+export interface EchoConfig {
+  /** delay response in seconds */
+  delay?: number;
+}
+
 router.all('/echo', async (ctx, next) => {
   const {method, path, query, headers, req} = ctx;
-  const {dataType = ''} = query;
-  let data: any = '';
-  // if (dataType === 'parsed') {
-  //   data = await parseBody(req);
-  // } else {
-  data = (await getStreamData(req)).toString();
-  // }
+  const data = (await getStreamData(req)).toString();
+  /** Setting echo config in query other than payload to make sure it is usable for both GET and POST  */
+  let {delay} = (query ?? {}) as EchoConfig;
+  if (delay) {
+    delay = toInt(delay);
+    if (isNumber(delay)) {
+      await waitFor(delay * 1000);
+    }
+  }
   ctx.body = {
     method,
     path,

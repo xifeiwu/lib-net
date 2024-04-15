@@ -1,7 +1,7 @@
 import assert from 'assert';
-import {startKoaServer} from '../server/koa';
-import {requestAndGetResponseInfo} from '../external';
-// import middlewareForum from './forum';
+import {startKoaServer} from '../server';
+import {requestAndGetResponseInfo} from '../../external';
+import {EchoConfig} from './debug';
 
 export async function testEcho() {
   const {origin, server} = await startKoaServer(['debug']);
@@ -29,4 +29,37 @@ export async function testEcho() {
     console.error(err);
   }
   server.close();
+}
+
+/**
+ * Emitted when the underlying socket times out from inactivity.
+ * This only notifies that the socket has been idle. The request must be destroyed manually.
+ */
+export async function testTimeout() {
+  const {origin, server} = await startKoaServer(['debug']);
+  const echoConfig: EchoConfig = {
+    delay: 10,
+  };
+  const payload = {
+    timeout: 25,
+    target: 'test-timeout',
+  };
+  try {
+    const resInfo = await requestAndGetResponseInfo({
+      origin,
+      pathname: '/api/debug/echo',
+      query: echoConfig,
+      method: 'post',
+      headers: {
+        agent: 'node',
+      },
+      data: payload,
+      timeout: 6000,
+    });
+    console.log(resInfo);
+  } catch (err) {
+    console.log(err);
+  } finally {
+    server.close();
+  }
 }
