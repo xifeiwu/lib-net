@@ -1,21 +1,17 @@
 export {
   toBuffer,
-  isNumber,
-  isPlainObject,
-  isRegExp,
-  deepClone,
-  deepEqual,
   requestAndGetUpgradeInfo,
   startSocketClient,
   isPortOpen,
   getAFreePort,
-  getHttpIncomingMessageInfo,
+  getRequestInfo,
   spawnTsFile,
-  waitFor,
   handleSocketEvents,
   logWithColor,
   writeDataByInterval,
   requestAndGetResponseInfo,
   startSocketServer,
-  LogColors
+  LogColors,
 } from '../../node';
+
+export {waitFor, isNumber, isPlainObject, isRegExp, deepClone, deepEqual} from '../../fe/common';

@@ -2,16 +2,17 @@ import {Socket} from 'net';
 import {checkPort, upgradeProtocol} from './service';
 import {HttpServerConfig} from './service/types';
 import {startDebugServer} from '../koa';
-import {getHttpIncomingMessageInfo} from './external';
+import {getRequestInfo} from './external';
 import {handleConnection} from './service/server';
 import {exposeStatusByHttp} from './service/http-server';
 import {handleCustomConnection} from './protocol-custom';
+import {IncomingHttpHeaders} from 'http';
 
 /**
  * used to catch error, such as:
  * node Error: read ECONNRESET
  */
-process.on('uncaughtException', function(err) {
+process.on('uncaughtException', function (err) {
   console.log(err.stack);
   console.log('NOT exit...');
 });
@@ -32,8 +33,8 @@ export async function runSocksServerOnHttp(config: HttpServerConfig) {
   const httpService = await startDebugServer([...koaMiddlewareList], {port});
   const {server} = httpService;
   server.on('upgrade', async (req, socket, head) => {
-    const {headers} = await getHttpIncomingMessageInfo(req);
-    const upgrade = Object.entries(headers).reduce<object>((sum, [key, value]) => {
+    const {headers} = await getRequestInfo(req);
+    const upgrade = Object.entries(headers).reduce<IncomingHttpHeaders>((sum, [key, value]) => {
       sum[key.toLocaleLowerCase()] = value;
       return sum;
     }, {}).upgrade;
