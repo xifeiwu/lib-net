@@ -133,7 +133,7 @@ export async function start() {
     logWithColor(colors.socksClient, getSocketInfo(client1.socket));
     await writeDataByInterval(client1.socket, {
       startChar: 'b',
-      end: 'bye',
+      endStr: 'bye',
       maxCount: 3,
     });
   }
@@ -155,7 +155,7 @@ export async function start() {
     logWithColor(colors.socksClient, getSocketInfo(client2.socket));
     await writeDataByInterval(client2.socket, {
       startChar: 'b',
-      end: 'bye',
+      endStr: 'bye',
       maxCount: 3,
     });
   }

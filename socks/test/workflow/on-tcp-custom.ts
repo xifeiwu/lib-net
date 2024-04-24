@@ -83,7 +83,7 @@ export async function start() {
     logWithColor(colors.socksClient, getSocketInfo(clientStatus.socket));
     await writeDataByInterval(clientStatus.socket, {
       startChar: 'b',
-      end: 'bye',
+      endStr: 'bye',
       maxCount: 3,
     });
   }
