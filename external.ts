@@ -11,7 +11,6 @@ export {
   getUrlPropsFromConfig,
   waitFor,
 } from '../fe';
-export type {MockFileFinder, MockFileContent, ParamsForFindMockInfoInDir, RequestConfig} from '../node';
 export {
   fromBuffer,
   getAFreePort,
@@ -24,4 +23,13 @@ export {
   getFileList,
   mime,
   MockFileContentWithRelativePath,
+  MockFileFinder,
+  MockFileContent,
+  ParamsForFindMockInfoInDir,
+  RequestConfig,
+  HttpResponseInfo,
+  getResponseData,
+  handleSocketEvents,
+  parseHttpHeaderPart,
+  startSocketServer,
 } from '../node';
