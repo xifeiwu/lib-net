@@ -62,7 +62,9 @@ export const getMockMiddleware = (
 ) => {
   const {allMockFileList = []} = options ?? {};
   const finderList: MockFileFinder[] = [];
-  for (const {mockFileList, finder} of mockParams.map(param => getMockFileFinderByDir(param))) {
+  for (const {mockFileList, finder} of mockParams
+    .filter(param => !param.ingore)
+    .map(param => getMockFileFinderByDir(param))) {
     allMockFileList.push(...mockFileList);
     finderList.push(finder);
   }
