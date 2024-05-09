@@ -1,14 +1,15 @@
 import http from 'http';
 import Koa from 'koa';
 import session from 'koa-session';
+import cors from './middleware/cors';
 import debug from './middleware/debug';
-import assist from './middleware/assist';
+import logs from './middleware/logs';
+import middlewareForum, {handleUpgrade} from './forum';
 import errorCatchMiddleware from './middleware/error-catch';
-import {getAFreePort, isNumber, toInt} from '../external';
+import {getAFreePort, isNumber, toInt, PORT} from '../external';
 
 const middlewareMap = {
   debug,
-  assist,
 };
 
 type MiddlewareName = keyof typeof middlewareMap;
@@ -18,7 +19,8 @@ export interface CustomKoaServerOptions {
   port?: number;
   keys?: string[];
   sessionOptions?: Partial<session.opts>;
-  printUrl?: boolean;
+  /** whether print origin of server or not */
+  printOrigin?: boolean;
 }
 
 /**
@@ -36,7 +38,7 @@ export async function startKoaServer(
   server: http.Server;
   app: Koa;
 }> {
-  const {host = '0.0.0.0', keys, sessionOptions, printUrl} = options;
+  const {host = '0.0.0.0', keys, sessionOptions, printOrigin} = options;
   let {port} = options;
   const app = new Koa();
   if (Array.isArray(keys)) {
@@ -56,13 +58,13 @@ export async function startKoaServer(
   }
   port = toInt(port);
   if (!isNumber(port)) {
-    port = await getAFreePort(3000);
+    port = await getAFreePort(PORT.exploreStart.port);
   }
   const server = app.listen(port, host);
   return new Promise((res, rej) => {
     server.on('listening', () => {
       const origin = `http://${host}:${port}`;
-      printUrl && console.log(`http server started on ${origin}`);
+      printOrigin && console.log(`http server started on ${origin}`);
       res({
         origin,
         port,
@@ -87,4 +89,14 @@ export async function startDebugServer(
 }
 
 /** start a koa server with all middlewares that this module have */
-export async function startFullFeatureServer() {}
+export async function startFullFeatureServer(
+  middlewareList: Koa.Middleware[] = [],
+  options: CustomKoaServerOptions = {}
+) {
+  const {origin, server, app} = await startKoaServer(
+    [...middlewareList, cors(), 'debug', logs(), middlewareForum],
+    options
+  );
+  server.on('upgrade', handleUpgrade);
+  return {origin, server, app};
+}

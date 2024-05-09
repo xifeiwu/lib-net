@@ -10,6 +10,9 @@ export {
   toInt,
   getUrlPropsFromConfig,
   waitFor,
+  PORT,
+  uuid,
+  urlPropsToInstance,
 } from '../fe';
 export {
   fromBuffer,
@@ -32,4 +35,6 @@ export {
   handleSocketEvents,
   parseHttpHeaderPart,
   startSocketServer,
+  requestAndGetUpgradeInfo,
+  toBuffer,
 } from '../node';

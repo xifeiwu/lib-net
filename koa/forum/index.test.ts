@@ -1,10 +1,16 @@
-import {deepEqual, requestAndGetResponseInfo, requestAndGetUpgradeInfo, configToUrlStr, uuid} from '../../external';
-import {startKoaServer} from '../../server/koa';
+import {
+  deepEqual,
+  requestAndGetResponseInfo,
+  requestAndGetUpgradeInfo,
+  urlPropsToHref,
+  uuid,
+} from '../../external';
+import {startKoaServer} from '../server';
 import {users, posts} from './mock-data';
 import middlewareForum, {handleUpgrade} from './index';
 import assert from 'assert';
 import {Post, Reaction} from './types/frontend';
-import {ErrorBody, INVALIDATE_PAYLOAD} from '../error-catch';
+import {ErrorBody, INVALIDATE_PAYLOAD} from '../middleware/error-catch';
 import {prefix} from './service';
 import {wsPath} from './websocket';
 import {WebSocket} from 'ws';
@@ -41,9 +47,9 @@ export async function getPostById() {
     const {statusCode, headers, data} = await requestAndGetResponseInfo({
       url: origin,
       method: 'get',
-      path: configToUrlStr({
-        path: pathname,
-        params: {
+      path: urlPropsToHref({
+        pathname,
+        pathnameParams: {
           postId: secondPost.id,
         },
       }),
@@ -55,9 +61,9 @@ export async function getPostById() {
     const {statusCode, headers, data} = await requestAndGetResponseInfo<ErrorBody>({
       url: origin,
       method: 'get',
-      path: configToUrlStr({
-        path: pathname,
-        params: {
+      path: urlPropsToHref({
+        pathname,
+        pathnameParams: {
           postId: `secondPost.id`,
         },
       }),
@@ -74,11 +80,9 @@ export async function postPost() {
   {
     const {statusCode, headers, data} = await requestAndGetResponseInfo(
       {
-        url: origin,
+        origin,
         method: 'post',
-        path: configToUrlStr({
-          path: pathname,
-        }),
+        pathname,
       },
       {
         dataType: 'json',
@@ -104,8 +108,8 @@ export async function postPost() {
       {
         url: origin,
         method: 'post',
-        path: configToUrlStr({
-          path: pathname,
+        path: urlPropsToHref({
+          pathname,
         }),
         data: post,
       },
@@ -140,11 +144,9 @@ export async function testValidate() {
     };
     const {statusCode, headers, data} = await requestAndGetResponseInfo<ErrorBody, Post>(
       {
-        url: origin,
+        origin,
         method: 'post',
-        path: configToUrlStr({
-          path: pathname,
-        }),
+        pathname,
         data: post,
       },
       {
@@ -168,8 +170,8 @@ export async function patchPost() {
       {
         url: origin,
         method: 'patch',
-        path: configToUrlStr({
-          path: pathname,
+        path: urlPropsToHref({
+          pathname,
         }),
         data: firstPost,
       },
@@ -190,11 +192,11 @@ export async function testReaction() {
     const {id: postId} = firstPost;
     const {statusCode, headers, data} = await requestAndGetResponseInfo<Reaction, Partial<Reaction>>(
       {
-        url: origin,
+        origin,
         method: 'post',
-        path: configToUrlStr({
-          path: pathname,
-          params: {
+        pathname: urlPropsToHref({
+          pathname,
+          pathnameParams: {
             postId,
           },
         }),
