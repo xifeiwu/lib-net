@@ -2,8 +2,11 @@ import {
   deepEqual,
   requestAndGetResponseInfo,
   requestAndGetUpgradeInfo,
+  requestAndGetRelatedInfo,
+  httpRequestOptionsToCurlCommand,
   urlPropsToHref,
   uuid,
+  PORT,
 } from '../../external';
 import {startKoaServer} from '../server';
 import {users, posts} from './mock-data';
@@ -215,6 +218,16 @@ export async function testReaction() {
   server.close();
 }
 
+export async function sendBroadcast(origin?: string) {
+  origin = origin ?? `http://127.0.0.1:${PORT.fullFeatureHttpServer.port}`;
+  const {requestOptions, responseInfo} = await requestAndGetRelatedInfo({
+    origin,
+    pathname: `${prefix}/ws/notifications/broadcast`,
+  });
+  console.log(responseInfo);
+  console.log(httpRequestOptionsToCurlCommand(requestOptions));
+}
+
 export async function testWsNotification() {
   const {origin, server} = await startKoaServer(
     [
@@ -265,6 +278,7 @@ export async function testWsNotification() {
     console.log(`data`);
     console.log(data.toString());
   });
+  await sendBroadcast(origin);
 
   /** for frontend usage */
   // const socket = new WebSocket('ws://127.0.0.1:3100/api/forum/ws/notifications');
@@ -276,12 +290,6 @@ export async function testWsNotification() {
   // socket.addEventListener('message', function (event) {
   //   console.log('Message from server ', event.data);
   // });
-
-  const res = await requestAndGetResponseInfo({
-    url: origin,
-    path: `${prefix}/ws/notifications/broadcast`,
-  });
-  console.log(res);
 }
 
 /** start koa http server with forum middleware */

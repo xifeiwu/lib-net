@@ -36,5 +36,7 @@ export {
   parseHttpHeaderPart,
   startSocketServer,
   requestAndGetUpgradeInfo,
+  requestAndGetRelatedInfo,
+  httpRequestOptionsToCurlCommand,
   toBuffer,
 } from '../node';
