@@ -35,8 +35,11 @@ export {
   handleSocketEvents,
   parseHttpHeaderPart,
   startSocketServer,
+<<<<<<< HEAD
   requestAndGetUpgradeInfo,
   requestAndGetRelatedInfo,
   httpRequestOptionsToCurlCommand,
+=======
+>>>>>>> 4c3f697 (more external functions)
   toBuffer,
 } from '../node';
