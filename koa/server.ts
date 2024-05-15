@@ -7,6 +7,7 @@ import logs from './middleware/logs';
 import middlewareForum, {handleUpgrade} from './forum';
 import errorCatchMiddleware from './middleware/error-catch';
 import {getAFreePort, isNumber, toInt, PORT} from '../external';
+import {WsMiddleware, getUpgradeHandler} from './websocket';
 
 const middlewareMap = {
   debug,
@@ -19,6 +20,7 @@ export interface CustomKoaServerOptions {
   port?: number;
   keys?: string[];
   sessionOptions?: Partial<session.opts>;
+  wsMiddlewareList?: WsMiddleware[];
   /** whether print origin of server or not */
   printOrigin?: boolean;
 }
@@ -38,7 +40,7 @@ export async function startKoaServer(
   server: http.Server;
   app: Koa;
 }> {
-  const {host = '0.0.0.0', keys, sessionOptions, printOrigin} = options;
+  const {host = '0.0.0.0', keys, sessionOptions, printOrigin, wsMiddlewareList = []} = options;
   let {port} = options;
   const app = new Koa();
   if (Array.isArray(keys)) {
@@ -61,6 +63,9 @@ export async function startKoaServer(
     port = await getAFreePort(PORT.exploreStart.port);
   }
   const server = app.listen(port, host);
+  if (wsMiddlewareList.length > 0) {
+    server.on('upgrade', getUpgradeHandler(wsMiddlewareList));
+  }
   return new Promise((res, rej) => {
     server.on('listening', () => {
       const origin = `http://${host}:${port}`;

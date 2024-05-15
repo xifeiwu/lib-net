@@ -2,6 +2,7 @@ import {uuid} from '../../external';
 import {users} from './mock-data';
 
 export const prefix = '/api/forum';
+export const wsPrefix = '/ws/forum';
 
 const notificationTemplates = ['poked you', 'says hi!', `is glad we're friends`, 'sent you a gift'];
 export function getRandom(max: number) {

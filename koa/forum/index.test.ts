@@ -7,6 +7,8 @@ import {
   urlPropsToHref,
   uuid,
   PORT,
+  logWithColor,
+  waitFor,
 } from '../../external';
 import {startKoaServer} from '../server';
 import {users, posts} from './mock-data';
@@ -15,7 +17,7 @@ import assert from 'assert';
 import {Post, Reaction} from './types/frontend';
 import {ErrorBody, INVALIDATE_PAYLOAD} from '../middleware/error-catch';
 import {prefix} from './service';
-import {wsPath} from './websocket';
+import {forumWsMiddleware, wsPath} from './websocket';
 import {WebSocket} from 'ws';
 
 export async function getPosts() {
@@ -224,7 +226,7 @@ export async function sendBroadcast(origin?: string) {
     origin,
     pathname: `${prefix}/ws/notifications/broadcast`,
   });
-  console.log(responseInfo);
+  assert.ok(Array.isArray(responseInfo.data));
   console.log(httpRequestOptionsToCurlCommand(requestOptions));
 }
 
@@ -241,22 +243,21 @@ export async function testWsNotification() {
     ],
     {
       port: 3100,
+      wsMiddlewareList: [forumWsMiddleware],
     }
   );
-  server.on('upgrade', handleUpgrade);
+  // server.on('upgrade', handleUpgrade);
   const {socket, head} = await requestAndGetUpgradeInfo({
-    url: origin,
-    path: wsPath,
+    origin,
+    pathname: wsPath,
     headers: {
-      'Accept-Encoding': 'gzip, deflate, br',
-      'Accept-Language': 'zh-CN,zh;q=0.9',
       Connection: 'Upgrade',
+      Upgrade: 'websocket',
       // Host: localhost:8102
       // Origin: http://localhost:8102
-      'Sec-Websocket-Extensions': 'permessage-deflate; client_max_window_bits',
+      // 'Sec-Websocket-Extensions': 'permessage-deflate; client_max_window_bits',
       'Sec-Websocket-Key': '+HxsOx05N7ArmiVGdL/KFA==',
       'Sec-Websocket-Version': 13,
-      Upgrade: 'websocket',
       'User-Agent':
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
     },
@@ -265,21 +266,30 @@ export async function testWsNotification() {
   // socket.on('data', chunk => {
   //   console.log(chunk.toString());
   // });
-  const ws = new WebSocket(null);
-  // @ts-ignore
-  ws._isServer = false;
+  /** A WebSocket based on current socket */
+  const ws = new WebSocket(null, null, {});
   // @ts-ignore
   ws.setSocket(socket, head, {
     maxPayload: 100 * 1024 * 1024,
     skipUTF8Validation: false,
   });
-
   ws.on('message', (data, isBinary) => {
-    console.log(`data`);
-    console.log(data.toString());
+    logWithColor('red', data.toString());
   });
-  await sendBroadcast(origin);
 
+  const clientSocket = new WebSocket(`${origin}${wsPath}`, [], {});
+  clientSocket.on('message', (data, isBinary) => {
+    logWithColor('blue', data.toString());
+  });
+  await new Promise((res, rej) => {
+    clientSocket.on('open', res);
+    clientSocket.on('error', rej);
+  });
+  // clientSocket.send(Buffer.from('data from client websocket'));
+
+  await waitFor(1000);
+  await sendBroadcast(origin);
+  server.close();
   /** for frontend usage */
   // const socket = new WebSocket('ws://127.0.0.1:3100/api/forum/ws/notifications');
   // // Connection opened
