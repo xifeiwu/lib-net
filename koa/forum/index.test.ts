@@ -269,6 +269,7 @@ export async function testWsNotification() {
   /** A WebSocket based on current socket */
   const ws = new WebSocket(null, null, {});
   // @ts-ignore
+  ws._isServer = false;
   ws.setSocket(socket, head, {
     maxPayload: 100 * 1024 * 1024,
     skipUTF8Validation: false,

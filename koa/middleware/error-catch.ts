@@ -12,6 +12,7 @@ const errorCatchMiddleware: Koa.Middleware = async (ctx: Koa.Context, next) => {
     await next();
   } catch (err) {
     const {url} = ctx;
+    /** Error of async-validator */
     if (err.errors && err.fields) {
       const {
         errors: [firstError],
@@ -23,7 +24,7 @@ const errorCatchMiddleware: Koa.Middleware = async (ctx: Koa.Context, next) => {
       ctx.body = {url, message: INVALIDATE_PAYLOAD, fields};
     } else {
       const message = err.message;
-      ctx.status = 400;
+      ctx.status = 505;
       ctx.body = {
         url,
         message,

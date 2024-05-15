@@ -6,7 +6,7 @@ import {Post} from './types/backend';
 import {postValidator, reactionValidator} from './rules';
 import {Reaction} from './types/frontend';
 import {generateRandomNotifications, getRandom, prefix} from './service';
-import {handleUpgrade, wss} from './websocket';
+import {handleUpgrade, websocketMap} from './websocket';
 
 const router = new KoaRouter({
   prefix,
@@ -94,7 +94,7 @@ router.get('/ws/notifications/broadcast', async (ctx: Koa.Context, next) => {
   const numNotifications = getRandom(5) + 1;
   const notifications = generateRandomNotifications(Date.now() - 5 * 3600 * 1000, numNotifications);
   const buf = await toBuffer({type: 'notifications', payload: notifications});
-  for (const socket of wss.clients.values()) {
+  for (const socket of websocketMap.values()) {
     socket.send(buf, {binary: false});
   }
   ctx.body = notifications;
