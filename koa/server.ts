@@ -4,7 +4,7 @@ import session from 'koa-session';
 import cors from './middleware/cors';
 import debug from './middleware/debug';
 import logs from './middleware/logs';
-import middlewareForum, {handleUpgrade} from './forum';
+import {forumMiddleware, forumWsMiddleware} from './forum';
 import errorCatchMiddleware from './middleware/error-catch';
 import {getAFreePort, isNumber, toInt, PORT} from '../external';
 import {WsMiddleware, getUpgradeHandler} from './websocket';
@@ -98,10 +98,13 @@ export async function startFullFeatureServer(
   middlewareList: Koa.Middleware[] = [],
   options: CustomKoaServerOptions = {}
 ) {
+  const {wsMiddlewareList = [], ...restOptions} = options;
   const {origin, server, app} = await startKoaServer(
-    [...middlewareList, cors(), 'debug', logs(), middlewareForum],
-    options
+    [...middlewareList, cors(), 'debug', logs(), forumMiddleware],
+    {
+      ...restOptions,
+      wsMiddlewareList: [...wsMiddlewareList, forumWsMiddleware],
+    }
   );
-  server.on('upgrade', handleUpgrade);
   return {origin, server, app};
 }

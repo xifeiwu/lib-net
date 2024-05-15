@@ -6,7 +6,7 @@ import {Post} from './types/backend';
 import {postValidator, reactionValidator} from './rules';
 import {Reaction} from './types/frontend';
 import {generateRandomNotifications, getRandom, prefix} from './service';
-import {handleUpgrade, websocketMap} from './websocket';
+import {forumWsMiddleware, websocketMap} from './websocket';
 
 const router = new KoaRouter({
   prefix,
@@ -100,7 +100,6 @@ router.get('/ws/notifications/broadcast', async (ctx: Koa.Context, next) => {
   ctx.body = notifications;
 });
 
-const middlewareForum = router.routes();
+const forumMiddleware = router.routes();
 
-export {handleUpgrade};
-export default middlewareForum;
+export {forumMiddleware, forumWsMiddleware, websocketMap};
