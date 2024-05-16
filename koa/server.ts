@@ -6,8 +6,8 @@ import {middlewareDebug, wsMiddlewareDebug} from './debug';
 import logs from './middleware/logs';
 import {forumMiddleware, forumWsMiddleware} from './forum';
 import errorCatchMiddleware from './middleware/error-catch';
-import {getAFreePort, isNumber, toInt, PORT} from '../external';
 import {WsMiddleware, getUpgradeHandler} from './websocket';
+import {getAFreePort, isNumber, toInt, PORT, closePortIfInUse} from '../external';
 
 export interface CustomKoaServerOptions {
   host?: string;
@@ -52,6 +52,8 @@ export async function startKoaServer(
   if (!isNumber(port)) {
     port = await getAFreePort(PORT.exploreStart.port);
   }
+  await closePortIfInUse(port);
+
   const server = app.listen(port, host);
   if (wsMiddlewareList.length > 0) {
     server.on('upgrade', getUpgradeHandler(wsMiddlewareList));

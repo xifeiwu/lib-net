@@ -2,7 +2,7 @@ export {
   toBuffer,
   requestAndGetUpgradeInfo,
   startSocketClient,
-  isPortOpen,
+  checkPort,
   getAFreePort,
   getRequestInfo,
   spawnTsFile,

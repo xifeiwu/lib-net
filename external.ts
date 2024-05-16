@@ -15,6 +15,7 @@ export {
   urlPropsToInstance,
   toUrlProps,
   isFunction,
+  isString,
 } from '../fe';
 export {
   fromBuffer,
@@ -45,4 +46,6 @@ export {
   toBuffer,
   responseInfoToBuffer,
   CanConvertToBuffer,
+  checkPort,
+  closePortIfInUse,
 } from '../node';
