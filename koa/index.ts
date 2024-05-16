@@ -3,6 +3,7 @@ import cors from './middleware/cors';
 import log from './middleware/log';
 export * from './debug';
 import assist from './middleware/logs';
+export * from './middleware/static';
 import errorCatchMiddleware from './middleware/error-catch';
 export * from './forum';
 export {cors, log, assist, errorCatchMiddleware};

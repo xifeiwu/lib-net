@@ -5,18 +5,30 @@ import Koa from 'koa';
 import stream = require('stream');
 import {toStream, mime, getFileList} from '../../external';
 
-/**
- * Key points:
- * pathname meaning: /path/a, /path/a/
- */
-export interface IFileStore {
-  get(pathname: string): TargetInfo | null;
-  set(pathname: string, info: TargetInfo): void;
-  remove(pathname: string): boolean;
-  all(): {[pathname: string]: TargetInfo};
+interface HttpHeaderConfig {
+  maxAge?: number;
+  cacheControl?: string;
 }
 
-export interface IStaticMiddlewareOptions {
+interface CommonInfo extends HttpHeaderConfig {
+  size: number;
+  modifyTime: Date;
+  md5?: string;
+  timestamp: number;
+}
+export interface LocalFileInfo extends CommonInfo {
+  /** fullpath for local file, buffer for generated file */
+  fullPath: string;
+  extName: string;
+}
+export interface BufferFileInfo extends CommonInfo {
+  buffer: Buffer;
+  contentType: string;
+}
+export type StaticFileInfo = LocalFileInfo | BufferFileInfo;
+
+
+export interface StaticMiddlewareOptions {
   /** target static dir */
   dir: string;
   /** urlPrefix will be replace to '' whne found a file by pathname */
@@ -25,7 +37,7 @@ export interface IStaticMiddlewareOptions {
   // preLoad?: boolean;
   // /** try to find the file from local when it not exist in store */
   // dynamic?: boolean;
-  store?: IFileStore;
+  store?: Map<string, StaticFileInfo>;
   /** enable gzip or not */
   enableGzip?: boolean;
   /** alias a pathname to another name before load file */
@@ -33,40 +45,18 @@ export interface IStaticMiddlewareOptions {
     [pathname: string]: string;
   };
   /** when the target path point to is dir, how to handle it */
-  handleDir?: (fullpath: string) => BufferInfo;
-  /** return a new contentType from origin contentType */
+  handleDir?: (fullpath: string) => BufferFileInfo;
+  /** return a customized contentType from origin contentType */
   customContentType?: (fileInfo: LocalFileInfo) => string | undefined;
-  /** handle data and return new data */
-  postTreatData?: (stream: stream.Readable, fileInfo: TargetInfo) => stream.Readable;
+  /** handle original file/dir data and return new data */
+  postTreatData?: (stream: stream.Readable, fileInfo: StaticFileInfo) => stream.Readable;
   maxCacheTime?: number;
 }
-
-interface IHttpHeaderConfig {
-  maxAge?: number;
-  cacheControl?: string;
-}
-
-interface ICommonInfo extends IHttpHeaderConfig {
-  size: number;
-  modifyTime: Date;
-  md5?: string;
-  timestamp: number;
-}
-export interface LocalFileInfo extends ICommonInfo {
-  /** fullpath for local file, buffer for generated file */
-  fullPath: string;
-  extName: string;
-}
-export interface BufferInfo extends ICommonInfo {
-  buffer: Buffer;
-  contentType: string;
-}
-export type TargetInfo = LocalFileInfo | BufferInfo;
 
 /**
  * A middleware of koa for handle static files under a target folder.
  */
-export default function staticCache(options: IStaticMiddlewareOptions) {
+export function getStaticMiddleware(options: StaticMiddlewareOptions) {
   let {
     dir,
     urlPrefix = '/',
@@ -79,7 +69,7 @@ export default function staticCache(options: IStaticMiddlewareOptions) {
     maxCacheTime = 0,
   } = options;
 
-  const getContentType = (fileInfo: LocalFileInfo | BufferInfo) => {
+  const getContentType = (fileInfo: LocalFileInfo | BufferFileInfo) => {
     if (customContentType && (fileInfo as LocalFileInfo).extName) {
       const contentType = customContentType(fileInfo as LocalFileInfo);
       if (contentType) {
@@ -106,7 +96,7 @@ export default function staticCache(options: IStaticMiddlewareOptions) {
       .filter(it => it)
       .join('/');
 
-  const fileStore = store ? store : new FileManager();
+  const fileStore = store ? store : new Map();
 
   return async (ctx: Koa.Context, next: Koa.Next) => {
     // only accept HEAD and GET
@@ -156,7 +146,7 @@ export default function staticCache(options: IStaticMiddlewareOptions) {
     } else {
       /** check whether fullpath exist in local storage */
       if (!fs.existsSync(fullpath)) {
-        fileStore.remove(fullpath);
+        fileStore.delete(fullpath);
         return await next();
       } else if (maxCacheTime && fileInfo.timestamp + maxCacheTime > Date.now()) {
         const _fileInfo = getFileInfo(fullpath, {handleDir});
@@ -205,8 +195,8 @@ export default function staticCache(options: IStaticMiddlewareOptions) {
     let stream: stream.Readable;
     if ((fileInfo as LocalFileInfo).fullPath) {
       stream = fs.createReadStream((fileInfo as LocalFileInfo).fullPath);
-    } else if (fileInfo as BufferInfo) {
-      stream = toStream((fileInfo as BufferInfo).buffer);
+    } else if (fileInfo as BufferFileInfo) {
+      stream = toStream((fileInfo as BufferFileInfo).buffer);
     }
     if (postTreatData) {
       stream = postTreatData(stream, fileInfo);
@@ -233,7 +223,7 @@ function safeDecodeURIComponent(text: string) {
 const FILE_SIZE_THRESHOLD = 1024 * 1024;
 
 /**
- *
+ * Get file related info except file data, as file data will consume lots of memory
  * @param fullPath
  * @param option
  * @param headerConfig config for http header
@@ -243,10 +233,10 @@ export function getFileInfo(
   fullPath: string,
   option: {
     /** return content of buffer when path points to a directory */
-    handleDir?: IStaticMiddlewareOptions['handleDir'];
+    handleDir?: StaticMiddlewareOptions['handleDir'];
   } = {},
-  headerConfig?: IHttpHeaderConfig
-): TargetInfo | null {
+  headerConfig?: HttpHeaderConfig
+): StaticFileInfo | null {
   if (!fs.existsSync(fullPath)) {
     console.error(`file ${fullPath} not exist`);
     return null;
@@ -269,35 +259,8 @@ export function getFileInfo(
   return null;
 }
 
-interface IFileInfoMap {
-  [pathname: string]: LocalFileInfo;
-}
-
-class FileManager implements IFileStore {
-  public map: IFileInfoMap = {};
-  constructor() {
-    this.map = {};
-  }
-  public get(pathname: string) {
-    return this.map[pathname];
-  }
-  public set(pathname: string, info: LocalFileInfo) {
-    this.map[pathname] = info;
-  }
-  public remove(pathname: string) {
-    if (Object.prototype.hasOwnProperty.call(this.map, pathname)) {
-      delete this.map[pathname];
-      return true;
-    }
-    return false;
-  }
-  public all() {
-    return this.map;
-  }
-}
-
 export function preLoadDir(
-  store: IFileStore,
+  store: Map<string, StaticFileInfo>,
   dirInfo: {
     fullPath: string;
     includeDir?: boolean;
