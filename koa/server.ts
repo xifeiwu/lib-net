@@ -2,18 +2,12 @@ import http from 'http';
 import Koa from 'koa';
 import session from 'koa-session';
 import cors from './middleware/cors';
-import debug from './middleware/debug';
+import {middlewareDebug, wsMiddlewareDebug} from './debug';
 import logs from './middleware/logs';
 import {forumMiddleware, forumWsMiddleware} from './forum';
 import errorCatchMiddleware from './middleware/error-catch';
 import {getAFreePort, isNumber, toInt, PORT} from '../external';
 import {WsMiddleware, getUpgradeHandler} from './websocket';
-
-const middlewareMap = {
-  debug,
-};
-
-type MiddlewareName = keyof typeof middlewareMap;
 
 export interface CustomKoaServerOptions {
   host?: string;
@@ -32,7 +26,7 @@ export interface CustomKoaServerOptions {
  * @returns
  */
 export async function startKoaServer(
-  middlewareList: Array<Koa.Middleware | MiddlewareName> = [],
+  middlewareList: Array<Koa.Middleware> = [],
   options: CustomKoaServerOptions = {}
 ): Promise<{
   origin: string;
@@ -52,11 +46,7 @@ export async function startKoaServer(
     app.use(session(sessionOptions, app));
   }
   for (const middleware of middlewareList) {
-    if (Object.prototype.hasOwnProperty.call(middlewareMap, middleware)) {
-      app.use(middlewareMap[middleware as MiddlewareName]);
-    } else {
-      app.use(middleware as Koa.Middleware);
-    }
+    app.use(middleware as Koa.Middleware);
   }
   port = toInt(port);
   if (!isNumber(port)) {
@@ -90,7 +80,11 @@ export async function startDebugServer(
   middlewareList: Koa.Middleware[] = [],
   options: CustomKoaServerOptions = {}
 ) {
-  return await startKoaServer([...middlewareList, 'debug'], options);
+  const {wsMiddlewareList = [], ...restOptions} = options;
+  return await startKoaServer([...middlewareList, middlewareDebug], {
+    ...restOptions,
+    wsMiddlewareList: [...wsMiddlewareList, wsMiddlewareDebug],
+  });
 }
 
 /** start a koa server with all middlewares that this module have */
@@ -100,10 +94,10 @@ export async function startFullFeatureServer(
 ) {
   const {wsMiddlewareList = [], ...restOptions} = options;
   const {origin, server, app} = await startKoaServer(
-    [...middlewareList, cors(), 'debug', logs(), forumMiddleware],
+    [...middlewareList, cors(), middlewareDebug, logs(), forumMiddleware],
     {
       ...restOptions,
-      wsMiddlewareList: [...wsMiddlewareList, forumWsMiddleware],
+      wsMiddlewareList: [...wsMiddlewareList, wsMiddlewareDebug, forumWsMiddleware],
     }
   );
   return {origin, server, app};

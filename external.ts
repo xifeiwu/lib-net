@@ -13,6 +13,7 @@ export {
   PORT,
   uuid,
   urlPropsToInstance,
+  toUrlProps,
 } from '../fe';
 export {
   fromBuffer,
@@ -42,4 +43,5 @@ export {
   HttpRequestInfo,
   toBuffer,
   responseInfoToBuffer,
+  CanConvertToBuffer,
 } from '../node';
