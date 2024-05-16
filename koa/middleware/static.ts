@@ -3,7 +3,7 @@ import path from 'path';
 import zlib from 'zlib';
 import Koa from 'koa';
 import stream = require('stream');
-import {toStream, mime, getFileList} from '../../external';
+import {toStream, mime, getFileList, isFunction} from '../../external';
 
 interface HttpHeaderConfig {
   maxAge?: number;
@@ -27,7 +27,6 @@ export interface BufferFileInfo extends CommonInfo {
 }
 export type StaticFileInfo = LocalFileInfo | BufferFileInfo;
 
-
 export interface StaticMiddlewareOptions {
   /** target static dir */
   dir: string;
@@ -41,9 +40,11 @@ export interface StaticMiddlewareOptions {
   /** enable gzip or not */
   enableGzip?: boolean;
   /** alias a pathname to another name before load file */
-  alias?: {
-    [pathname: string]: string;
-  };
+  pathnameRewrite?:
+    | {
+        [pathname: string]: string;
+      }
+    | ((pathname: string) => string);
   /** when the target path point to is dir, how to handle it */
   handleDir?: (fullpath: string) => BufferFileInfo;
   /** return a customized contentType from origin contentType */
@@ -62,7 +63,7 @@ export function getStaticMiddleware(options: StaticMiddlewareOptions) {
     urlPrefix = '/',
     store,
     enableGzip = false,
-    alias = {},
+    pathnameRewrite,
     handleDir,
     postTreatData,
     customContentType,
@@ -106,9 +107,12 @@ export function getStaticMiddleware(options: StaticMiddlewareOptions) {
     // decode for `/%E4%B8%AD%E6%96%87`
     // normalize for `//index`
     let pathname = path.normalize(safeDecodeURIComponent(ctx.path));
-    // check alias
-    if (alias && alias[pathname]) {
-      pathname = alias[pathname];
+    if (pathnameRewrite) {
+      if (isFunction(pathnameRewrite)) {
+        pathname = (pathnameRewrite as Function)(pathname);
+      } else if (pathnameRewrite[pathname]) {
+        pathname = pathnameRewrite[pathname];
+      }
     }
     // check prefix first to avoid calculate
     if (pathname.indexOf(urlPrefix) !== 0) {

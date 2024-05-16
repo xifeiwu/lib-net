@@ -14,6 +14,7 @@ export {
   uuid,
   urlPropsToInstance,
   toUrlProps,
+  isFunction,
 } from '../fe';
 export {
   fromBuffer,
