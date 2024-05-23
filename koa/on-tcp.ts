@@ -28,7 +28,7 @@ const app = new Koa();
 app.use(async (ctx, next) => {
   const {url} = ctx;
   ctx.status = 200;
-  ctx.headers['connection'] = 'close';
+  ctx.headers.connection = 'close';
   if (url.startsWith('/api')) {
     ctx.body = 'response for /api';
     return;
