@@ -1,59 +1,51 @@
 import Koa from 'koa';
 import {IncomingMessage, ServerResponse} from 'http';
-import {
-  getResponseData,
-  handleSocketEvents,
-  parseHttpHeaderPart,
-  startSocketServer,
-  HttpResponseInfo,
-} from '../external';
+import {HttpResponseInfo, getResponseData, parseHttpHeaderPart, startSocketServer} from '../external';
+import {Socket, ServerOpts} from 'net';
 
-export const responseInfo: HttpResponseInfo = {
+const KoaInstanceNotFound: HttpResponseInfo = {
   httpVersion: 'HTTP/1.1',
-  statusCode: 200,
-  statusMessage: 'OK',
+  statusCode: 404,
+  statusMessage: 'No handler',
   headers: {
     'content-type': 'application/json',
   },
   data: {
-    id: '8fh924b42o',
-    text: 'this is a comment',
-    createdAt: '2017-04-20T16:19:42.840Z',
-    updatedAt: '2017-04-20T16:19:42.840Z',
+    err: 'koa instance not found',
   },
 };
 
-const app = new Koa();
-// @ts-ignore
-app.use(async (ctx, next) => {
-  const {url} = ctx;
-  ctx.status = 200;
-  ctx.headers.connection = 'close';
-  if (url.startsWith('/api')) {
-    ctx.body = 'response for /api';
-    return;
+export async function startTcpServer(
+  options: {
+    onConnection?: (socket: Socket) => Promise<boolean | void>;
+    tcpHandler?: (firstChunk: Buffer, socket: Socket) => Promise<boolean | void>;
+    koa?: Koa;
+  },
+  tcpOptions?: {
+    host?: string;
+    port?: number;
+    options?: ServerOpts;
   }
-  ctx.body = 'dd';
-  // await next();
-});
-
-export async function startCustomServer() {
+) {
+  const {tcpHandler, koa, onConnection} = options ?? {};
   const {host, port, server} = await startSocketServer(async socket => {
-    handleSocketEvents(socket, {
-      maxPrintDataLength: 100,
-      color: 'red',
-      onData: null,
-    });
-    // socket.on('data', chunk => {
-    //   console.log(chunk.toString());
-    // });
-    // socket.resume
+    if (onConnection && (await onConnection(socket))) {
+      return;
+    }
     const req = new IncomingMessage(socket);
     const {requestInfo, dataConsumed} = await parseHttpHeaderPart(socket);
     if (!requestInfo) {
       if (socket.writable) {
-        socket.end(getResponseData(responseInfo));
+        if (tcpHandler) {
+          tcpHandler(dataConsumed, socket);
+        } else {
+          socket.end('no handler found for this connection');
+        }
       }
+      return;
+    }
+    if (!koa) {
+      socket.end(getResponseData(KoaInstanceNotFound));
       return;
     }
     req.method = requestInfo.method;
@@ -62,10 +54,8 @@ export async function startCustomServer() {
     req.headers = requestInfo.headers;
     const res = new ServerResponse(req);
     res.assignSocket(socket);
-    // res.end('ddd');
-    // socket.end(getResponseData(responseInfo));
-    app.callback()(req, res);
-  });
+    koa.callback()(req, res);
+  }, tcpOptions);
   console.log(`start server: http://${host}:${port}`);
   return {host, port, server};
 }
