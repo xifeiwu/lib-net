@@ -30,6 +30,7 @@ export async function startKoaServer(
   options: CustomKoaServerOptions = {}
 ): Promise<{
   origin: string;
+  host: string;
   port: number;
   server: http.Server;
   app: Koa;
@@ -64,6 +65,7 @@ export async function startKoaServer(
       printOrigin && console.log(`http server started on ${origin}`);
       res({
         origin,
+        host,
         port,
         server,
         app,
