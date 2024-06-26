@@ -1,7 +1,7 @@
 import KoaRouter from 'koa-router';
 import {notifications, posts, users} from './mock-data';
 import Koa from 'koa';
-import {formatDate, getStreamData, toBuffer, uuid} from '../../external';
+import {formatDate, getDataFromReadable, toBuffer, uuid} from '../../external';
 import {Post} from './types/backend';
 import {postValidator, reactionValidator} from './rules';
 import {Reaction} from './types/frontend';
@@ -31,7 +31,7 @@ router.get('/posts/:postId', async (ctx: Koa.Context, next) => {
 });
 
 router.post('/posts', async (ctx: Koa.Context, next) => {
-  const data = await getStreamData(ctx.req);
+  const data = await getDataFromReadable(ctx.req);
   if (!data || data.length === 0) {
     ctx.throw('data is empty', 400);
   }
@@ -51,7 +51,7 @@ router.post('/posts', async (ctx: Koa.Context, next) => {
 });
 
 router.patch('/posts', async (ctx: Koa.Context, next) => {
-  const data = await getStreamData(ctx.req);
+  const data = await getDataFromReadable(ctx.req);
   if (!data || data.length === 0) {
     ctx.throw('data is empty', 400);
   }
@@ -69,7 +69,7 @@ router.post('/posts/:postId/reactions', async (ctx: Koa.Context, next) => {
   ctx.assert(postId, 400, 'postId not found in url');
   const post = posts.find(it => it.id === postId);
   ctx.assert(post, 400, `not found post with postId: ${postId}`);
-  const data = await getStreamData(ctx.req);
+  const data = await getDataFromReadable(ctx.req);
   if (!data || data.length === 0) {
     ctx.throw('data is empty', 400);
   }

@@ -3,7 +3,7 @@ import {
   TcpHttpRequestProps,
   TcpHttpResponseProps,
   getRequestInfo,
-  getStreamData,
+  getDataFromReadable,
   isNumber,
   toInt,
   waitFor,
@@ -29,7 +29,7 @@ router.all('/echo', async (ctx, next) => {
     // query,
     headers,
   };
-  const reqData = await getStreamData(req);
+  const reqData = await getDataFromReadable(req);
   if (reqData.byteLength > 0) {
     resData.data = reqData.toString();
   }

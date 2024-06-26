@@ -1,5 +1,5 @@
 import KoaRouter from 'koa-router';
-import {formatDate, fromBuffer, getStreamData} from '../../external';
+import {formatDate, fromBuffer, getDataFromReadable} from '../../external';
 const MAX_DATA_LIST_LENGTH = 200;
 
 interface LogsOption {
@@ -38,7 +38,7 @@ export default function logs(options?: LogsOption) {
 
   router.post('/:tag?', async ctx => {
     const {tag = ''} = ctx.params;
-    const jsonOrStr = fromBuffer(await getStreamData(ctx.req), 'json');
+    const jsonOrStr = fromBuffer(await getDataFromReadable(ctx.req), 'json');
     ctx.type = 'json';
     ctx.body = pushDataList(jsonOrStr, tag);
   });

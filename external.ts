@@ -21,7 +21,7 @@ export {
 export {
   fromBuffer,
   getAFreePort,
-  getStreamData,
+  getDataFromReadable,
   logWithColor,
   requestAndGetResponseInfo,
   getMockFileFinderByDir,
