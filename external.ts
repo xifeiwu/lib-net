@@ -16,6 +16,7 @@ export {
   toUrlProps,
   isFunction,
   isString,
+  isObject
 } from '../fe';
 export {
   fromBuffer,

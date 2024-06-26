@@ -1,4 +1,10 @@
-import {GeneralRequestConfig, getUrlPropsFromConfig, logWithColor, urlPropsToHref} from '../external';
+import {
+  GeneralRequestConfig,
+  getUrlPropsFromConfig,
+  isObject,
+  logWithColor,
+  urlPropsToHref,
+} from '../external';
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 
 export type CustomizedAxiosRequestConfig = GeneralRequestConfig<AxiosRequestConfig>;
@@ -55,26 +61,30 @@ export function prettyConsoleAxiosError(err: AxiosError | Error, v1: boolean = t
   }
 }
 
-export function axiosConfigToCurlCommand(
-  config: Pick<AxiosRequestConfig<any>, 'baseURL' | 'url' | 'method' | 'headers' | 'auth' | 'params' | 'data'>
-) {
-  const {baseURL, url, method = 'GET', headers, auth, params, data} = config;
-  if (auth) {
-    const {username, password} = auth;
-    headers.Authorization = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');
+const concatenateURL = (url, baseURL) => new URL(url, baseURL).href;
+export function axiosConfigToCurlCommand(axiosConfig: AxiosRequestConfig) {
+  try {
+    const {baseURL = '', url, method = 'GET', headers = {}, auth, data, params} = axiosConfig;
+    if (auth) {
+      const {username, password} = auth;
+      headers.Authorization = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');
+    }
+    const command = [
+      'curl',
+      `-X ${method.toUpperCase()}`,
+      concatenateURL(url, baseURL),
+      ...Object.entries(headers)
+        .filter(([_k, v]) => {
+          return !isObject(v);
+        })
+        .map(([k, v]) => {
+          return `-H '${k}: ${v}'`;
+        }),
+      data !== undefined ? `-d ${isObject(data) ? "'" + JSON.stringify(data) + "'" : data}` : '',
+    ];
+    return command.join(' ');
+  } catch (err) {
+    /** Ignore */
   }
-  if (params) {
-    logWithColor('red', 'curl command may be error with params', params);
-  }
-  urlPropsToHref;
-  const command = [
-    'curl',
-    `-X ${method.toUpperCase()}`,
-    urlPropsToHref({origin: baseURL, pathname: url}),
-    ...Object.entries(headers).map(([k, v]) => {
-      return `-H '${k}: ${v}'`;
-    }),
-    data ? `-d ${JSON.stringify(data)}` : '',
-  ].join(' ');
-  return command;
+  return '';
 }
