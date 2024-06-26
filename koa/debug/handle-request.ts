@@ -1,7 +1,7 @@
 import KoaRouter from 'koa-router';
 import {
-  HttpRequestInfo,
-  HttpResponseInfo,
+  TcpHttpRequestProps,
+  TcpHttpResponseProps,
   getRequestInfo,
   getStreamData,
   isNumber,
@@ -22,7 +22,7 @@ export interface EchoConfig {
 
 router.all('/echo', async (ctx, next) => {
   const {method, url, query, headers, req} = ctx;
-  const resData: HttpRequestInfo = {
+  const resData: TcpHttpRequestProps = {
     method,
     url,
     httpVersion: req.httpVersion,

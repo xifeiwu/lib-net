@@ -1,9 +1,9 @@
 import Koa from 'koa';
 import {IncomingMessage, ServerResponse} from 'http';
-import {HttpResponseInfo, getResponseData, parseHttpHeaderPart, startSocketServer} from '../external';
+import {TcpHttpResponseProps, tcpResponsePropsToBuffer, parseHttpHeaderPart, startSocketServer} from '../external';
 import {Socket, ServerOpts} from 'net';
 
-const KoaInstanceNotFound: HttpResponseInfo = {
+const KoaInstanceNotFound: TcpHttpResponseProps = {
   httpVersion: 'HTTP/1.1',
   statusCode: 404,
   statusMessage: 'No handler',
@@ -45,7 +45,7 @@ export async function startTcpServer(
       return;
     }
     if (!koa) {
-      socket.end(getResponseData(KoaInstanceNotFound));
+      socket.end(tcpResponsePropsToBuffer(KoaInstanceNotFound));
       return;
     }
     req.method = requestInfo.method;

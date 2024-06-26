@@ -2,7 +2,7 @@ import {IncomingMessage} from 'http';
 import {Socket} from 'net';
 import compose from 'koa-compose';
 import WebSocket from 'ws';
-import {HttpRequestInfo, getRequestInfo, responseInfoToBuffer} from '../external';
+import {TcpHttpRequestProps, getRequestInfo, responseInfoToBuffer} from '../external';
 
 export interface Ctx4Upgrade {
   req: IncomingMessage;
