@@ -1,6 +1,11 @@
 import Koa from 'koa';
 import {IncomingMessage, ServerResponse} from 'http';
-import {TcpHttpResponseProps, tcpResponsePropsToBuffer, parseHttpHeaderPart, startSocketServer} from '../external';
+import {
+  TcpHttpResponseProps,
+  tcpResponsePropsToBuffer,
+  parseHttpHeaderPart,
+  startSocketServer,
+} from '../external';
 import {Socket, ServerOpts} from 'net';
 
 const KoaInstanceNotFound: TcpHttpResponseProps = {
@@ -33,8 +38,8 @@ export async function startTcpServer(
       return;
     }
     const req = new IncomingMessage(socket);
-    const {requestInfo, dataConsumed} = await parseHttpHeaderPart(socket);
-    if (!requestInfo) {
+    const {headerPartProps, dataConsumed} = await parseHttpHeaderPart(socket);
+    if (!headerPartProps) {
       if (socket.writable) {
         if (tcpHandler) {
           tcpHandler(dataConsumed, socket);
@@ -48,10 +53,10 @@ export async function startTcpServer(
       socket.end(tcpResponsePropsToBuffer(KoaInstanceNotFound));
       return;
     }
-    req.method = requestInfo.method;
-    req.url = requestInfo.url;
-    req.httpVersion = requestInfo.httpVersion;
-    req.headers = requestInfo.headers;
+    req.method = headerPartProps.method;
+    req.url = headerPartProps.url;
+    req.httpVersion = headerPartProps.httpVersion;
+    req.headers = headerPartProps.headers;
     const res = new ServerResponse(req);
     res.assignSocket(socket);
     koa.callback()(req, res);
