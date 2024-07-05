@@ -1,7 +1,6 @@
 import KoaRouter from 'koa-router';
 import {
   TcpHttpRequestProps,
-  TcpHttpResponseProps,
   getRequestInfo,
   getDataFromReadable,
   isNumber,

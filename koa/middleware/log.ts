@@ -1,7 +1,7 @@
 import Koa from 'koa';
-import {logWithColor} from '../../external';
+import {logColorful} from '../../external';
 
-export default function(options: {
+export default function getLogMiddleware(options: {
   prefix?: string;
   showHeaders?: boolean;
   showPayload?: boolean;
@@ -10,7 +10,8 @@ export default function(options: {
   const {prefix = '->', maxRequestDataLength = 3000, showHeaders = true, showPayload = true} = options;
   return async (ctx: Koa.Context, next: Koa.Next) => {
     const {method = null, href, type, headers, req} = ctx;
-    logWithColor('blue', `${prefix}${href}`);
+    // watchSocketState(req.socket, {color: 'blue'});
+    logColorful({color: 'blue'}, `${prefix}${href}`);
     if (showHeaders) {
       console.log(headers);
     }
@@ -22,7 +23,7 @@ export default function(options: {
             bufferList.push(chunk);
           }
         });
-        req.on('end', function() {
+        req.on('end', () => {
           res(Buffer.concat(bufferList));
         });
         req.on('error', (err: any) => {

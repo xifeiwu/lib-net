@@ -1,14 +1,14 @@
 import Koa from 'koa';
 import {IncomingMessage, ServerResponse} from 'http';
 import {
-  TcpHttpResponseProps,
+  HttpResponseProps,
   tcpResponsePropsToBuffer,
   parseHttpHeaderPart,
   startSocketServer,
 } from '../external';
 import {Socket, ServerOpts} from 'net';
 
-const KoaInstanceNotFound: TcpHttpResponseProps = {
+const KoaInstanceNotFound: HttpResponseProps = {
   httpVersion: 'HTTP/1.1',
   statusCode: 404,
   statusMessage: 'No handler',
