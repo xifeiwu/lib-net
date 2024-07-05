@@ -56,6 +56,7 @@ export async function startTcpServer(
     req.method = headerPartProps.method;
     req.url = headerPartProps.url;
     req.httpVersion = headerPartProps.httpVersion;
+    // @ts-ignore
     req.headers = headerPartProps.headers;
     const res = new ServerResponse(req);
     res.assignSocket(socket);
