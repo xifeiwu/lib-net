@@ -2,10 +2,10 @@ import assert from 'assert';
 import {startKoaServer} from '../server';
 import {requestAndGetResponseInfo} from '../../external';
 import {EchoConfig} from './handle-request';
-import {middlewareDebug, wsMiddlewareDebug} from './index';
+import {getDebug, wsMiddlewareDebug} from './index';
 
 export async function testEcho() {
-  const {origin, server} = await startKoaServer([middlewareDebug], {
+  const {origin, server} = await startKoaServer([getDebug()], {
     wsMiddlewareList: [wsMiddlewareDebug],
   });
   const {
@@ -39,7 +39,7 @@ export async function testEcho() {
  * This only notifies that the socket has been idle. The request must be destroyed manually.
  */
 export async function testTimeout() {
-  const {origin, server} = await startKoaServer([middlewareDebug]);
+  const {origin, server} = await startKoaServer([getDebug()]);
   const echoConfig: EchoConfig = {
     delay: 10,
   };

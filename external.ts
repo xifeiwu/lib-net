@@ -51,4 +51,6 @@ export {
   CanConvertToBuffer,
   checkPort,
   closePortIfInUse,
+  parseBody,
+  ParserOptions
 } from '../node';

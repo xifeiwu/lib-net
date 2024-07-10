@@ -2,7 +2,8 @@ import http from 'http';
 import Koa from 'koa';
 import session from 'koa-session';
 import cors from './middleware/cors';
-import {middlewareDebug, wsMiddlewareDebug} from './debug';
+import {getDebug, wsMiddlewareDebug} from './debug';
+import log from './middleware/log';
 import logs from './middleware/logs';
 import {forumMiddleware, forumWsMiddleware} from './forum';
 import errorCatchMiddleware from './middleware/error-catch';
@@ -17,6 +18,8 @@ export interface CustomKoaServerOptions {
   wsMiddlewareList?: WsMiddleware[];
   /** whether print origin of server or not */
   printOrigin?: boolean;
+  /** dir used to locate upload files */
+  uploadDir?: string;
 }
 
 /**
@@ -85,7 +88,7 @@ export async function startDebugServer(
   options: CustomKoaServerOptions = {}
 ) {
   const {wsMiddlewareList = [], ...restOptions} = options;
-  return await startKoaServer([...middlewareList, middlewareDebug], {
+  return await startKoaServer([...middlewareList, getDebug()], {
     ...restOptions,
     wsMiddlewareList: [...wsMiddlewareList, wsMiddlewareDebug],
   });
@@ -96,9 +99,19 @@ export async function startFullFeatureServer(
   middlewareList: Koa.Middleware[] = [],
   options: CustomKoaServerOptions = {}
 ) {
-  const {wsMiddlewareList = [], ...restOptions} = options;
+  const {wsMiddlewareList = [], uploadDir, ...restOptions} = options;
   const {origin, server, app} = await startKoaServer(
-    [...middlewareList, cors(), middlewareDebug, logs(), forumMiddleware],
+    [
+      // log({
+      //   showHeaders: false,
+      //   showPayload: false,
+      // }),
+      ...middlewareList,
+      cors(),
+      getDebug({uploadDir}),
+      logs(),
+      forumMiddleware,
+    ],
     {
       ...restOptions,
       wsMiddlewareList: [...wsMiddlewareList, wsMiddlewareDebug, forumWsMiddleware],
