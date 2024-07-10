@@ -2,7 +2,7 @@ import http from 'http';
 import Koa from 'koa';
 import session from 'koa-session';
 import cors from './middleware/cors';
-import {getDebug, wsMiddlewareDebug} from './debug';
+import {getDebugMiddleware, debugMiddlewareWs} from './debug';
 import log from './middleware/log';
 import logs from './middleware/logs';
 import {forumMiddleware, forumWsMiddleware} from './forum';
@@ -88,9 +88,9 @@ export async function startDebugServer(
   options: CustomKoaServerOptions = {}
 ) {
   const {wsMiddlewareList = [], ...restOptions} = options;
-  return await startKoaServer([...middlewareList, getDebug()], {
+  return await startKoaServer([...middlewareList, getDebugMiddleware()], {
     ...restOptions,
-    wsMiddlewareList: [...wsMiddlewareList, wsMiddlewareDebug],
+    wsMiddlewareList: [...wsMiddlewareList, debugMiddlewareWs],
   });
 }
 
@@ -108,13 +108,13 @@ export async function startFullFeatureServer(
       // }),
       ...middlewareList,
       cors(),
-      getDebug({uploadDir}),
+      getDebugMiddleware({uploadDir}),
       logs(),
       forumMiddleware,
     ],
     {
       ...restOptions,
-      wsMiddlewareList: [...wsMiddlewareList, wsMiddlewareDebug, forumWsMiddleware],
+      wsMiddlewareList: [...wsMiddlewareList, debugMiddlewareWs, forumWsMiddleware],
     }
   );
   return {origin, server, app};

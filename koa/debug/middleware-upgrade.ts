@@ -24,7 +24,7 @@ export function wsConnections() {
   return connections;
 }
 
-export const wsMiddlewareDebug: WsMiddleware = async (ctx, next) => {
+export const debugMiddlewareWs: WsMiddleware = async (ctx, next) => {
   const {req, socket, head} = ctx;
   const {url} = req;
   const {pathname} = toUrlProps(url);

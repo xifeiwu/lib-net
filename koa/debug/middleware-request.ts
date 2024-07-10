@@ -75,7 +75,7 @@ function getRouter() {
   return router;
 }
 
-export function getDebug(options?: {uploadDir: string}) {
+export function getDebugMiddleware(options?: {uploadDir: string}) {
   const {uploadDir} = options ?? {};
   const router = getRouter();
   if (uploadDir !== undefined) {
