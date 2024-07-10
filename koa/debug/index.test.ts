@@ -1,7 +1,7 @@
 import assert from 'assert';
 import {startKoaServer} from '../server';
 import {requestAndGetResponseInfo} from '../../external';
-import {EchoConfig} from './middleware-request';
+import {EchoConfig} from './middleware-http';
 import {getDebugMiddleware, debugMiddlewareWs} from './index';
 
 export async function testEcho() {

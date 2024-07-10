@@ -1,2 +1,2 @@
-export {getDebugMiddleware} from './middleware-request';
-export {debugMiddlewareWs} from './middleware-upgrade';
+export {getDebugMiddleware} from './middleware-http';
+export {debugMiddlewareWs} from './middleware-ws';
