@@ -12,7 +12,7 @@ import {
   ParserOptions,
 } from '../../external';
 import {urlPrefix} from './service';
-import {broadcastData, wsConnections} from './handle-upgrade';
+import {broadcastData, wsConnections} from './middleware-upgrade';
 
 export interface EchoConfig {
   /** delay response in seconds */
