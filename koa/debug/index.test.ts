@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import assert from 'assert';
 import {startKoaServer} from '../server';
-import {ParserOptions, requestAndGetResponseInfo} from '../../external';
+import {ParsedFileInfo, ParserOptions, requestAndGetResponseInfo} from '../../external';
 import {EchoConfig} from './middleware-http';
 import {debugMiddleware, debugMiddlewareWs} from './index';
 
@@ -44,13 +44,15 @@ export async function testUpload() {
   const {origin, server, app} = await startKoaServer([debugMiddleware], {
     wsMiddlewareList: [debugMiddlewareWs],
   });
+  const uploadDir = path.resolve(__dirname, 'uploads');
   const parseOptions: ParserOptions = {
-    uploadDir: path.resolve(__dirname, 'uploads'),
+    uploadDir,
     wayOfHandleFile: 'save',
   };
   app.context.parseOptions = parseOptions;
 
   try {
+    const fileName = 'test-case-4-debug-middleware.ts';
     const {
       statusCode,
       headers,
@@ -63,11 +65,14 @@ export async function testUpload() {
       },
       method: 'post',
       headers: {
-        'content-type': '.ts',
-        'x-file-name': 'test-case-4-debug-middleware',
+        'content-type': 'application/octet-stream',
+        'x-file-name': fileName,
       },
       data: fs.createReadStream(__filename),
     });
+    console.log(resData);
+    const fileInfo: ParsedFileInfo = resData[fileName];
+    assert.equal(fs.existsSync(path.resolve(uploadDir, fileInfo.name)), true);
   } catch (err) {
     console.log(err);
   }

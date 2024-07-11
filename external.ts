@@ -55,4 +55,5 @@ export {
   parseBody,
   ParserOptions,
   htmlDirContent,
+  ParsedFileInfo,
 } from '../node';
