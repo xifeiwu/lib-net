@@ -1,7 +1,8 @@
+import fs from 'fs';
 import {htmlDirContent} from '../../external';
 import {BufferFileInfo, StaticMiddlewareOptions} from './middleware';
 
-const showDirContent: StaticMiddlewareOptions['handleDir'] = (fullpath: string) => {
+export const handleDirByHtmlDirContent: StaticMiddlewareOptions['handleDir'] = (fullpath: string) => {
   const buffer = Buffer.from(htmlDirContent(fullpath));
   return {
     buffer,
@@ -12,26 +13,70 @@ const showDirContent: StaticMiddlewareOptions['handleDir'] = (fullpath: string) 
   };
 };
 
-export function getOptionsForStaticDir(options: StaticMiddlewareOptions) {
-  const mergedOptions: StaticMiddlewareOptions = {
-    ...options,
-    handleDir: showDirContent,
+export function getPathnameRewriteForSpa(entries: string[]) {
+  const pathnameRewrite: StaticMiddlewareOptions['pathnameRewrite'] = (pathname: string) => {
+    const target = entries.find(it => {
+      return pathname.startsWith('/' + it);
+    });
+    if (target) {
+      return '/' + target + '.html';
+    }
+    return pathname;
   };
-  return mergedOptions;
+  return pathnameRewrite;
 }
 
-export function getOptionsForSpaDir(options: StaticMiddlewareOptions, otherOptions: {entries: string[]}) {
-  const {entries} = otherOptions;
-  return {
-    ...options,
-    pathnameRewrite: (pathname: string) => {
-      const target = entries.find(it => {
-        return pathname.startsWith('/' + it);
-      });
-      if (target) {
-        return '/' + target + '.html';
-      }
-      return pathname;
-    },
-  };
+function isDirectory(fullpath: string) {
+  try {
+    const stat = fs.statSync(fullpath);
+    return stat.isDirectory();
+  } catch (err) {
+    return false;
+  }
+}
+/**
+ * Check whether dir exist and return
+ * @param dirs
+ * @returns
+ */
+export function getDefaultStaticOptionsForDirs(
+  fullPathList: string[],
+  options?: Omit<StaticMiddlewareOptions, 'dir' | 'handleDir'>
+): StaticMiddlewareOptions[] {
+  return fullPathList
+    .filter(fullpath => {
+      isDirectory(fullpath);
+    })
+    .map(fullpath => {
+      return {
+        dir: fullpath,
+        handleDir: handleDirByHtmlDirContent,
+        ...(options ?? {}),
+      };
+    });
+}
+
+export function getDefaultStaticOptionsForSpaDirs(
+  configs: {fullpath: string; entries: string[]}[],
+  options?: Omit<StaticMiddlewareOptions, 'dir' | 'pathnameRewrite'>
+) {
+  return configs
+    .filter(({fullpath}) => {
+      return isDirectory(fullpath);
+    })
+    .map(({fullpath, entries}) => {
+      return {
+        dir: fullpath,
+        pathnameRewrite: (pathname: string) => {
+          const target = entries.find(it => {
+            return pathname.startsWith('/' + it);
+          });
+          if (target) {
+            return '/' + target + '.html';
+          }
+          return pathname;
+        },
+        ...(options ?? {}),
+      };
+    });
 }
