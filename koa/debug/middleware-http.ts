@@ -9,9 +9,11 @@ import {
   waitFor,
   parseBody,
   ParserOptions,
+  toUrlProps,
 } from '../../external';
 import {urlPrefix} from './service';
 import {broadcastData, wsConnections} from './middleware-ws';
+import {NormalizedUrlProps} from '../../../fe';
 
 export interface EchoConfig {
   /** delay response in seconds */
@@ -23,13 +25,15 @@ const router = new KoaRouter({
 });
 
 router.all('/echo', async (ctx, next) => {
-  const {method, url, query, headers, req} = ctx;
-  const resData: TcpHttpRequestProps = {
+  const {method, url, headers, req} = ctx;
+  const {query, pathname} = toUrlProps(url);
+  const resData: TcpHttpRequestProps & NormalizedUrlProps = {
     method,
     url,
     httpVersion: req.httpVersion,
-    // query,
     headers,
+    pathname,
+    query,
   };
   const reqData = await getDataFromReadable(req);
   if (reqData.byteLength > 0) {
