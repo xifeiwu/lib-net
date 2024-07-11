@@ -3,7 +3,7 @@ import path from 'path';
 import zlib from 'zlib';
 import Koa from 'koa';
 import stream = require('stream');
-import {toStream, mime, getFileList, isFunction} from '../../external';
+import {toReadable, mime, getFileList, isFunction} from '../../external';
 
 interface HttpHeaderConfig {
   maxAge?: number;
@@ -200,7 +200,7 @@ export function getStaticMiddleware(options: StaticMiddlewareOptions) {
     if ((fileInfo as LocalFileInfo).fullPath) {
       stream = fs.createReadStream((fileInfo as LocalFileInfo).fullPath);
     } else if (fileInfo as BufferFileInfo) {
-      stream = toStream((fileInfo as BufferFileInfo).buffer);
+      stream = toReadable((fileInfo as BufferFileInfo).buffer);
     }
     if (postTreatData) {
       stream = postTreatData(stream, fileInfo);

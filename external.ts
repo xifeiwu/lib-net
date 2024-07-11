@@ -28,7 +28,7 @@ export {
   requestAndGetResponseInfo,
   getMockFileFinderByDir,
   readDirRecursive,
-  toStream,
+  toReadable,
   getFileList,
   mime,
   MockFileContentWithRelativePath,
@@ -52,5 +52,6 @@ export {
   checkPort,
   closePortIfInUse,
   parseBody,
-  ParserOptions
+  ParserOptions,
+  htmlDirContent,
 } from '../node';
