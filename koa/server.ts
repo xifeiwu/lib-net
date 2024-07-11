@@ -2,7 +2,7 @@ import http from 'http';
 import Koa from 'koa';
 import session from 'koa-session';
 import cors from './middleware/cors';
-import {getDebugMiddleware, debugMiddlewareWs} from './debug';
+import {debugMiddleware, debugMiddlewareWs} from './debug';
 import log from './middleware/log';
 import logs from './middleware/logs';
 import {forumMiddleware, forumWsMiddleware} from './forum';
@@ -18,8 +18,6 @@ export interface CustomKoaServerOptions {
   wsMiddlewareList?: WsMiddleware[];
   /** whether print origin of server or not */
   printOrigin?: boolean;
-  /** dir used to locate upload files */
-  uploadDir?: string;
 }
 
 /**
@@ -80,6 +78,7 @@ export async function startKoaServer(
   });
 }
 
+
 /**
  * A http server mainly used for debug, with two koa middleware: cors, debug.
  */
@@ -88,7 +87,7 @@ export async function startDebugServer(
   options: CustomKoaServerOptions = {}
 ) {
   const {wsMiddlewareList = [], ...restOptions} = options;
-  return await startKoaServer([...middlewareList, getDebugMiddleware()], {
+  return await startKoaServer([...middlewareList, debugMiddleware], {
     ...restOptions,
     wsMiddlewareList: [...wsMiddlewareList, debugMiddlewareWs],
   });
@@ -99,7 +98,7 @@ export async function startFullFeatureServer(
   middlewareList: Koa.Middleware[] = [],
   options: CustomKoaServerOptions = {}
 ) {
-  const {wsMiddlewareList = [], uploadDir, ...restOptions} = options;
+  const {wsMiddlewareList = [], ...restOptions} = options;
   const {origin, server, app} = await startKoaServer(
     [
       // log({
@@ -108,7 +107,7 @@ export async function startFullFeatureServer(
       // }),
       ...middlewareList,
       cors(),
-      getDebugMiddleware({uploadDir}),
+      debugMiddleware,
       logs(),
       forumMiddleware,
     ],
