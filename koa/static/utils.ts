@@ -29,7 +29,8 @@ export function getPathnameRewriteForSpa(entries: string[]) {
 function isDirectory(fullpath: string) {
   try {
     const stat = fs.statSync(fullpath);
-    return stat.isDirectory();
+    const isDir = stat.isDirectory();
+    return isDir;
   } catch (err) {
     return false;
   }
@@ -45,7 +46,7 @@ export function getDefaultStaticOptionsForDirs(
 ): StaticMiddlewareOptions[] {
   return fullPathList
     .filter(fullpath => {
-      isDirectory(fullpath);
+      return isDirectory(fullpath);
     })
     .map(fullpath => {
       return {

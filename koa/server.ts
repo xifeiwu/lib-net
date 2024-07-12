@@ -32,7 +32,7 @@ export async function startKoaServer(
 }> {
   middlewareList = middlewareList ?? [];
   wsMiddlewareList = wsMiddlewareList ?? [];
-  const {host = '0.0.0.0', port, bodyParserOptions, keys, sessionOptions, printOrigin} = options;
+  const {host = '0.0.0.0', port, bodyParserOptions, keys, sessionOptions, printOrigin = true} = options;
   let finalPort = toInt(port);
   if (!isNumber(finalPort)) {
     finalPort = await getAFreePort(PORT.exploreStart.port);
