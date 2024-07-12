@@ -9,7 +9,7 @@ import {forumMiddleware, forumWsMiddleware} from './forum';
 import errorCatchMiddleware from './middleware/error-catch';
 import {getUpgradeHandler} from './websocket';
 import {getAFreePort, isNumber, toInt, PORT, closePortIfInUse} from '../external';
-import {CustomizeKoaConfig, KoaConfig, WsMiddleware} from './types';
+import {CustomKoaConfig, KoaConfig, WsMiddleware} from './types';
 import {
   getDefaultStaticOptionsForDirs,
   getDefaultStaticOptionsForSpaDirs,
@@ -17,12 +17,7 @@ import {
 } from './static';
 
 /**
- * Start a http server based on Koa, include middlwares:
- * 1. errorCatchMiddleware
- * 2. sessionMiddleware(if sessionOptions provided)
- * @param middlewareList
- * @param options
- * @returns
+ * start koa server with KoaConfig
  */
 export async function startKoaServer(
   options: KoaConfig = {},
@@ -45,7 +40,7 @@ export async function startKoaServer(
   await closePortIfInUse(finalPort);
 
   const app = new Koa();
-  /** add  */
+  /** add bodyParserOptions to context, so */
   app.context.bodyParserOptions = bodyParserOptions;
   if (Array.isArray(keys)) {
     app.keys = keys;
@@ -79,8 +74,8 @@ export async function startKoaServer(
   });
 }
 
-export async function startCustomizedKoaServer(
-  options: CustomizeKoaConfig,
+export async function startCustomKoaServer(
+  options: CustomKoaConfig,
   middlewareList?: Array<Koa.Middleware>,
   wsMiddlewareList?: WsMiddleware[]
 ) {
@@ -110,11 +105,8 @@ export async function startCustomizedKoaServer(
 /**
  * A http server mainly used for debug, with two koa middleware: cors, debug.
  */
-export async function startDebugServer(
-  middlewareList: Koa.Middleware[] = [],
-  options: CustomizeKoaConfig = {}
-) {
-  return await startCustomizedKoaServer({useDebugMW: true}, middlewareList);
+export async function startDebugServer(middlewareList: Koa.Middleware[] = [], options: CustomKoaConfig = {}) {
+  return await startCustomKoaServer({useDebugMW: true}, middlewareList);
 }
 
 /** start a koa server with all middlewares that this module have */

@@ -7,6 +7,8 @@ import WebSocket from 'ws';
 import {CorsMWOptions} from './middleware/cors';
 import {LogsMWOptions} from './middleware/logs';
 
+export {StaticMiddlewareOptions} from './static';
+
 export interface SpaDirInfo {
   fullpath: string;
   entries: string[];
@@ -27,7 +29,7 @@ export interface KoaConfig {
   /** whether print origin of server or not */
   printOrigin?: boolean;
 }
-export interface CustomizeKoaConfig extends KoaConfig {
+export interface CustomKoaConfig extends KoaConfig {
   /** http middleware config */
   useErrorCatchMW?: boolean;
   useDebugMW?: boolean;
