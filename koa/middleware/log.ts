@@ -1,45 +1,89 @@
 import Koa from 'koa';
-import {logColorful} from '../../external';
+import {ColorStyle, logColorful, getRandomBase64String, getRequestHeaderInfo} from '../../external';
+import {INVALIDATE_PAYLOAD} from './error-catch';
 
-export default function getLogMiddleware(options: {
+export interface LogMWOptions {
+  theme?: ColorStyle;
   prefix?: string;
-  showHeaders?: boolean;
-  showPayload?: boolean;
-  maxRequestDataLength?: number;
-}) {
-  const {prefix = '->', maxRequestDataLength = 3000, showHeaders = true, showPayload = true} = options;
+  logHeaders?: boolean;
+  logBody?: {
+    maxSize?: number;
+  };
+  catchAndWrapError?: boolean;
+}
+export function getLogMiddleware(options: LogMWOptions) {
+  const {
+    theme = {color: 'yellow'},
+    prefix = '->',
+    logHeaders = true,
+    logBody,
+    catchAndWrapError = true,
+  } = options;
   return async (ctx: Koa.Context, next: Koa.Next) => {
-    const {method = null, href, type, headers, req} = ctx;
+    const requestId = getRandomBase64String(8);
+    const {type, req} = ctx;
+    const {method, url, httpVersion, headers} = getRequestHeaderInfo(req);
     // watchSocketState(req.socket, {color: 'blue'});
-    logColorful({color: 'blue'}, `${prefix}${href}`);
-    if (showHeaders) {
-      console.log(headers);
+    logColorful(theme, requestId, [method, url, httpVersion].join(' '));
+    if (logHeaders) {
+      logColorful({}, headers);
     }
-    if (showPayload) {
+    if (logBody) {
+      const {maxSize = 1024} = logBody ?? {};
       new Promise<Buffer>((res, rej) => {
+        let byteLength = 0;
         const bufferList: Buffer[] = [];
         req.on('data', (chunk: Buffer) => {
-          if (bufferList.length < maxRequestDataLength) {
+          if (byteLength < maxSize) {
             bufferList.push(chunk);
+            byteLength += chunk.byteLength;
           }
         });
         req.on('end', () => {
-          res(Buffer.concat(bufferList));
+          res(Buffer.concat(bufferList).subarray(0, maxSize));
         });
         req.on('error', (err: any) => {
           rej(err);
         });
       })
         .then(buf => {
-          console.log(`HTTP ${method} ${href}`);
-          if (type === 'application/json') {
-            console.log(buf.toString());
-          }
+          logColorful(theme, requestId);
+          console.log(buf.toString());
+          // if (type === 'application/json') {
+          //   console.log(buf.toString());
+          // }
         })
         .catch(err => {
           console.log(err);
         });
     }
-    await next();
+    if (catchAndWrapError) {
+      try {
+        await next();
+      } catch (err) {
+        const {url} = ctx;
+        /** Error of async-validator */
+        if (err.errors && err.fields) {
+          const {
+            errors: [firstError],
+            fields,
+          } = err;
+          // ctx.throw(fields, 400);
+          ctx.status = 400;
+          ctx.type = 'json';
+          ctx.body = {url, message: INVALIDATE_PAYLOAD, fields};
+        } else {
+          const message = err.message;
+          ctx.status = 505;
+          ctx.body = {
+            url,
+            message,
+          };
+          // ctx.throw({url, message}, 400);
+        }
+      }
+    } else {
+      await next();
+    }
   };
 }

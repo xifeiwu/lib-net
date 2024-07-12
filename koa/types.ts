@@ -6,6 +6,7 @@ import {Socket} from 'net';
 import WebSocket from 'ws';
 import {CorsMWOptions} from './middleware/cors';
 import {LogsMWOptions} from './middleware/logs';
+import {LogMWOptions} from './middleware/log';
 
 export {StaticMiddlewareOptions} from './static';
 
@@ -31,7 +32,8 @@ export interface KoaConfig {
 }
 export interface CustomKoaConfig extends KoaConfig {
   /** http middleware config */
-  useErrorCatchMW?: boolean;
+  // useErrorCatchMW?: boolean;
+  logMWOptions?: LogMWOptions;
   useDebugMW?: boolean;
   corsWMOptions?: CorsMWOptions;
   logsMWOptions?: LogsMWOptions;

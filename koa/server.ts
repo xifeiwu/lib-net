@@ -3,12 +3,12 @@ import Koa from 'koa';
 import session from 'koa-session';
 import cors from './middleware/cors';
 import {debugMiddleware, debugMiddlewareWs} from './debug';
-import log from './middleware/log';
+import {getLogMiddleware} from './middleware/log';
 import logs from './middleware/logs';
 import {forumMiddleware, forumWsMiddleware} from './forum';
 import errorCatchMiddleware from './middleware/error-catch';
 import {getUpgradeHandler} from './websocket';
-import {getAFreePort, isNumber, toInt, PORT, closePortIfInUse} from '../external';
+import {getAFreePort, isNumber, toInt, PORT, closePortIfInUse, getLocalIpAddress} from '../external';
 import {CustomKoaConfig, KoaConfig, WsMiddleware} from './types';
 import {
   getDefaultStaticOptionsForDirs,
@@ -32,7 +32,17 @@ export async function startKoaServer(
 }> {
   middlewareList = middlewareList ?? [];
   wsMiddlewareList = wsMiddlewareList ?? [];
-  const {host = '0.0.0.0', port, bodyParserOptions, keys, sessionOptions, printOrigin = true} = options;
+  /**
+   * When host is set to '0.0.0.0', the service can be accessed from outside
+   */
+  const {
+    host = '0.0.0.0',
+    port,
+    bodyParserOptions,
+    keys,
+    sessionOptions,
+    printOrigin = true,
+  } = options;
   let finalPort = toInt(port);
   if (!isNumber(finalPort)) {
     finalPort = await getAFreePort(PORT.exploreStart.port);
@@ -60,6 +70,7 @@ export async function startKoaServer(
     server.on('listening', () => {
       const origin = `http://${host}:${finalPort}`;
       printOrigin && console.log(`http server started on ${origin}`);
+      printOrigin && console.log(`http server started on ${`http://${getLocalIpAddress()}:${finalPort}`}`);
       res({
         origin,
         host,
@@ -81,11 +92,11 @@ export async function startCustomKoaServer(
 ) {
   middlewareList = middlewareList ?? [];
   wsMiddlewareList = wsMiddlewareList ?? [];
-  const {useErrorCatchMW, useDebugMW, corsWMOptions, logsMWOptions, useForumMW, staticWMConfig} = options;
+  const {logMWOptions, useDebugMW, corsWMOptions, logsMWOptions, useForumMW, staticWMConfig} = options;
 
   /** errorCatchMiddleware should be set as first koa middleware */
-  if (useErrorCatchMW) {
-    middlewareList.unshift(errorCatchMiddleware);
+  if (logMWOptions) {
+    middlewareList.unshift(getLogMiddleware(logMWOptions));
   }
   useDebugMW && middlewareList.push(debugMiddleware) && wsMiddlewareList.push(debugMiddlewareWs);
   corsWMOptions && middlewareList.push(cors(corsWMOptions));

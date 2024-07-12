@@ -12,6 +12,7 @@ export {
   waitFor,
   PORT,
   uuid,
+  getRandomBase64String,
   urlPropsToInstance,
   toUrlProps,
   isFunction,
@@ -24,6 +25,7 @@ export {
   getAFreePort,
   getDataFromReadable,
   logWithColor,
+  ColorStyle,
   logColorful,
   watchSocketState,
   requestAndGetResponseInfo,
@@ -56,4 +58,6 @@ export {
   ParserOptions,
   htmlDirContent,
   ParsedFileInfo,
+  getLocalIpAddress,
+  getRequestHeaderInfo,
 } from '../node';
