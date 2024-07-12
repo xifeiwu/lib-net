@@ -77,9 +77,9 @@ router.get('/ws/connections', async ctx => {
 
 const uploadMiddleware: Koa.Middleware = async ctx => {
   const parseOptionsFromQuery = ctx.query as Partial<ParserOptions>;
-  const {parseOptions} = ctx;
+  const {bodyParserOptions} = ctx;
   ctx.body = await parseBody(ctx.req, {
-    ...parseOptions,
+    ...bodyParserOptions,
     ...parseOptionsFromQuery,
   });
 };

@@ -7,28 +7,27 @@ import log from './middleware/log';
 import logs from './middleware/logs';
 import {forumMiddleware, forumWsMiddleware} from './forum';
 import errorCatchMiddleware from './middleware/error-catch';
-import {WsMiddleware, getUpgradeHandler} from './websocket';
+import {getUpgradeHandler} from './websocket';
 import {getAFreePort, isNumber, toInt, PORT, closePortIfInUse} from '../external';
-
-export interface CustomKoaServerOptions {
-  host?: string;
-  port?: number;
-  keys?: string[];
-  sessionOptions?: Partial<session.opts>;
-  wsMiddlewareList?: WsMiddleware[];
-  /** whether print origin of server or not */
-  printOrigin?: boolean;
-}
+import {CustomizeKoaConfig, KoaConfig, WsMiddleware} from './types';
+import {
+  getDefaultStaticOptionsForDirs,
+  getDefaultStaticOptionsForSpaDirs,
+  getStaticMiddleware,
+} from './static';
 
 /**
- * Start a http server based on Koa
+ * Start a http server based on Koa, include middlwares:
+ * 1. errorCatchMiddleware
+ * 2. sessionMiddleware(if sessionOptions provided)
  * @param middlewareList
  * @param options
  * @returns
  */
 export async function startKoaServer(
-  middlewareList: Array<Koa.Middleware> = [],
-  options: CustomKoaServerOptions = {}
+  options: KoaConfig = {},
+  middlewareList?: Array<Koa.Middleware>,
+  wsMiddlewareList?: WsMiddleware[]
 ): Promise<{
   origin: string;
   host: string;
@@ -36,33 +35,35 @@ export async function startKoaServer(
   server: http.Server;
   app: Koa;
 }> {
-  const {host = '0.0.0.0', keys, sessionOptions, printOrigin, wsMiddlewareList = []} = options;
-  let {port} = options;
+  middlewareList = middlewareList ?? [];
+  wsMiddlewareList = wsMiddlewareList ?? [];
+  const {host = '0.0.0.0', port, bodyParserOptions, keys, sessionOptions, printOrigin} = options;
+  let finalPort = toInt(port);
+  if (!isNumber(finalPort)) {
+    finalPort = await getAFreePort(PORT.exploreStart.port);
+  }
+  await closePortIfInUse(finalPort);
+
   const app = new Koa();
+  /** add  */
+  app.context.bodyParserOptions = bodyParserOptions;
   if (Array.isArray(keys)) {
     app.keys = keys;
   }
-  /** errorCatchMiddleware should be set as first koa middleware */
-  app.use(errorCatchMiddleware);
   if (sessionOptions) {
-    app.use(session(sessionOptions, app));
+    /** session middle should be used as first middleware */
+    middlewareList.unshift(session(sessionOptions, app));
   }
-  for (const middleware of middlewareList) {
-    app.use(middleware as Koa.Middleware);
-  }
-  port = toInt(port);
-  if (!isNumber(port)) {
-    port = await getAFreePort(PORT.exploreStart.port);
-  }
-  await closePortIfInUse(port);
 
-  const server = app.listen(port, host);
+  /** app.middleware assginment should happen before app.listen */
+  app.middleware = middlewareList;
+  const server = app.listen(finalPort, host);
   if (wsMiddlewareList.length > 0) {
     server.on('upgrade', getUpgradeHandler(wsMiddlewareList));
   }
   return new Promise((res, rej) => {
     server.on('listening', () => {
-      const origin = `http://${host}:${port}`;
+      const origin = `http://${host}:${finalPort}`;
       printOrigin && console.log(`http server started on ${origin}`);
       res({
         origin,
@@ -78,43 +79,66 @@ export async function startKoaServer(
   });
 }
 
+export async function startCustomizedKoaServer(
+  options: CustomizeKoaConfig,
+  middlewareList?: Array<Koa.Middleware>,
+  wsMiddlewareList?: WsMiddleware[]
+) {
+  middlewareList = middlewareList ?? [];
+  wsMiddlewareList = wsMiddlewareList ?? [];
+  const {useErrorCatchMW, useDebugMW, corsWMOptions, logsMWOptions, useForumMW, staticWMConfig} = options;
 
+  /** errorCatchMiddleware should be set as first koa middleware */
+  if (useErrorCatchMW) {
+    middlewareList.unshift(errorCatchMiddleware);
+  }
+  useDebugMW && middlewareList.push(debugMiddleware) && wsMiddlewareList.push(debugMiddlewareWs);
+  corsWMOptions && middlewareList.push(cors(corsWMOptions));
+  logsMWOptions && middlewareList.push(logs(logsMWOptions));
+  useForumMW && middlewareList.push(forumMiddleware) && wsMiddlewareList.push(forumWsMiddleware);
+  if (staticWMConfig) {
+    const {dirList = [], spaDirList = [], mwOptions} = staticWMConfig;
+    const staticSpaDirOptionsList = getDefaultStaticOptionsForSpaDirs(spaDirList, mwOptions);
+    const staticDirOptionsList = getDefaultStaticOptionsForDirs(dirList, mwOptions);
+    const staticMiddlewares = [...staticSpaDirOptionsList, ...staticDirOptionsList].map(config =>
+      getStaticMiddleware(config)
+    );
+    middlewareList.push(...staticMiddlewares);
+  }
+  return await startKoaServer(options, middlewareList, wsMiddlewareList);
+}
 /**
  * A http server mainly used for debug, with two koa middleware: cors, debug.
  */
 export async function startDebugServer(
   middlewareList: Koa.Middleware[] = [],
-  options: CustomKoaServerOptions = {}
+  options: CustomizeKoaConfig = {}
 ) {
-  const {wsMiddlewareList = [], ...restOptions} = options;
-  return await startKoaServer([...middlewareList, debugMiddleware], {
-    ...restOptions,
-    wsMiddlewareList: [...wsMiddlewareList, debugMiddlewareWs],
-  });
+  return await startCustomizedKoaServer({useDebugMW: true}, middlewareList);
 }
 
 /** start a koa server with all middlewares that this module have */
-export async function startFullFeatureServer(
-  middlewareList: Koa.Middleware[] = [],
-  options: CustomKoaServerOptions = {}
-) {
-  const {wsMiddlewareList = [], ...restOptions} = options;
-  const {origin, server, app} = await startKoaServer(
-    [
-      // log({
-      //   showHeaders: false,
-      //   showPayload: false,
-      // }),
-      ...middlewareList,
-      cors(),
-      debugMiddleware,
-      logs(),
-      forumMiddleware,
-    ],
-    {
-      ...restOptions,
-      wsMiddlewareList: [...wsMiddlewareList, debugMiddlewareWs, forumWsMiddleware],
-    }
-  );
-  return {origin, server, app};
-}
+// export async function startFullFeatureServer(
+//   middlewareList: Koa.Middleware[] = [],
+//   options: CustomizeKoaConfig = {}
+// ) {
+//   const {wsMiddlewareList = [], ...restOptions} = options;
+//   const {origin, server, app} = await startKoaServer(
+//     [
+//       // log({
+//       //   showHeaders: false,
+//       //   showPayload: false,
+//       // }),
+//       ...middlewareList,
+//       cors(),
+//       debugMiddleware,
+//       logs(),
+//       forumMiddleware,
+//     ],
+//     {
+//       ...restOptions,
+//       wsMiddlewareList: [...wsMiddlewareList, debugMiddlewareWs, forumWsMiddleware],
+//     }
+//   );
+//   return {origin, server, app};
+// }

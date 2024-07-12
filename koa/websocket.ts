@@ -1,16 +1,12 @@
 import {IncomingMessage} from 'http';
 import {Socket} from 'net';
 import compose from 'koa-compose';
-import WebSocket from 'ws';
-import {TcpHttpRequestProps, getRequestInfo, responseInfoToBuffer} from '../external';
+import {responseInfoToBuffer} from '../external';
+import {Ctx4Upgrade} from './types';
 
-export interface Ctx4Upgrade {
-  req: IncomingMessage;
-  socket: Socket;
-  head: Buffer;
-  ws?: WebSocket;
-}
-
+/**
+ * @deprecated by WsMiddleware in types.ts
+ */
 export type WsMiddleware = (ctx: Ctx4Upgrade, next) => Promise<void>;
 
 const NotFoundMiddleware = (ctx: Ctx4Upgrade, next) => {

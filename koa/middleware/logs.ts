@@ -2,10 +2,10 @@ import KoaRouter from 'koa-router';
 import {formatDate, fromBuffer, getDataFromReadable} from '../../external';
 const MAX_DATA_LIST_LENGTH = 200;
 
-interface LogsOption {
+export interface LogsMWOptions {
   maxSize?: number;
 }
-export default function logs(options?: LogsOption) {
+export default function logs(options?: LogsMWOptions) {
   const {maxSize = MAX_DATA_LIST_LENGTH} = options ?? {};
   const router = new KoaRouter({
     prefix: '/api/log',

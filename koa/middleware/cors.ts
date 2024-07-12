@@ -14,16 +14,17 @@
  */
 
 import Koa from 'koa';
-export default function crossOrigin(
-  options: {
-    origin?: string | ((ctx: Koa.Context) => boolean | string) | undefined;
-    exposeHeaders?: string[] | undefined;
-    maxAge?: number | undefined;
-    credentials?: boolean | undefined;
-    allowMethods?: string[] | undefined;
-    allowHeaders?: string[] | undefined;
-  } = {}
-) {
+
+export interface CorsMWOptions {
+  origin?: string | ((ctx: Koa.Context) => boolean | string) | undefined;
+  exposeHeaders?: string[] | undefined;
+  maxAge?: number | undefined;
+  credentials?: boolean | undefined;
+  allowMethods?: string[] | undefined;
+  allowHeaders?: string[] | undefined;
+}
+
+export default function crossOrigin(options: CorsMWOptions = {}) {
   const defaultOptions = {
     allowMethods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
   };

@@ -7,9 +7,7 @@ import {EchoConfig} from './middleware-http';
 import {debugMiddleware, debugMiddlewareWs} from './index';
 
 export async function testEcho() {
-  const {origin, server} = await startKoaServer([debugMiddleware], {
-    wsMiddlewareList: [debugMiddlewareWs],
-  });
+  const {origin, server} = await startKoaServer({}, [debugMiddleware]);
   const {
     statusCode,
     headers,
@@ -41,15 +39,12 @@ export async function testEcho() {
 }
 
 export async function testUpload() {
-  const {origin, server, app} = await startKoaServer([debugMiddleware], {
-    wsMiddlewareList: [debugMiddlewareWs],
-  });
   const uploadDir = path.resolve(__dirname, 'uploads');
-  const parseOptions: ParserOptions = {
+  const bodyParserOptions: ParserOptions = {
     uploadDir,
     wayOfHandleFile: 'save',
   };
-  app.context.parseOptions = parseOptions;
+  const {origin, server, app} = await startKoaServer({bodyParserOptions}, [debugMiddleware]);
 
   try {
     const fileName = 'test-case-4-debug-middleware.ts';
@@ -72,21 +67,13 @@ export async function testUpload() {
     });
     console.log(resData);
     const fileInfo: ParsedFileInfo = resData[fileName];
+    assert.equal(statusCode, 200);
     assert.equal(fs.existsSync(path.resolve(uploadDir, fileInfo.name)), true);
   } catch (err) {
     console.log(err);
+  } finally {
+    server.close();
   }
-  // assert.equal(statusCode, 200);
-  // try {
-  //   const {method, url, headers, data} = resData;
-  //   assert.equal(method, 'POST');
-  //   assert.equal(url, '/api/debug/echo?a=b');
-  //   assert.equal(headers.agent, 'node');
-  //   assert.equal(data, 'abc');
-  // } catch (err) {
-  //   console.error(err);
-  // }
-  // server.close();
 }
 
 /**
@@ -94,7 +81,7 @@ export async function testUpload() {
  * This only notifies that the socket has been idle. The request must be destroyed manually.
  */
 export async function testTimeout() {
-  const {origin, server} = await startKoaServer([debugMiddleware]);
+  const {origin, server} = await startKoaServer({}, [debugMiddleware]);
   const echoConfig: EchoConfig = {
     delay: 10,
   };
