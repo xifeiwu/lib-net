@@ -35,14 +35,7 @@ export async function startKoaServer(
   /**
    * When host is set to '0.0.0.0', the service can be accessed from outside
    */
-  const {
-    host = '0.0.0.0',
-    port,
-    bodyParserOptions,
-    keys,
-    sessionOptions,
-    printOrigin = true,
-  } = options;
+  const {host = '0.0.0.0', port, bodyParserOptions, keys, sessionOptions, printOrigin = true} = options;
   let finalPort = toInt(port);
   if (!isNumber(finalPort)) {
     finalPort = await getAFreePort(PORT.exploreStart.port);
@@ -104,6 +97,11 @@ export async function startCustomKoaServer(
   useForumMW && middlewareList.push(forumMiddleware) && wsMiddlewareList.push(forumWsMiddleware);
   if (staticWMConfig) {
     const {dirList = [], spaDirList = [], mwOptions} = staticWMConfig;
+    /**
+     * It is better to place spaStaticDir before staticDir:
+     * spa files should be less than static files
+     * url to spa should not intercepted by static file
+     */
     const staticSpaDirOptionsList = getDefaultStaticOptionsForSpaDirs(spaDirList, mwOptions);
     const staticDirOptionsList = getDefaultStaticOptionsForDirs(dirList, mwOptions);
     const staticMiddlewares = [...staticSpaDirOptionsList, ...staticDirOptionsList].map(config =>

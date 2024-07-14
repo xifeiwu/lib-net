@@ -7,6 +7,11 @@ export interface ErrorBody {
   message: string;
   [name: string]: any;
 }
+/**
+ * @deprecated replaced by log middleware
+ * @param ctx
+ * @param next
+ */
 const errorCatchMiddleware: Koa.Middleware = async (ctx: Koa.Context, next) => {
   try {
     await next();

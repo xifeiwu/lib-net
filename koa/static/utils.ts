@@ -35,27 +35,6 @@ function isDirectory(fullpath: string) {
     return false;
   }
 }
-/**
- * Check whether dir exist and return
- * @param dirs
- * @returns
- */
-export function getDefaultStaticOptionsForDirs(
-  fullPathList: string[],
-  options?: Omit<StaticMiddlewareOptions, 'dir' | 'handleDir'>
-): StaticMiddlewareOptions[] {
-  return fullPathList
-    .filter(fullpath => {
-      return isDirectory(fullpath);
-    })
-    .map(fullpath => {
-      return {
-        dir: fullpath,
-        handleDir: handleDirByHtmlDirContent,
-        ...(options ?? {}),
-      };
-    });
-}
 
 export function getDefaultStaticOptionsForSpaDirs(
   configs: {fullpath: string; entries: string[]}[],
@@ -77,6 +56,28 @@ export function getDefaultStaticOptionsForSpaDirs(
           }
           return pathname;
         },
+        ...(options ?? {}),
+      };
+    });
+}
+
+/**
+ * Check whether dir exist and return
+ * @param dirs
+ * @returns
+ */
+export function getDefaultStaticOptionsForDirs(
+  fullPathList: string[],
+  options?: Omit<StaticMiddlewareOptions, 'dir' | 'handleDir'>
+): StaticMiddlewareOptions[] {
+  return fullPathList
+    .filter(fullpath => {
+      return isDirectory(fullpath);
+    })
+    .map(fullpath => {
+      return {
+        dir: fullpath,
+        handleDir: handleDirByHtmlDirContent,
         ...(options ?? {}),
       };
     });
