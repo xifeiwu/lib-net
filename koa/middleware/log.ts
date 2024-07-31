@@ -1,5 +1,12 @@
 import Koa from 'koa';
-import {ColorStyle, logColorful, getRandomBase64String, getRequestHeaderInfo} from '../../external';
+import {
+  ColorStyle,
+  logColorful,
+  getRandomBase64String,
+  getRequestHeaderInfo,
+  toBuffer,
+  CanConvertToBuffer,
+} from '../../external';
 import {INVALIDATE_PAYLOAD} from './error-catch';
 
 export interface LogMWOptions {
@@ -20,11 +27,12 @@ export function getLogMiddleware(options: LogMWOptions) {
     catchAndWrapError = true,
   } = options;
   return async (ctx: Koa.Context, next: Koa.Next) => {
+    const startTime = Date.now();
     const requestId = getRandomBase64String(8);
     const {type, req} = ctx;
     const {method, url, httpVersion, headers} = getRequestHeaderInfo(req);
     // watchSocketState(req.socket, {color: 'blue'});
-    logColorful(theme, requestId, [method, url, httpVersion].join(' '));
+    logColorful(theme, `${requestId} Header`, [method, url, httpVersion].join(' '));
     if (logHeaders) {
       logColorful({}, headers);
     }
@@ -47,7 +55,7 @@ export function getLogMiddleware(options: LogMWOptions) {
         });
       })
         .then(buf => {
-          logColorful(theme, requestId);
+          logColorful(theme, `${requestId} Body`);
           console.log(buf.toString());
           // if (type === 'application/json') {
           //   console.log(buf.toString());
@@ -57,10 +65,10 @@ export function getLogMiddleware(options: LogMWOptions) {
           console.log(err);
         });
     }
-    if (catchAndWrapError) {
-      try {
-        await next();
-      } catch (err) {
+    try {
+      await next();
+    } catch (err) {
+      if (catchAndWrapError) {
         const {url} = ctx;
         /** Error of async-validator */
         if (err.errors && err.fields) {
@@ -82,8 +90,19 @@ export function getLogMiddleware(options: LogMWOptions) {
           // ctx.throw({url, message}, 400);
         }
       }
-    } else {
-      await next();
+    } finally {
+      const responseBody = toBuffer(ctx.body as CanConvertToBuffer);
+      let length = -1;
+      if (Buffer.isBuffer(responseBody)) {
+        length = responseBody.byteLength;
+      }
+      logColorful(theme, `${requestId} End`, {
+        timeCost: Date.now() - startTime,
+        status: ctx.status,
+        headers: {...ctx.res.getHeaders()},
+        length,
+        data: length > 0 ? responseBody.subarray(0, 256).toString() : '',
+      });
     }
   };
 }
