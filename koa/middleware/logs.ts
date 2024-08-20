@@ -3,17 +3,19 @@ import {formatDate, fromBuffer, getDataFromReadable} from '../../external';
 const MAX_DATA_LIST_LENGTH = 200;
 
 export interface LogsMWOptions {
-  maxSize?: number;
+  maxCount?: number;
 }
 export default function logs(options?: LogsMWOptions) {
-  const {maxSize = MAX_DATA_LIST_LENGTH} = options ?? {};
+  const {maxCount = MAX_DATA_LIST_LENGTH} = options ?? {};
   const router = new KoaRouter({
     prefix: '/api/log',
   });
 
   interface DataItem {
+    /** unique id of each log item */
     id: string;
-    tag: string;
+    /** from which client this log comes */
+    from: string;
     data?: any;
   }
   const dataList: Array<DataItem> = [];
@@ -24,23 +26,23 @@ export default function logs(options?: LogsMWOptions) {
     const dt = formatDate(new Date(), 'MM-ddThh:mm:ss.SSS');
     let newId = dt;
     let cnt = 0;
-    while (dataList.some(it => it.id === newId) && cnt < maxSize) {
+    while (dataList.some(it => it.id === newId) && cnt < maxCount) {
       newId = `${dt}-${cnt}`;
       cnt++;
     }
-    const item: DataItem = {id: newId, tag, data};
-    while (dataList.length > maxSize) {
+    const item: DataItem = {id: newId, from: tag, data};
+    while (dataList.length > maxCount) {
       dataList.pop();
     }
     dataList.unshift(item);
     return item;
   }
 
-  router.post('/:tag?', async ctx => {
-    const {tag = ''} = ctx.params;
+  router.post('/:from?', async ctx => {
+    const {from = ''} = ctx.params;
     const jsonOrStr = fromBuffer(await getDataFromReadable(ctx.req), 'json');
     ctx.type = 'json';
-    ctx.body = pushDataList(jsonOrStr, tag);
+    ctx.body = pushDataList(jsonOrStr, from);
   });
 
   router.get('/list', async (ctx, next) => {
@@ -48,7 +50,7 @@ export default function logs(options?: LogsMWOptions) {
     const {id, tag} = query;
     ctx.type = 'json';
     ctx.body = dataList.filter(it => {
-      const tagMatched = tag === undefined || it.tag === tag;
+      const tagMatched = tag === undefined || it.from === tag;
       const idMatched = id === undefined || it.id === id;
       return tagMatched && idMatched;
     });

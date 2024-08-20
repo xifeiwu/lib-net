@@ -4,7 +4,7 @@ import {startKoaServer} from '../server';
 import {requestAndGetResponseInfo} from '../../external';
 
 export async function testUploadLog() {
-  const {origin, server} = await startKoaServer([logs()], {printOrigin: true});
+  const {origin, server} = await startKoaServer({printOrigin: true}, [logs()]);
   const data = {a: 1, b: 2};
   const {data: item1} = await requestAndGetResponseInfo({
     origin,
@@ -13,7 +13,7 @@ export async function testUploadLog() {
     data,
   });
   assert.deepEqual(data, item1.data);
-  assert.equal('node-server', item1.tag);
+  assert.equal('node-server', item1.from);
 
   const {data: item2} = await requestAndGetResponseInfo({
     origin,
@@ -22,13 +22,13 @@ export async function testUploadLog() {
     data,
   });
   assert.deepEqual(data, item2.data);
-  assert.equal('', item2.tag);
+  assert.equal('', item2.from);
 
   const {data: list1} = await requestAndGetResponseInfo({
     origin,
     pathname: '/api/log/list',
   });
-  assert.ok(Array.isArray(list1) && list1.length === 2);
+  assert(Array.isArray(list1) && list1.length === 2);
   console.log(item1, list1);
 
   const {data: list2} = await requestAndGetResponseInfo({

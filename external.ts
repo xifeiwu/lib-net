@@ -30,7 +30,6 @@ export {
   watchSocketState,
   requestAndGetResponseInfo,
   getMockFileFinderByDir,
-  readDirRecursive,
   toReadable,
   getFileList,
   mime,
