@@ -7,5 +7,6 @@ export {getMockMiddleware} from './middleware/mock';
 // import errorCatchMiddleware from './middleware/error-catch';
 // export * from './forum';
 // export {cors, log, assist};
+export * from './utils';
 export * from './server';
 export * from './types';
