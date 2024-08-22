@@ -8,40 +8,51 @@ import logs from './middleware/logs';
 import {forumMiddleware, forumWsMiddleware} from './forum';
 import errorCatchMiddleware from './middleware/error-catch';
 import {getUpgradeHandler} from './websocket';
-import {getAFreePort, isNumber, toInt, PORT, closePortIfInUse, getLocalIpAddress} from '../external';
-import {CustomKoaConfig, KoaConfig, WsMiddleware} from './types';
+import {
+  getAFreePort,
+  isNumber,
+  toInt,
+  PORT,
+  closePortIfInUse,
+  getLocalIpAddress,
+  deepMerge,
+} from '../external';
+import {KoaConfig, KoaMiddlewareConfig, WsMiddleware} from './types';
 import {
   getDefaultStaticOptionsForDirs,
   getDefaultStaticOptionsForSpaDirs,
   getStaticMiddleware,
 } from './static';
+import path from 'path';
 
-/**
- * start koa server with KoaConfig
- */
-export async function startKoaServer(
-  options: KoaConfig = {},
-  middlewareList?: Array<Koa.Middleware>,
-  wsMiddlewareList?: WsMiddleware[]
-): Promise<{
-  origin: string;
-  host: string;
-  port: number;
-  server: http.Server;
-  app: Koa;
-}> {
-  middlewareList = middlewareList ?? [];
-  wsMiddlewareList = wsMiddlewareList ?? [];
-  /**
-   * When host is set to '0.0.0.0', the service can be accessed from outside
-   */
-  const {host = '0.0.0.0', port, bodyParserOptions, keys, sessionOptions, printOrigin = true} = options;
-  let finalPort = toInt(port);
-  if (!isNumber(finalPort)) {
-    finalPort = await getAFreePort(PORT.exploreStart.port);
+export function getKoa(koaConfig: KoaConfig = {}) {
+  const {
+    bodyParserOptions,
+    keys,
+    sessionOptions,
+    middlewareList = [],
+    wsMiddlewareList = [],
+    mwConfig = {},
+  } = koaConfig;
+  const {logMWOptions, useDebugMW, corsWMOptions, logsMWOptions, useForumMW, staticWMConfig} = mwConfig;
+  useDebugMW && middlewareList.push(debugMiddleware) && wsMiddlewareList.push(debugMiddlewareWs);
+  corsWMOptions && middlewareList.push(cors(corsWMOptions));
+  logsMWOptions && middlewareList.push(logs(logsMWOptions));
+  useForumMW && middlewareList.push(forumMiddleware) && wsMiddlewareList.push(forumWsMiddleware);
+  if (staticWMConfig) {
+    const {dirList = [], spaDirList = [], mwOptions} = staticWMConfig;
+    /**
+     * It is better to place spaStaticDir before staticDir:
+     * spa files should be less than static files
+     * url to spa should not intercepted by static file
+     */
+    const staticSpaDirOptionsList = getDefaultStaticOptionsForSpaDirs(spaDirList, mwOptions);
+    const staticDirOptionsList = getDefaultStaticOptionsForDirs(dirList, mwOptions);
+    const staticMiddlewares = [...staticSpaDirOptionsList, ...staticDirOptionsList].map(config =>
+      getStaticMiddleware(config)
+    );
+    middlewareList.push(...staticMiddlewares);
   }
-  await closePortIfInUse(finalPort);
-
   const app = new Koa();
   /** add bodyParserOptions to context, so */
   app.context.bodyParserOptions = bodyParserOptions;
@@ -52,9 +63,37 @@ export async function startKoaServer(
     /** session middle should be used as first middleware */
     middlewareList.unshift(session(sessionOptions, app));
   }
+  /** errorCatchMiddleware should be set as first koa middleware */
+  if (logMWOptions) {
+    middlewareList.unshift(getLogMiddleware(logMWOptions));
+  }
 
   /** app.middleware assginment should happen before app.listen */
   app.middleware = middlewareList;
+  return {app, wsMiddlewareList};
+}
+/**
+ * start koa server with KoaConfig
+ */
+export async function startKoaServer(options: KoaConfig = {}): Promise<{
+  origin: string;
+  host: string;
+  port: number;
+  server: http.Server;
+  app: Koa;
+}> {
+  /**
+   * When host is set to '0.0.0.0', the service can be accessed from outside
+   */
+  const {host = '0.0.0.0', port, printOrigin = true} = options;
+  let finalPort = toInt(port);
+  if (!isNumber(finalPort)) {
+    finalPort = await getAFreePort(PORT.exploreStart.port);
+  }
+  await closePortIfInUse(finalPort);
+
+  /** app.middleware assginment should happen before app.listen */
+  const {app, wsMiddlewareList} = getKoa(options);
   const server = app.listen(finalPort, host);
   if (wsMiddlewareList.length > 0) {
     server.on('upgrade', getUpgradeHandler(wsMiddlewareList));
@@ -78,68 +117,48 @@ export async function startKoaServer(
   });
 }
 
-export async function startCustomKoaServer(
-  options: CustomKoaConfig,
-  middlewareList?: Array<Koa.Middleware>,
-  wsMiddlewareList?: WsMiddleware[]
-) {
-  middlewareList = middlewareList ?? [];
-  wsMiddlewareList = wsMiddlewareList ?? [];
-  const {logMWOptions, useDebugMW, corsWMOptions, logsMWOptions, useForumMW, staticWMConfig} = options;
-
-  /** errorCatchMiddleware should be set as first koa middleware */
-  if (logMWOptions) {
-    middlewareList.unshift(getLogMiddleware(logMWOptions));
-  }
-  useDebugMW && middlewareList.push(debugMiddleware) && wsMiddlewareList.push(debugMiddlewareWs);
-  corsWMOptions && middlewareList.push(cors(corsWMOptions));
-  logsMWOptions && middlewareList.push(logs(logsMWOptions));
-  useForumMW && middlewareList.push(forumMiddleware) && wsMiddlewareList.push(forumWsMiddleware);
-  if (staticWMConfig) {
-    const {dirList = [], spaDirList = [], mwOptions} = staticWMConfig;
-    /**
-     * It is better to place spaStaticDir before staticDir:
-     * spa files should be less than static files
-     * url to spa should not intercepted by static file
-     */
-    const staticSpaDirOptionsList = getDefaultStaticOptionsForSpaDirs(spaDirList, mwOptions);
-    const staticDirOptionsList = getDefaultStaticOptionsForDirs(dirList, mwOptions);
-    const staticMiddlewares = [...staticSpaDirOptionsList, ...staticDirOptionsList].map(config =>
-      getStaticMiddleware(config)
-    );
-    middlewareList.push(...staticMiddlewares);
-  }
-  return await startKoaServer(options, middlewareList, wsMiddlewareList);
-}
 /**
  * A http server mainly used for debug, with two koa middleware: cors, debug.
  */
-export async function startDebugServer(middlewareList: Koa.Middleware[] = [], options: CustomKoaConfig = {}) {
-  return await startCustomKoaServer({useDebugMW: true}, middlewareList);
+export async function startDebugServer(middlewareList: Koa.Middleware[] = [], options: KoaConfig = {}) {
+  return await startKoaServer({mwConfig: {useDebugMW: true}, middlewareList});
 }
 
-/** start a koa server with all middlewares that this module have */
-// export async function startFullFeatureServer(
-//   middlewareList: Koa.Middleware[] = [],
-//   options: CustomizeKoaConfig = {}
-// ) {
-//   const {wsMiddlewareList = [], ...restOptions} = options;
-//   const {origin, server, app} = await startKoaServer(
-//     [
-//       // log({
-//       //   showHeaders: false,
-//       //   showPayload: false,
-//       // }),
-//       ...middlewareList,
-//       cors(),
-//       debugMiddleware,
-//       logs(),
-//       forumMiddleware,
-//     ],
-//     {
-//       ...restOptions,
-//       wsMiddlewareList: [...wsMiddlewareList, debugMiddlewareWs, forumWsMiddleware],
-//     }
-//   );
-//   return {origin, server, app};
-// }
+/**
+ * Common middleware config for all cases(local, remote server)
+ */
+export const mwConfigCommon: KoaMiddlewareConfig = {
+  useDebugMW: true,
+  corsWMOptions: {},
+  logsMWOptions: {},
+  useForumMW: true,
+};
+
+/** Middleware config used for local only */
+export const localFullFeatureKoaConfig: KoaConfig = {
+  mwConfig: {
+    ...mwConfigCommon,
+    logMWOptions: {
+      logBody: {
+        maxSize: 1024,
+      },
+    },
+    staticWMConfig: {
+      spaDirList: [
+        {
+          fullpath: path.resolve(process.env.HOME, 'code/react/start/browser-feature/react-tsx-less/dist'),
+          entries: ['net', 'browser-feature'],
+        },
+      ],
+    },
+  },
+  bodyParserOptions: {
+    uploadDir: path.resolve(process.cwd(), 'uploads'),
+  },
+  printOrigin: true,
+};
+
+export async function startFullFeatureServer(koaConfig?: KoaConfig) {
+  const mergedConfig = Object.assign(koaConfig ?? {}, localFullFeatureKoaConfig);
+  return await startKoaServer(mergedConfig);
+}
