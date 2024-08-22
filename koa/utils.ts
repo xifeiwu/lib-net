@@ -6,7 +6,7 @@ import Koa from 'koa';
  * @param options
  * @returns
  */
-export function getKoaCtx(options?: {
+export function generateKoaCtx(options?: {
   requestHeaders?: object;
   requestBody?: object;
   keyForRequestBody?: string;

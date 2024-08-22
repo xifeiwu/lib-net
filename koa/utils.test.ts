@@ -1,8 +1,8 @@
 import assert from 'assert';
-import {getKoaCtx} from './utils';
+import {generateKoaCtx} from './utils';
 
-export async function testGetKoaCtx() {
-  const ctx = getKoaCtx({
+export async function testGenerateKoaCtx() {
+  const ctx = generateKoaCtx({
     requestHeaders: {
       'trace-id': 'aabbcc',
     },
