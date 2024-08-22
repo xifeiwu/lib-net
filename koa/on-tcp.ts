@@ -3,7 +3,7 @@ import {IncomingMessage, ServerResponse} from 'http';
 import {
   HttpResponseProps,
   tcpResponsePropsToBuffer,
-  parseHttpHeaderPart,
+  tryParseHttpHeaderPart,
   startSocketServer,
 } from '../external';
 import {Socket, ServerOpts} from 'net';
@@ -38,7 +38,7 @@ export async function startTcpServer(
       return;
     }
     const req = new IncomingMessage(socket);
-    const {headerPartProps, dataConsumed} = await parseHttpHeaderPart(socket);
+    const {headerPartProps, dataConsumed} = await tryParseHttpHeaderPart(socket);
     if (!headerPartProps) {
       if (socket.writable) {
         if (tcpHandler) {

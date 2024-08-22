@@ -10,3 +10,4 @@ export {getMockMiddleware} from './middleware/mock';
 export * from './utils';
 export * from './server';
 export * from './types';
+export * from './on-tcp';

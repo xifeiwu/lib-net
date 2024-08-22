@@ -42,7 +42,7 @@ export {
   HttpResponseProps,
   tcpResponsePropsToBuffer,
   handleSocketEvents,
-  parseHttpHeaderPart,
+  tryParseHttpHeaderPart,
   startSocketServer,
   requestAndGetUpgradeInfo,
   requestAndGetRelatedInfo,
