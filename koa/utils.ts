@@ -4,14 +4,14 @@ import Koa from 'koa';
 
 /**
  * @param options
- * @returns
+ * @returns Koa.Context, return any to avoid type difference on differnt Koa version
  */
 export function generateKoaCtx(options?: {
   requestHeaders?: object;
   requestBody?: object;
   keyForRequestBody?: string;
   state?: Koa.DefaultState;
-}): Koa.Context {
+}): any {
   const {
     requestHeaders = {},
     state = {},
