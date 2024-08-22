@@ -47,6 +47,14 @@ export interface KoaConfig {
   mwConfig?: KoaMiddlewareConfig;
 }
 
+/**
+ * Short cut config for quick config
+ */
+export interface KoaShortCutConfig {
+  staticDir?: string | string[];
+  uploadDir?: string;
+}
+
 export interface Ctx4Upgrade {
   req: IncomingMessage;
   socket: Socket;

@@ -17,7 +17,7 @@ import {
   getLocalIpAddress,
   deepMerge,
 } from '../external';
-import {KoaConfig, KoaMiddlewareConfig, WsMiddleware} from './types';
+import {KoaConfig, KoaMiddlewareConfig, KoaShortCutConfig, WsMiddleware} from './types';
 import {
   getDefaultStaticOptionsForDirs,
   getDefaultStaticOptionsForSpaDirs,
@@ -25,20 +25,41 @@ import {
 } from './static';
 import path from 'path';
 
-export function getKoa(koaConfig: KoaConfig = {}) {
+export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutConfig) {
   const {
-    bodyParserOptions,
+    bodyParserOptions = {},
     keys,
     sessionOptions,
     middlewareList = [],
     wsMiddlewareList = [],
     mwConfig = {},
   } = koaConfig;
-  const {logMWOptions, useDebugMW, corsWMOptions, logsMWOptions, useForumMW, staticWMConfig} = mwConfig;
+  const {staticDir, uploadDir} = shortCutConfig;
+  const {logMWOptions, useDebugMW, corsWMOptions, logsMWOptions, useForumMW} = mwConfig;
+  let {staticWMConfig} = mwConfig;
   useDebugMW && middlewareList.push(debugMiddleware) && wsMiddlewareList.push(debugMiddlewareWs);
   corsWMOptions && middlewareList.push(cors(corsWMOptions));
   logsMWOptions && middlewareList.push(logs(logsMWOptions));
   useForumMW && middlewareList.push(forumMiddleware) && wsMiddlewareList.push(forumWsMiddleware);
+  if (staticDir) {
+    const staticDirList = Array.isArray(staticDir) ? staticDir : [staticDir];
+    if (!staticWMConfig) {
+      staticWMConfig = {
+        dirList: staticDirList,
+      };
+    } else {
+      if (!Array.isArray(staticWMConfig.dirList)) {
+        staticWMConfig.dirList = [];
+      }
+      staticWMConfig.dirList.push(...staticDirList);
+    }
+  }
+  // if (staticDir) {
+  //   staticDir = path.resolve(process.cwd(), staticDir);
+  //   const dirList = get(envConfig, ['mwConfig', 'staticWMConfig', 'dirList'], []);
+  //   !dirList.includes(staticDir) && dirList.push(staticDir);
+  //   set(envConfig, ['mwConfig', 'staticWMConfig', 'dirList'], dirList);
+  // }
   if (staticWMConfig) {
     const {dirList = [], spaDirList = [], mwOptions} = staticWMConfig;
     /**
@@ -54,7 +75,13 @@ export function getKoa(koaConfig: KoaConfig = {}) {
     middlewareList.push(...staticMiddlewares);
   }
   const app = new Koa();
-  /** add bodyParserOptions to context, so */
+  /**
+   * add bodyParserOptions to context
+   * so we can get bodyParserOptions by ctx.bodyParserOptions for parseBody function
+   */
+  if (uploadDir) {
+    bodyParserOptions.uploadDir = uploadDir;
+  }
   app.context.bodyParserOptions = bodyParserOptions;
   if (Array.isArray(keys)) {
     app.keys = keys;
@@ -75,7 +102,10 @@ export function getKoa(koaConfig: KoaConfig = {}) {
 /**
  * start koa server with KoaConfig
  */
-export async function startKoaServer(koaConfig: KoaConfig = {}): Promise<{
+export async function startKoaServer(
+  koaConfig: KoaConfig = {},
+  shortCutConfig?: KoaShortCutConfig
+): Promise<{
   origin: string;
   host: string;
   port: number;
@@ -93,7 +123,7 @@ export async function startKoaServer(koaConfig: KoaConfig = {}): Promise<{
   await closePortIfInUse(finalPort);
 
   /** app.middleware assginment should happen before app.listen */
-  const {app, wsMiddlewareList} = getKoa(koaConfig);
+  const {app, wsMiddlewareList} = getKoa(koaConfig, shortCutConfig);
   const server = app.listen(finalPort, host);
   if (wsMiddlewareList.length > 0) {
     server.on('upgrade', getUpgradeHandler(wsMiddlewareList));
