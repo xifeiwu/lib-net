@@ -7,7 +7,7 @@ export {
   urlPropsToHref,
   deepEqual,
   isPlainObject,
-  toInt,
+  toNumber,
   getUrlPropsFromConfig,
   waitFor,
   PORT,

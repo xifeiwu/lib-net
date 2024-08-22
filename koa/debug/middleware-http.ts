@@ -5,7 +5,7 @@ import {
   getRequestInfo,
   getDataFromReadable,
   isNumber,
-  toInt,
+  toNumber,
   waitFor,
   parseBody,
   ParserOptions,
@@ -42,7 +42,7 @@ router.all('/echo', async (ctx, next) => {
   /** Setting echo config in query other than payload to make sure it is usable for both GET and POST  */
   let {delay} = (query ?? {}) as EchoConfig;
   if (delay) {
-    delay = toInt(delay);
+    delay = toNumber(delay);
     if (isNumber(delay)) {
       await waitFor(delay * 1000);
     }

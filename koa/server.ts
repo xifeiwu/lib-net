@@ -11,7 +11,7 @@ import {getUpgradeHandler} from './websocket';
 import {
   getAFreePort,
   isNumber,
-  toInt,
+  toNumber,
   PORT,
   closePortIfInUse,
   getLocalIpAddress,
@@ -75,7 +75,7 @@ export function getKoa(koaConfig: KoaConfig = {}) {
 /**
  * start koa server with KoaConfig
  */
-export async function startKoaServer(options: KoaConfig = {}): Promise<{
+export async function startKoaServer(koaConfig: KoaConfig = {}): Promise<{
   origin: string;
   host: string;
   port: number;
@@ -85,15 +85,15 @@ export async function startKoaServer(options: KoaConfig = {}): Promise<{
   /**
    * When host is set to '0.0.0.0', the service can be accessed from outside
    */
-  const {host = '0.0.0.0', port, printOrigin = true} = options;
-  let finalPort = toInt(port);
+  const {host = '0.0.0.0', port, printOrigin = true} = koaConfig;
+  let finalPort = toNumber(port);
   if (!isNumber(finalPort)) {
     finalPort = await getAFreePort(PORT.exploreStart.port);
   }
   await closePortIfInUse(finalPort);
 
   /** app.middleware assginment should happen before app.listen */
-  const {app, wsMiddlewareList} = getKoa(options);
+  const {app, wsMiddlewareList} = getKoa(koaConfig);
   const server = app.listen(finalPort, host);
   if (wsMiddlewareList.length > 0) {
     server.on('upgrade', getUpgradeHandler(wsMiddlewareList));
