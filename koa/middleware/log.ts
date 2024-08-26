@@ -6,6 +6,7 @@ import {
   getRequestHeaderInfo,
   toBuffer,
   CanConvertToBuffer,
+  getSocketInfo,
 } from '../../external';
 import {INVALIDATE_PAYLOAD} from './error-catch';
 
@@ -20,7 +21,7 @@ export interface LogMWOptions {
 }
 export function getLogMiddleware(options: LogMWOptions) {
   const {
-    theme = {color: 'yellow'},
+    theme = {color: 'blue'},
     prefix = '->',
     logHeaders = true,
     logBody,
@@ -29,10 +30,14 @@ export function getLogMiddleware(options: LogMWOptions) {
   return async (ctx: Koa.Context, next: Koa.Next) => {
     const startTime = Date.now();
     const requestId = getRandomBase64String(8);
-    const {type, req} = ctx;
+    const {type, req, socket} = ctx;
     const {method, url, httpVersion, headers} = getRequestHeaderInfo(req);
     // watchSocketState(req.socket, {color: 'blue'});
-    logColorful(theme, `${requestId} Header`, [method, url, httpVersion].join(' '));
+    logColorful(
+      theme,
+      `${requestId}[${getSocketInfo(socket).id}] Header`,
+      [method, url, httpVersion].join(' ')
+    );
     if (logHeaders) {
       logColorful({}, headers);
     }
@@ -56,7 +61,7 @@ export function getLogMiddleware(options: LogMWOptions) {
       })
         .then(buf => {
           logColorful(theme, `${requestId} Body`);
-          console.log(buf.toString());
+          logColorful({}, buf.toString());
           // if (type === 'application/json') {
           //   console.log(buf.toString());
           // }
@@ -96,13 +101,17 @@ export function getLogMiddleware(options: LogMWOptions) {
       if (Buffer.isBuffer(responseBody)) {
         length = responseBody.byteLength;
       }
-      logColorful(theme, `${requestId} End`, {
-        timeCost: Date.now() - startTime,
-        status: ctx.status,
-        headers: {...ctx.res.getHeaders()},
-        length,
-        data: length > 0 ? responseBody.subarray(0, 256).toString() : '',
-      });
+      logColorful(theme, `${requestId} End`);
+      logColorful(
+        {},
+        {
+          timeCost: Date.now() - startTime,
+          status: ctx.status,
+          headers: {...ctx.res.getHeaders()},
+          length,
+          data: length > 0 ? responseBody.subarray(0, 256).toString() : '',
+        }
+      );
     }
   };
 }

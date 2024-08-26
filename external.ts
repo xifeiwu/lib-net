@@ -61,4 +61,5 @@ export {
   ParsedFileInfo,
   getLocalIpAddress,
   getRequestHeaderInfo,
+  getSocketInfo,
 } from '../node';
