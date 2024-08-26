@@ -1,7 +1,7 @@
 import net from 'net';
 import {checkPort, getInfoFromFirstChunk} from './service';
 import {SocketServerConfig} from './service/types';
-import {startDebugServer} from '../koa';
+import {startDebugKoaServer} from '../koa';
 import {getAFreePort, isNumber, startSocketClient} from './external';
 import {handleConnection} from './service/server';
 import {handleCustomConnection} from './protocol-custom';
@@ -31,7 +31,7 @@ export async function runSocksServerOnSocket(config: SocketServerConfig) {
   /** Use authorized method first */
   methodList.sort((pre, next) => next.method - pre.method);
   const {pushConnectStatus, koaMiddlewareList} = exposeStatusByHttp();
-  let httpService: Awaited<ReturnType<typeof startDebugServer>>;
+  let httpService: Awaited<ReturnType<typeof startDebugKoaServer>>;
   const handleConnectionFinal = cipher ? handleCustomConnection : handleConnection;
 
   const {server} = await new Promise<{server: net.Server}>((res, rej) => {
@@ -69,7 +69,7 @@ export async function runSocksServerOnSocket(config: SocketServerConfig) {
     server.listen(socksServerPort, host);
   });
   if (httpServerConfig) {
-    httpService = await startDebugServer(koaMiddlewareList, httpServerConfig);
+    httpService = await startDebugKoaServer(koaMiddlewareList, httpServerConfig);
   }
   return {
     socksService: {

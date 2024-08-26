@@ -153,7 +153,7 @@ const customizeDeepMerge = customDeepMerge({mergeArraySolution: 'concat'});
 /**
  * A http server mainly used for debug, with two koa middleware: cors, debug.
  */
-export async function startDebugServer(koaConfig?: KoaConfig) {
+export async function startDebugKoaServer(koaConfig?: KoaConfig) {
   const mergedConfig = customizeDeepMerge<KoaConfig, KoaConfig>(
     {mwConfig: {useDebugMW: true}},
     koaConfig ?? {}
@@ -195,7 +195,7 @@ export const localFullFeatureKoaConfig: KoaConfig = {
   printOrigin: true,
 };
 
-export async function startFullFeatureServer(koaConfig?: KoaConfig) {
+export async function startFullFeatureKoaServer(koaConfig?: KoaConfig) {
   const mergedConfig = customizeDeepMerge<KoaConfig, KoaConfig>(localFullFeatureKoaConfig, koaConfig ?? {});
   return await startKoaServer(mergedConfig);
 }
