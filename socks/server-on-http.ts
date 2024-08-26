@@ -1,7 +1,7 @@
 import {Socket} from 'net';
 import {checkPort, upgradeProtocol} from './service';
 import {HttpServerConfig} from './service/types';
-import {startDebugKoaServer} from '../koa';
+import {startKoaDebugServer} from '../koa';
 import {getRequestInfo} from './external';
 import {handleConnection} from './service/server';
 import {exposeStatusByHttp} from './service/http-server';
@@ -30,7 +30,7 @@ export async function runSocksServerOnHttp(config: HttpServerConfig) {
   const handleConnectionFinal = cipher ? handleCustomConnection : handleConnection;
   /** Use authorized method first */
   methodList.sort((pre, next) => next.method - pre.method);
-  const httpService = await startDebugKoaServer([...koaMiddlewareList], {port});
+  const httpService = await startKoaDebugServer([...koaMiddlewareList], {port});
   const {server} = httpService;
   server.on('upgrade', async (req, socket, head) => {
     const {headers} = await getRequestInfo(req);
