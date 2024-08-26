@@ -15,7 +15,7 @@ import {
   PORT,
   closePortIfInUse,
   getLocalIpAddress,
-  deepMerge,
+  customDeepMerge,
 } from '../external';
 import {KoaConfig, KoaMiddlewareConfig, KoaShortCutConfig, WsMiddleware} from './types';
 import {
@@ -34,7 +34,7 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
     wsMiddlewareList = [],
     mwConfig = {},
   } = koaConfig;
-  const {staticDir, uploadDir} = shortCutConfig;
+  const {staticDir, uploadDir} = shortCutConfig ?? {};
   const {logMWOptions, useDebugMW, corsWMOptions, logsMWOptions, useForumMW} = mwConfig;
   let {staticWMConfig} = mwConfig;
   useDebugMW && middlewareList.push(debugMiddleware) && wsMiddlewareList.push(debugMiddlewareWs);
@@ -97,7 +97,7 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
 
   /** app.middleware assginment should happen before app.listen */
   app.middleware = middlewareList;
-  return {app, wsMiddlewareList};
+  return {app, wsMiddlewareList, koaConfig};
 }
 /**
  * start koa server with KoaConfig
@@ -111,6 +111,7 @@ export async function startKoaServer(
   port: number;
   server: http.Server;
   app: Koa;
+  koaConfig: KoaConfig;
 }> {
   /**
    * When host is set to '0.0.0.0', the service can be accessed from outside
@@ -139,6 +140,7 @@ export async function startKoaServer(
         port,
         server,
         app,
+        koaConfig,
       });
     });
     server.on('error', error => {
@@ -147,11 +149,16 @@ export async function startKoaServer(
   });
 }
 
+const customizeDeepMerge = customDeepMerge({mergeArraySolution: 'concat'});
 /**
  * A http server mainly used for debug, with two koa middleware: cors, debug.
  */
-export async function startDebugServer(middlewareList: Koa.Middleware[] = [], options: KoaConfig = {}) {
-  return await startKoaServer({mwConfig: {useDebugMW: true}, middlewareList});
+export async function startDebugServer(koaConfig?: KoaConfig) {
+  const mergedConfig = customizeDeepMerge<KoaConfig, KoaConfig>(
+    {mwConfig: {useDebugMW: true}},
+    koaConfig ?? {}
+  );
+  return await startKoaServer(mergedConfig);
 }
 
 /**
@@ -189,6 +196,6 @@ export const localFullFeatureKoaConfig: KoaConfig = {
 };
 
 export async function startFullFeatureServer(koaConfig?: KoaConfig) {
-  const mergedConfig = Object.assign(koaConfig ?? {}, localFullFeatureKoaConfig);
+  const mergedConfig = customizeDeepMerge<KoaConfig, KoaConfig>(localFullFeatureKoaConfig, koaConfig ?? {});
   return await startKoaServer(mergedConfig);
 }

@@ -20,6 +20,7 @@ export {
   isObject,
   NormalizedUrlProps,
   deepMerge,
+  customDeepMerge,
 } from '../fe';
 export {
   fromBuffer,
