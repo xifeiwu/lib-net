@@ -137,7 +137,7 @@ export async function startKoaServer(
       res({
         origin,
         host,
-        port,
+        port: finalPort,
         server,
         app,
         koaConfig,
