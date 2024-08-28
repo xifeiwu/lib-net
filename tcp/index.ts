@@ -13,7 +13,7 @@ import {TcpServerConfig} from '../../node';
 const store = new MemcachedStore();
 const memcachedHandler = getConnectionHandler(store);
 function tcpHandler(socket: Socket, firstChunk?: Buffer) {
-  memcachedHandler(socket, firstChunk);
+  memcachedHandler(socket);
 }
 
 function getMemcachedMw() {
