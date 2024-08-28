@@ -14,6 +14,7 @@ import {
 import {urlPrefix} from './service';
 import {broadcastData, wsConnections} from './middleware-ws';
 import {NormalizedUrlProps} from '../../../fe';
+import {Action4IncomingMessage, handleIncomingMessageByConfig} from '../../../node';
 
 export interface EchoConfig {
   /** delay response in seconds */
@@ -39,14 +40,7 @@ router.all('/echo', async (ctx, next) => {
   if (reqData.byteLength > 0) {
     resData.data = reqData.toString();
   }
-  /** Setting echo config in query other than payload to make sure it is usable for both GET and POST  */
-  let {delay} = (query ?? {}) as EchoConfig;
-  if (delay) {
-    delay = toNumber(delay);
-    if (isNumber(delay)) {
-      await waitFor(delay * 1000);
-    }
-  }
+  await handleIncomingMessageByConfig({request: ctx.req, response: ctx.res}, query as Action4IncomingMessage);
   ctx.body = resData;
 });
 
