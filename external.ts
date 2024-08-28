@@ -7,7 +7,7 @@ export {
   urlPropsToHref,
   deepEqual,
   isPlainObject,
-  toNumber,
+  toNumber as toNumber,
   getUrlPropsFromConfig,
   waitFor,
   PORT,
@@ -44,6 +44,7 @@ export {
   tcpResponsePropsToBuffer,
   handleSocketEvents,
   tryParseHttpHeaderPart,
+  startSocketClient,
   startSocketServer,
   requestAndGetUpgradeInfo,
   requestAndGetRelatedInfo,
@@ -62,4 +63,7 @@ export {
   getLocalIpAddress,
   getRequestHeaderInfo,
   getSocketInfo,
+  startProxyableTcpServer,
 } from '../node';
+
+export {Store as MemcachedStore, getConnectionHandler, getClient} from '../node/lib/memcached';
