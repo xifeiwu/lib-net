@@ -52,7 +52,7 @@ export async function startSyntheticTcpServer(options: {
       tcpHandler,
     },
     {
-      port: PORT.fullFeatureTcpServer.port,
+      // port: PORT.fullFeatureTcpServer.port,
       ...tcpServerConfig,
     }
   );

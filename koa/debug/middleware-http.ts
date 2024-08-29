@@ -36,11 +36,20 @@ router.all('/echo', async (ctx, next) => {
     pathname,
     query,
   };
-  const reqData = await getDataFromReadable(req);
-  if (reqData.byteLength > 0) {
-    resData.data = reqData.toString();
+  // const reqData = await getDataFromReadable(req);
+  const reqData = await parseBody(ctx.req);
+  if (reqData) {
+    resData.data = reqData;
   }
-  await handleIncomingMessageByConfig({request: ctx.req, response: ctx.res}, query as Action4IncomingMessage);
+  const {actionConfig} = reqData ?? {};
+  const mergedActionConfig: Action4IncomingMessage = Object.assign(
+    actionConfig ?? {},
+    query ?? {}
+  ) as Action4IncomingMessage;
+  await handleIncomingMessageByConfig({request: ctx.req, response: ctx.res}, mergedActionConfig);
+  if (mergedActionConfig.responseCode) {
+    ctx.status = ctx.res.statusCode;
+  }
   ctx.body = resData;
 });
 
