@@ -5,7 +5,7 @@ import {
   MemcachedStore,
   PORT,
   startSocketClient,
-  startProxyableTcpServer,
+  startRedirectSocketServer,
 } from '../external';
 import {KoaConfig, KoaShortCutConfig, localFullFeatureKoaConfig, startKoaServer} from '../koa';
 import {TcpServerConfig} from '../../node';
@@ -46,7 +46,7 @@ export async function startSyntheticTcpServer(options: {
     const proxyClient = await startSocketClient({host, port});
     socket.pipe(proxyClient).pipe(socket);
   }
-  const {host, port, server} = await startProxyableTcpServer(
+  const {host, port, server} = await startRedirectSocketServer(
     {
       httpHandler,
       tcpHandler,

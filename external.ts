@@ -63,7 +63,7 @@ export {
   getLocalIpAddress,
   getRequestHeaderInfo,
   getSocketInfo,
-  startProxyableTcpServer,
+  startRedirectSocketServer,
 } from '../node';
 
 export {Store as MemcachedStore, getConnectionHandler, getClient} from '../node/lib/memcached';
