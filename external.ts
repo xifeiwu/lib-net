@@ -67,6 +67,8 @@ export {
   CustomHandleRequestOptions,
   customHandleRequest,
   getIncomingMessageData,
+  uploadDirOnCwd,
+  TcpServerConfig,
 } from '../node';
 
 export {Store as MemcachedStore, getConnectionHandler, getClient} from '../node/lib/memcached';

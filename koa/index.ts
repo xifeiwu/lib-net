@@ -1,13 +1,5 @@
 export {getMockMiddleware} from './middleware/mock';
-// import cors from './middleware/cors';
-// import log from './middleware/log';
-// export * from './debug';
-// export * from './static';
-// import assist from './middleware/logs';
-// import errorCatchMiddleware from './middleware/error-catch';
-// export * from './forum';
-// export {cors, log, assist};
-export * from './utils';
+export * from './service';
 export * from './server';
 export * from './types';
 export * from './on-tcp';

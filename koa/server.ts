@@ -2,7 +2,10 @@ import http from 'http';
 import Koa from 'koa';
 import session from 'koa-session';
 import cors from './middleware/cors';
-import {requestMiddleware as requestMiddlewareOfDebug, upgradeMiddelware as upgradeMiddelwareOfDebug} from './middleware/debug';
+import {
+  requestMiddleware as requestMiddlewareOfDebug,
+  upgradeMiddelware as upgradeMiddelwareOfDebug,
+} from './middleware/debug';
 import {getLogMiddleware} from './middleware/log';
 import {
   getDefaultStaticOptionsForDirs,
@@ -24,6 +27,7 @@ import {
 } from '../external';
 import {KoaConfig, KoaMiddlewareConfig, KoaShortCutConfig, UpgradeMiddleware} from './types';
 import path from 'path';
+import {localKoaConfig} from './service';
 
 export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutConfig) {
   const {
@@ -37,7 +41,9 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
   const {staticDir, uploadDir} = shortCutConfig ?? {};
   const {logMWOptions, useDebugMW, corsWMOptions, logsMWOptions, useForumMW} = mwConfig;
   let {staticWMConfig} = mwConfig;
-  useDebugMW && requestMiddlewares.push(requestMiddlewareOfDebug) && upgradeMiddlewares.push(upgradeMiddelwareOfDebug);
+  useDebugMW &&
+    requestMiddlewares.push(requestMiddlewareOfDebug) &&
+    upgradeMiddlewares.push(upgradeMiddelwareOfDebug);
   corsWMOptions && requestMiddlewares.push(cors(corsWMOptions));
   logsMWOptions && requestMiddlewares.push(logs(logsMWOptions));
   useForumMW && requestMiddlewares.push(forumMiddleware) && upgradeMiddlewares.push(forumWsMiddleware);
@@ -124,7 +130,7 @@ export async function startKoaServer(
   await closePortIfInUse(finalPort);
 
   /** app.middleware assginment should happen before app.listen */
-  const {app, upgradeMiddlewares} = getKoa(koaConfig, shortCutConfig);
+  const {app, upgradeMiddlewares, koaConfig: finalKoaConfig} = getKoa(koaConfig, shortCutConfig);
   const server = app.listen(finalPort, host);
   if (upgradeMiddlewares.length > 0) {
     server.on('upgrade', getUpgradeHandler(upgradeMiddlewares));
@@ -140,7 +146,7 @@ export async function startKoaServer(
         port: finalPort,
         server,
         app,
-        koaConfig,
+        koaConfig: finalKoaConfig,
       });
     });
     server.on('error', error => {
@@ -161,41 +167,7 @@ export async function startKoaDebugServer(koaConfig?: KoaConfig) {
   return await startKoaServer(mergedConfig);
 }
 
-/**
- * Common middleware config for all cases(local, remote server)
- */
-export const mwConfigCommon: KoaMiddlewareConfig = {
-  useDebugMW: true,
-  corsWMOptions: {},
-  logsMWOptions: {},
-  useForumMW: true,
-};
-
-/** Middleware config used for local only */
-export const localFullFeatureKoaConfig: KoaConfig = {
-  mwConfig: {
-    ...mwConfigCommon,
-    logMWOptions: {
-      logBody: {
-        maxSize: 1024,
-      },
-    },
-    staticWMConfig: {
-      spaDirList: [
-        {
-          fullpath: path.resolve(process.env.HOME, 'code/react/start/browser-feature/react-tsx-less/dist'),
-          entries: ['net', 'browser-feature'],
-        },
-      ],
-    },
-  },
-  bodyParserOptions: {
-    uploadDir: path.resolve(process.cwd(), 'uploads'),
-  },
-  printOrigin: true,
-};
-
 export async function startKoaFullFeatureServer(koaConfig?: KoaConfig) {
-  const mergedConfig = customizeDeepMerge<KoaConfig, KoaConfig>(localFullFeatureKoaConfig, koaConfig ?? {});
+  const mergedConfig = customizeDeepMerge<KoaConfig, KoaConfig>(localKoaConfig, koaConfig ?? {});
   return await startKoaServer(mergedConfig);
 }

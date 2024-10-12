@@ -1,5 +1,5 @@
 import assert from 'assert';
-import {generateKoaCtx} from './utils';
+import {generateKoaCtx} from './service';
 
 export async function testGenerateKoaCtx() {
   const ctx = generateKoaCtx({
