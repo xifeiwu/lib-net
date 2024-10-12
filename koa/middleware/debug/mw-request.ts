@@ -9,8 +9,8 @@ import {
   ParserOptions,
   toUrlProps,
   NormalizedUrlProps,
-  Action4IncomingMessage,
-  handleIncomingMessageByConfig,
+  CustomHandleRequestOptions,
+  customHandleRequest,
   isPlainObject,
   fromBuffer,
 } from '../../../external';
@@ -40,11 +40,11 @@ router.all('/echo', async (ctx, next) => {
   const isJson = isPlainObject(reqData);
   if (isJson) {
     const {actionConfig} = reqData ?? {};
-    const mergedActionConfig: Action4IncomingMessage = Object.assign(
+    const mergedActionConfig: CustomHandleRequestOptions = Object.assign(
       actionConfig ?? {},
       query ?? {}
-    ) as Action4IncomingMessage;
-    await handleIncomingMessageByConfig({request: ctx.req, response: ctx.res}, mergedActionConfig);
+    ) as CustomHandleRequestOptions;
+    await customHandleRequest({request: ctx.req, response: ctx.res}, mergedActionConfig);
     if (mergedActionConfig.responseCode) {
       ctx.status = ctx.res.statusCode;
     }

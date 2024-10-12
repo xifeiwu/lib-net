@@ -40,7 +40,7 @@ export {
   MockFileContent,
   ParamsForFindMockInfoInDir,
   RequestConfig,
-  HttpResponseProps,
+  HttpResponseInfo,
   tcpResponsePropsToBuffer,
   handleSocketEvents,
   tryParseHttpHeaderPart,
@@ -64,8 +64,8 @@ export {
   getRequestHeaderInfo,
   getSocketInfo,
   startRedirectSocketServer,
-  Action4IncomingMessage,
-  handleIncomingMessageByConfig,
+  CustomHandleRequestOptions,
+  customHandleRequest,
 } from '../node';
 
 export {Store as MemcachedStore, getConnectionHandler, getClient} from '../node/lib/memcached';
