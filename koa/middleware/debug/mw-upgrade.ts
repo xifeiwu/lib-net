@@ -2,6 +2,7 @@ import WebSocket, {WebSocketServer} from 'ws';
 import {wsPrefix} from './service';
 import {uuid, toUrlProps, CanConvertToBuffer, toBuffer} from '../../../external';
 import {UpgradeMiddleware} from '../../types';
+import {getUpgradeProtocol} from '../../../../node';
 
 export const path4Broadcast = `${wsPrefix}/broadcast`;
 
@@ -28,27 +29,27 @@ export const upgradeMiddelware: UpgradeMiddleware = async (ctx, next) => {
   const {req, socket, head} = ctx;
   const {url} = req;
   const {pathname} = toUrlProps(url);
-  if (pathname === path4Broadcast) {
-    wss.handleUpgrade(req, socket, head, ws => {
-      // wss.emit('connection', ws, req);
-      ctx.ws = ws;
-      const {remoteAddress, remotePort} = socket;
-      let key = uuid();
-      if (remoteAddress !== undefined && remotePort !== undefined) {
-        key = remoteAddress + ':' + remotePort;
-      }
-      if (wsMap.has(key)) {
-        throw new Error(`${key} already existed.`);
-      }
-      wsMap.set(key, ws);
-      ws.on('message', (data, isBinary) => {
-        broadcastData(data);
-      });
-      ws.on('close', () => {
-        wsMap.delete(key);
-      });
-    });
-  } else {
-    await next();
+  const protocol = getUpgradeProtocol(req);
+  if (!protocol || protocol.toLowerCase() !== 'websocket' || pathname !== path4Broadcast) {
+    return await next();
   }
+  wss.handleUpgrade(req, socket, head, ws => {
+    // wss.emit('connection', ws, req);
+    ctx.ws = ws;
+    const {remoteAddress, remotePort} = socket;
+    let key = uuid();
+    if (remoteAddress !== undefined && remotePort !== undefined) {
+      key = remoteAddress + ':' + remotePort;
+    }
+    if (wsMap.has(key)) {
+      throw new Error(`${key} already existed.`);
+    }
+    wsMap.set(key, ws);
+    ws.on('message', (data, isBinary) => {
+      broadcastData(data);
+    });
+    ws.on('close', () => {
+      wsMap.delete(key);
+    });
+  });
 };
