@@ -3,11 +3,11 @@ import path from 'path';
 import assert from 'assert';
 import {startKoaServer} from '../server';
 import {ParsedFileInfo, ParserOptions, requestAndGetResponseInfo} from '../../external';
-import {EchoConfig} from './middleware-http';
-import {debugMiddleware, debugMiddlewareWs} from './index';
+import {EchoConfig} from './mw-request';
+import {requestMiddleware, upgradeMiddelware} from './index';
 
 export async function testEcho() {
-  const {origin, server} = await startKoaServer({}, [debugMiddleware]);
+  const {origin, server} = await startKoaServer({middlewareList: [requestMiddleware]});
   const {
     statusCode,
     headers,
@@ -44,7 +44,10 @@ export async function testUpload() {
     uploadDir,
     wayOfHandleFile: 'save',
   };
-  const {origin, server, app} = await startKoaServer({bodyParserOptions}, [debugMiddleware]);
+  const {origin, server, app} = await startKoaServer({
+    bodyParserOptions,
+    middlewareList: [requestMiddleware],
+  });
 
   try {
     const fileName = 'test-case-4-debug-middleware.ts';
@@ -81,7 +84,7 @@ export async function testUpload() {
  * This only notifies that the socket has been idle. The request must be destroyed manually.
  */
 export async function testTimeout() {
-  const {origin, server} = await startKoaServer({}, [debugMiddleware]);
+  const {origin, server} = await startKoaServer({middlewareList: [requestMiddleware]});
   const echoConfig: EchoConfig = {
     delay: 10,
   };

@@ -1,5 +1,5 @@
-export type {UrlProps} from '../fe';
 export {
+  UrlProps,
   formatDate,
   isNumber,
   applyPathnameParams,
@@ -64,6 +64,8 @@ export {
   getRequestHeaderInfo,
   getSocketInfo,
   startRedirectSocketServer,
+  Action4IncomingMessage,
+  handleIncomingMessageByConfig,
 } from '../node';
 
 export {Store as MemcachedStore, getConnectionHandler, getClient} from '../node/lib/memcached';

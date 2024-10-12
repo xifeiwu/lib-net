@@ -1,20 +1,9 @@
 import Koa from 'koa';
 import KoaRouter from 'koa-router';
-import {
-  TcpHttpRequestProps,
-  getRequestInfo,
-  getDataFromReadable,
-  isNumber,
-  toNumber,
-  waitFor,
-  parseBody,
-  ParserOptions,
-  toUrlProps,
-} from '../../external';
+import {TcpHttpRequestProps, getRequestInfo, parseBody, ParserOptions, toUrlProps} from '../../external';
 import {urlPrefix} from './service';
-import {broadcastData, wsConnections} from './middleware-ws';
-import {NormalizedUrlProps} from '../../../fe';
-import {Action4IncomingMessage, handleIncomingMessageByConfig} from '../../../node';
+import {broadcastData, wsConnections} from './mw-upgrade';
+import {NormalizedUrlProps, Action4IncomingMessage, handleIncomingMessageByConfig} from '../../external';
 
 export interface EchoConfig {
   /** delay response in seconds */
@@ -88,4 +77,4 @@ const uploadMiddleware: Koa.Middleware = async ctx => {
 };
 router.all('/upload', uploadMiddleware);
 
-export const debugMiddleware = router.routes();
+export const requestMiddleware = router.routes();

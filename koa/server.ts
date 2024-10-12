@@ -2,7 +2,7 @@ import http from 'http';
 import Koa from 'koa';
 import session from 'koa-session';
 import cors from './middleware/cors';
-import {debugMiddleware, debugMiddlewareWs} from './debug';
+import {requestMiddleware, upgradeMiddelware} from './debug';
 import {getLogMiddleware} from './middleware/log';
 import logs from './middleware/logs';
 import {forumMiddleware, forumWsMiddleware} from './forum';
@@ -37,7 +37,7 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
   const {staticDir, uploadDir} = shortCutConfig ?? {};
   const {logMWOptions, useDebugMW, corsWMOptions, logsMWOptions, useForumMW} = mwConfig;
   let {staticWMConfig} = mwConfig;
-  useDebugMW && middlewareList.push(debugMiddleware) && wsMiddlewareList.push(debugMiddlewareWs);
+  useDebugMW && middlewareList.push(requestMiddleware) && wsMiddlewareList.push(upgradeMiddelware);
   corsWMOptions && middlewareList.push(cors(corsWMOptions));
   logsMWOptions && middlewareList.push(logs(logsMWOptions));
   useForumMW && middlewareList.push(forumMiddleware) && wsMiddlewareList.push(forumWsMiddleware);
