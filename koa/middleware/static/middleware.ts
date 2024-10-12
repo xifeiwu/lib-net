@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import zlib from 'zlib';
 import Koa from 'koa';
-import stream = require('stream');
-import {toReadable, mime, getFileList, isFunction} from '../../external';
+import {Readable} from 'stream';
+import {toReadable, mime, getFileList, isFunction} from '../../../external';
 
 interface HttpHeaderConfig {
   maxAge?: number;
@@ -50,7 +50,7 @@ export interface StaticMiddlewareOptions {
   /** return a customized contentType from origin contentType */
   customContentType?: (fileInfo: LocalFileInfo) => string | undefined;
   /** handle original file/dir data and return new data */
-  postTreatData?: (stream: stream.Readable, fileInfo: StaticFileInfo) => stream.Readable;
+  postTreatData?: (stream: Readable, fileInfo: StaticFileInfo) => Readable;
   maxCacheTime?: number;
 }
 
@@ -196,22 +196,23 @@ export function getStaticMiddleware(options: StaticMiddlewareOptions) {
     const shouldGzip =
       enableGzip && fileInfo.size > 1024 && acceptGzip && mime.compressible(getContentType(fileInfo));
 
-    let stream: stream.Readable;
+    let reader: Readable;
     if ((fileInfo as LocalFileInfo).fullPath) {
-      stream = fs.createReadStream((fileInfo as LocalFileInfo).fullPath);
+      reader = fs.createReadStream((fileInfo as LocalFileInfo).fullPath);
     } else if (fileInfo as BufferFileInfo) {
-      stream = toReadable((fileInfo as BufferFileInfo).buffer);
+      reader = toReadable((fileInfo as BufferFileInfo).buffer);
     }
     if (postTreatData) {
-      stream = postTreatData(stream, fileInfo);
+      reader = postTreatData(reader, fileInfo);
     }
 
-    ctx.body = stream;
     // enable gzip will remove content length
     if (shouldGzip) {
       ctx.remove('content-length');
       ctx.set('content-encoding', 'gzip');
-      ctx.body = stream.pipe(zlib.createGzip());
+      ctx.body = reader.pipe(zlib.createGzip());
+    } else {
+      ctx.body = reader;
     }
   };
 }

@@ -1,6 +1,6 @@
 import fs from 'fs';
-import {htmlDirContent} from '../../external';
-import {BufferFileInfo, StaticMiddlewareOptions} from './middleware';
+import {htmlDirContent} from '../../../external';
+import {StaticMiddlewareOptions} from './middleware';
 
 export const handleDirByHtmlDirContent: StaticMiddlewareOptions['handleDir'] = (fullpath: string) => {
   const buffer = Buffer.from(htmlDirContent(fullpath));

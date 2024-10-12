@@ -4,6 +4,11 @@ import session from 'koa-session';
 import cors from './middleware/cors';
 import {requestMiddleware, upgradeMiddelware} from './middleware/debug';
 import {getLogMiddleware} from './middleware/log';
+import {
+  getDefaultStaticOptionsForDirs,
+  getDefaultStaticOptionsForSpaDirs,
+  getStaticMiddleware,
+} from './middleware/static';
 import logs from './middleware/logs';
 import {forumMiddleware, forumWsMiddleware} from './forum';
 import errorCatchMiddleware from './middleware/error-catch';
@@ -18,11 +23,6 @@ import {
   customDeepMerge,
 } from '../external';
 import {KoaConfig, KoaMiddlewareConfig, KoaShortCutConfig, WsMiddleware} from './types';
-import {
-  getDefaultStaticOptionsForDirs,
-  getDefaultStaticOptionsForSpaDirs,
-  getStaticMiddleware,
-} from './static';
 import path from 'path';
 
 export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutConfig) {

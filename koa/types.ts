@@ -3,7 +3,7 @@ import {Socket} from 'net';
 import WebSocket from 'ws';
 import session from 'koa-session';
 import {ParserOptions} from '../external';
-import {StaticMiddlewareOptions} from './static';
+import {StaticMiddlewareOptions} from './middleware/static';
 import {IncomingMessage} from 'http';
 import {CorsMWOptions} from './middleware/cors';
 import {LogsMWOptions} from './middleware/logs';

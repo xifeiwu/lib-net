@@ -1,8 +1,8 @@
 import assert from 'assert';
 import {getDefaultStaticOptionsForDirs} from './utils';
-import {startKoaServer} from '../server';
+import {startKoaServer} from '../../server';
 import {getStaticMiddleware} from './middleware';
-import {requestAndGetResponseInfo} from '../../external';
+import {requestAndGetResponseInfo} from '../../../external';
 
 export async function testGetDefaultStaticOptionsForDirs() {
   const staticOptions = getDefaultStaticOptionsForDirs([__dirname]);
