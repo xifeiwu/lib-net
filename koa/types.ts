@@ -36,14 +36,17 @@ export interface KoaMiddlewareConfig {
 export interface KoaConfig {
   host?: string;
   port?: number;
-  /** whether print origin of server or not */
+  /** whether print server's origin or not */
   printOrigin?: boolean;
   keys?: string[];
+  /** config for koa-session */
   sessionOptions?: Partial<session.opts>;
-  /** bodyParserOptions is a config will adde to Koa.Context, it's not a Koa middlware */
+  /** bodyParserOptions is a bodyParser's config and will be added to Koa.Context, it's not a Koa middlware */
   bodyParserOptions?: ParserOptions;
+  /** koa middleware passed by user, they will be list at front part of middleware list */
   middlewareList?: Array<Koa.Middleware>;
   wsMiddlewareList?: WsMiddleware[];
+  /** config for pre-defined koa-middleware, such as debug, cors, logs, forum, static */
   mwConfig?: KoaMiddlewareConfig;
 }
 
