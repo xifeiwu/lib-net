@@ -10,11 +10,11 @@ import {SOCKS_SERVER_CONFIG} from './middleware/socks/service';
  * @param options
  * @returns Koa.Context, return any to avoid type difference on differnt Koa version
  */
-export function generateKoaCtx(options?: {
+export function generateKoaCtx<KoaState = Koa.DefaultState>(options?: {
   requestHeaders?: object;
   requestBody?: object;
   keyForRequestBody?: string;
-  state?: Koa.DefaultState;
+  state?: KoaState;
 }): any {
   const {
     requestHeaders = {},
@@ -29,7 +29,7 @@ export function generateKoaCtx(options?: {
   });
   const response = new http.ServerResponse(request);
   const app = new Koa();
-  const ctx = app.createContext(request, response) as Koa.Context;
+  const ctx = app.createContext<KoaState>(request, response);
   if (requestBody) {
     ctx.request[keyForRequestBody ?? 'body'] = requestBody;
   }
