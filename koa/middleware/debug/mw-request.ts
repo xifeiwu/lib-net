@@ -13,18 +13,30 @@ import {
   customHandleRequest,
   isPlainObject,
   fromBuffer,
+  getIncomingMessageData,
 } from '../../../external';
-
-export interface EchoConfig {
-  /** delay response in seconds */
-  delay?: number;
-}
 
 const router = new KoaRouter({
   prefix: urlPrefix,
 });
 
 router.all('/echo', async (ctx, next) => {
+  const {method, url, headers, req} = ctx;
+  const resData: TcpHttpRequestProps & NormalizedUrlProps = {
+    method,
+    url,
+    httpVersion: req.httpVersion,
+    headers,
+  };
+  const reqData = await getIncomingMessageData(req);
+  if (reqData) {
+    resData.data = Buffer.isBuffer(reqData) ? fromBuffer(reqData, 'json') : reqData;
+  }
+
+  ctx.body = resData;
+});
+
+router.all('/custom', async ctx => {
   const {method, url, headers, req} = ctx;
   const {query, pathname} = toUrlProps(url);
   const resData: TcpHttpRequestProps & NormalizedUrlProps = {
@@ -37,22 +49,23 @@ router.all('/echo', async (ctx, next) => {
   };
   // const reqData = await getDataFromReadable(req);
   const reqData = await parseBody(ctx.req);
-  const isJson = isPlainObject(reqData);
-  if (isJson) {
-    const {actionConfig} = reqData ?? {};
-    const mergedActionConfig: CustomHandleRequestOptions = Object.assign(
-      actionConfig ?? {},
-      query ?? {}
-    ) as CustomHandleRequestOptions;
-    await customHandleRequest({request: ctx.req, response: ctx.res}, mergedActionConfig);
-    if (mergedActionConfig.responseCode) {
-      ctx.status = ctx.res.statusCode;
-    }
-  }
   if (reqData) {
+    const isJson = isPlainObject(reqData);
+    if (isJson) {
+      const {config} = (reqData ?? {}) as {config: CustomHandleRequestOptions};
+      if (isPlainObject(config)) {
+        const mergedConfig: CustomHandleRequestOptions = Object.assign(
+          config ?? {},
+          query ?? {}
+        ) as CustomHandleRequestOptions;
+        await customHandleRequest({request: ctx.req, response: ctx.res}, mergedConfig);
+        if (mergedConfig.responseCode) {
+          ctx.status = ctx.res.statusCode;
+        }
+      }
+    }
     resData.data = isJson ? reqData : fromBuffer(reqData, 'json');
   }
-
   ctx.body = resData;
 });
 
