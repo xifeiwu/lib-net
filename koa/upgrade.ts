@@ -2,14 +2,14 @@ import {IncomingMessage} from 'http';
 import {Socket} from 'net';
 import compose from 'koa-compose';
 import {responseInfoToBuffer} from '../external';
-import {Ctx4Upgrade, WsMiddleware} from './types';
+import {Ctx4Upgrade, UpgradeMiddleware} from './types';
+import {getUpgradeProtocol} from '../../node';
 
 const NotFoundMiddleware = (ctx: Ctx4Upgrade, next) => {
-  const {
-    req: {url},
-    socket,
-  } = ctx;
-  const data = Buffer.from(`no handler found for url: ${url}`);
+  const {req, socket} = ctx;
+  const {url} = req;
+  const protocol = getUpgradeProtocol(req);
+  const data = Buffer.from(`Not found upgrade handler for protocol[${protocol}], url[${url}]`);
   socket.end(
     responseInfoToBuffer({
       statusCode: 400,
@@ -22,7 +22,7 @@ const NotFoundMiddleware = (ctx: Ctx4Upgrade, next) => {
   );
 };
 
-export function getUpgradeHandler(middlewareList: WsMiddleware[]) {
+export function getUpgradeHandler(middlewareList: UpgradeMiddleware[]) {
   const fn = compose([...middlewareList, NotFoundMiddleware]);
   async function handleUpgrade(req: IncomingMessage, socket: Socket, head: Buffer) {
     const ctx: Ctx4Upgrade = {req, socket, head};

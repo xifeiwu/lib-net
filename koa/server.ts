@@ -2,7 +2,7 @@ import http from 'http';
 import Koa from 'koa';
 import session from 'koa-session';
 import cors from './middleware/cors';
-import {requestMiddleware, upgradeMiddelware} from './middleware/debug';
+import {requestMiddleware as requestMiddlewareOfDebug, upgradeMiddelware as upgradeMiddelwareOfDebug} from './middleware/debug';
 import {getLogMiddleware} from './middleware/log';
 import {
   getDefaultStaticOptionsForDirs,
@@ -12,7 +12,7 @@ import {
 import logs from './middleware/logs';
 import {forumMiddleware, forumWsMiddleware} from './forum';
 import errorCatchMiddleware from './middleware/error-catch';
-import {getUpgradeHandler} from './websocket';
+import {getUpgradeHandler} from './upgrade';
 import {
   getAFreePort,
   isNumber,
@@ -22,7 +22,7 @@ import {
   getLocalIpAddress,
   customDeepMerge,
 } from '../external';
-import {KoaConfig, KoaMiddlewareConfig, KoaShortCutConfig, WsMiddleware} from './types';
+import {KoaConfig, KoaMiddlewareConfig, KoaShortCutConfig, UpgradeMiddleware} from './types';
 import path from 'path';
 
 export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutConfig) {
@@ -30,17 +30,17 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
     bodyParserOptions = {},
     keys,
     sessionOptions,
-    middlewareList = [],
-    wsMiddlewareList = [],
+    requestMiddlewares = [],
+    upgradeMiddlewares = [],
     mwConfig = {},
   } = koaConfig;
   const {staticDir, uploadDir} = shortCutConfig ?? {};
   const {logMWOptions, useDebugMW, corsWMOptions, logsMWOptions, useForumMW} = mwConfig;
   let {staticWMConfig} = mwConfig;
-  useDebugMW && middlewareList.push(requestMiddleware) && wsMiddlewareList.push(upgradeMiddelware);
-  corsWMOptions && middlewareList.push(cors(corsWMOptions));
-  logsMWOptions && middlewareList.push(logs(logsMWOptions));
-  useForumMW && middlewareList.push(forumMiddleware) && wsMiddlewareList.push(forumWsMiddleware);
+  useDebugMW && requestMiddlewares.push(requestMiddlewareOfDebug) && upgradeMiddlewares.push(upgradeMiddelwareOfDebug);
+  corsWMOptions && requestMiddlewares.push(cors(corsWMOptions));
+  logsMWOptions && requestMiddlewares.push(logs(logsMWOptions));
+  useForumMW && requestMiddlewares.push(forumMiddleware) && upgradeMiddlewares.push(forumWsMiddleware);
   if (staticDir) {
     const staticDirList = Array.isArray(staticDir) ? staticDir : [staticDir];
     if (!staticWMConfig) {
@@ -72,7 +72,7 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
     const staticMiddlewares = [...staticSpaDirOptionsList, ...staticDirOptionsList].map(config =>
       getStaticMiddleware(config)
     );
-    middlewareList.push(...staticMiddlewares);
+    requestMiddlewares.push(...staticMiddlewares);
   }
   const app = new Koa();
   /**
@@ -88,16 +88,16 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
   }
   if (sessionOptions) {
     /** session middle should be used as first middleware */
-    middlewareList.unshift(session(sessionOptions, app));
+    requestMiddlewares.unshift(session(sessionOptions, app));
   }
   /** errorCatchMiddleware should be set as first koa middleware */
   if (logMWOptions) {
-    middlewareList.unshift(getLogMiddleware(logMWOptions));
+    requestMiddlewares.unshift(getLogMiddleware(logMWOptions));
   }
 
   /** app.middleware assginment should happen before app.listen */
-  app.middleware = middlewareList;
-  return {app, wsMiddlewareList, koaConfig};
+  app.middleware = requestMiddlewares;
+  return {app, upgradeMiddlewares, koaConfig};
 }
 /**
  * start koa server with KoaConfig
@@ -124,10 +124,10 @@ export async function startKoaServer(
   await closePortIfInUse(finalPort);
 
   /** app.middleware assginment should happen before app.listen */
-  const {app, wsMiddlewareList} = getKoa(koaConfig, shortCutConfig);
+  const {app, upgradeMiddlewares} = getKoa(koaConfig, shortCutConfig);
   const server = app.listen(finalPort, host);
-  if (wsMiddlewareList.length > 0) {
-    server.on('upgrade', getUpgradeHandler(wsMiddlewareList));
+  if (upgradeMiddlewares.length > 0) {
+    server.on('upgrade', getUpgradeHandler(upgradeMiddlewares));
   }
   return new Promise((res, rej) => {
     server.on('listening', () => {

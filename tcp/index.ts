@@ -7,7 +7,7 @@ import {
   startSocketClient,
   startRedirectSocketServer,
 } from '../external';
-import {KoaConfig, KoaShortCutConfig, localFullFeatureKoaConfig, startKoaServer} from '../koa/middleware';
+import {KoaConfig, KoaShortCutConfig, localFullFeatureKoaConfig, startKoaServer} from '../koa';
 import {TcpServerConfig} from '../../node';
 
 const store = new MemcachedStore();
@@ -37,7 +37,7 @@ export async function startSyntheticTcpServer(options: {
   const httpServerInfo = await startKoaServer(
     {
       ...koaConfig,
-      middlewareList: [getMemcachedMw()],
+      requestMiddlewares: [getMemcachedMw()],
     },
     koaShortCutConfig
   );

@@ -2,7 +2,7 @@ import WebSocket, {WebSocketServer} from 'ws';
 import {parse} from 'url';
 import {wsPrefix} from './service';
 import {uuid} from '../../external';
-import {WsMiddleware} from '../types';
+import {UpgradeMiddleware} from '../types';
 export const wsPath = `${wsPrefix}/notifications`;
 
 const wss = new WebSocketServer({noServer: true, clientTracking: false});
@@ -12,7 +12,7 @@ wss.on('wsClientError', err => {
 });
 
 export const websocketMap = new Map<string, WebSocket>();
-export const forumWsMiddleware: WsMiddleware = async (ctx, next) => {
+export const forumWsMiddleware: UpgradeMiddleware = async (ctx, next) => {
   const {req, socket, head} = ctx;
   const {url} = req;
   const {pathname} = parse(url);

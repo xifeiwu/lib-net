@@ -11,7 +11,7 @@ import {
 import {EchoConfig, requestMiddleware} from './mw-request';
 
 export async function testEcho() {
-  const {origin, server} = await startKoaServer({middlewareList: [requestMiddleware]});
+  const {origin, server} = await startKoaServer({requestMiddlewares: [requestMiddleware]});
   const {
     statusCode,
     headers,
@@ -47,7 +47,7 @@ export async function testEcho() {
  * This only notifies that the socket has been idle. The request must be destroyed manually.
  */
 export async function testTimeout() {
-  const {origin, server} = await startKoaServer({middlewareList: [requestMiddleware]});
+  const {origin, server} = await startKoaServer({requestMiddlewares: [requestMiddleware]});
   const customOptions: CustomHandleRequestOptions = {
     delayMs: 10 * 1000,
   };
@@ -82,7 +82,7 @@ export async function testUpload() {
   };
   const {origin, server, app} = await startKoaServer({
     bodyParserOptions,
-    middlewareList: [requestMiddleware],
+    requestMiddlewares: [requestMiddleware],
   });
 
   try {

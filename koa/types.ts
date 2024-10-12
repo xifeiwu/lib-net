@@ -9,8 +9,7 @@ import {CorsMWOptions} from './middleware/cors';
 import {LogsMWOptions} from './middleware/logs';
 import {LogMWOptions} from './middleware/log';
 
-export {StaticMiddlewareOptions} from './static';
-
+export {StaticMiddlewareOptions}
 export interface SpaDirInfo {
   fullpath: string;
   entries: string[];
@@ -44,8 +43,8 @@ export interface KoaConfig {
   /** bodyParserOptions is a bodyParser's config and will be added to Koa.Context, it's not a Koa middlware */
   bodyParserOptions?: ParserOptions;
   /** koa middleware passed by user, they will be list at front part of middleware list */
-  middlewareList?: Array<Koa.Middleware>;
-  wsMiddlewareList?: WsMiddleware[];
+  requestMiddlewares?: Array<Koa.Middleware>;
+  upgradeMiddlewares?: UpgradeMiddleware[];
   /** config for pre-defined koa-middleware, such as debug, cors, logs, forum, static */
   mwConfig?: KoaMiddlewareConfig;
 }
@@ -64,4 +63,4 @@ export interface Ctx4Upgrade {
   head: Buffer;
   ws?: WebSocket;
 }
-export type WsMiddleware = (ctx: Ctx4Upgrade, next) => Promise<void>;
+export type UpgradeMiddleware = (ctx: Ctx4Upgrade, next) => Promise<void>;
