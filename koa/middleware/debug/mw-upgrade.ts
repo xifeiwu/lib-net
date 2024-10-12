@@ -1,7 +1,7 @@
 import WebSocket, {WebSocketServer} from 'ws';
 import {wsPrefix} from './service';
-import {uuid, toUrlProps, CanConvertToBuffer, toBuffer} from '../../external';
-import {WsMiddleware} from '../types';
+import {uuid, toUrlProps, CanConvertToBuffer, toBuffer} from '../../../external';
+import {WsMiddleware} from '../../types';
 
 export const path4Broadcast = `${wsPrefix}/broadcast`;
 

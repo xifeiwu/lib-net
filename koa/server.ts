@@ -2,7 +2,7 @@ import http from 'http';
 import Koa from 'koa';
 import session from 'koa-session';
 import cors from './middleware/cors';
-import {requestMiddleware, upgradeMiddelware} from './debug';
+import {requestMiddleware, upgradeMiddelware} from './middleware/debug';
 import {getLogMiddleware} from './middleware/log';
 import logs from './middleware/logs';
 import {forumMiddleware, forumWsMiddleware} from './forum';

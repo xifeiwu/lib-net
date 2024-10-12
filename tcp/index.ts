@@ -7,7 +7,7 @@ import {
   startSocketClient,
   startRedirectSocketServer,
 } from '../external';
-import {KoaConfig, KoaShortCutConfig, localFullFeatureKoaConfig, startKoaServer} from '../koa';
+import {KoaConfig, KoaShortCutConfig, localFullFeatureKoaConfig, startKoaServer} from '../koa/middleware';
 import {TcpServerConfig} from '../../node';
 
 const store = new MemcachedStore();

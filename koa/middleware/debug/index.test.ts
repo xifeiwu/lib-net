@@ -1,10 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import assert from 'assert';
-import {startKoaServer} from '../server';
-import {ParsedFileInfo, ParserOptions, requestAndGetResponseInfo} from '../../external';
-import {EchoConfig} from './mw-request';
-import {requestMiddleware, upgradeMiddelware} from './index';
+import {startKoaServer} from '../../server';
+import {ParsedFileInfo, ParserOptions, requestAndGetResponseInfo} from '../../../external';
+import {EchoConfig, requestMiddleware} from './mw-request';
 
 export async function testEcho() {
   const {origin, server} = await startKoaServer({middlewareList: [requestMiddleware]});
@@ -31,7 +30,7 @@ export async function testEcho() {
     assert.equal(method, 'POST');
     assert.equal(url, '/api/debug/echo?a=b');
     assert.equal(headers.agent, 'node');
-    assert.equal(data, 'abc');
+    assert.equal(data.data, 'abc');
   } catch (err) {
     console.error(err);
   }
@@ -50,7 +49,7 @@ export async function testUpload() {
   });
 
   try {
-    const fileName = 'test-case-4-debug-middleware.ts';
+    const fileName = 'koa-debug-middleware.test.ts';
     const {
       statusCode,
       headers,
@@ -71,7 +70,8 @@ export async function testUpload() {
     console.log(resData);
     const fileInfo: ParsedFileInfo = resData[fileName];
     assert.equal(statusCode, 200);
-    assert.equal(fs.existsSync(path.resolve(uploadDir, fileInfo.name)), true);
+    assert.notEqual(fileInfo.name, undefined);
+    assert.equal(fs.existsSync(path.resolve(uploadDir, fileInfo.name as string)), true);
   } catch (err) {
     console.log(err);
   } finally {

@@ -1,9 +1,19 @@
 import Koa from 'koa';
 import KoaRouter from 'koa-router';
-import {TcpHttpRequestProps, getRequestInfo, parseBody, ParserOptions, toUrlProps} from '../../external';
 import {urlPrefix} from './service';
 import {broadcastData, wsConnections} from './mw-upgrade';
-import {NormalizedUrlProps, Action4IncomingMessage, handleIncomingMessageByConfig} from '../../external';
+import {
+  TcpHttpRequestProps,
+  getRequestInfo,
+  parseBody,
+  ParserOptions,
+  toUrlProps,
+  NormalizedUrlProps,
+  Action4IncomingMessage,
+  handleIncomingMessageByConfig,
+  isPlainObject,
+  fromBuffer,
+} from '../../../external';
 
 export interface EchoConfig {
   /** delay response in seconds */
@@ -27,18 +37,22 @@ router.all('/echo', async (ctx, next) => {
   };
   // const reqData = await getDataFromReadable(req);
   const reqData = await parseBody(ctx.req);
+  const isJson = isPlainObject(reqData);
+  if (isJson) {
+    const {actionConfig} = reqData ?? {};
+    const mergedActionConfig: Action4IncomingMessage = Object.assign(
+      actionConfig ?? {},
+      query ?? {}
+    ) as Action4IncomingMessage;
+    await handleIncomingMessageByConfig({request: ctx.req, response: ctx.res}, mergedActionConfig);
+    if (mergedActionConfig.responseCode) {
+      ctx.status = ctx.res.statusCode;
+    }
+  }
   if (reqData) {
-    resData.data = reqData;
+    resData.data = isJson ? reqData : fromBuffer(reqData, 'json');
   }
-  const {actionConfig} = reqData ?? {};
-  const mergedActionConfig: Action4IncomingMessage = Object.assign(
-    actionConfig ?? {},
-    query ?? {}
-  ) as Action4IncomingMessage;
-  await handleIncomingMessageByConfig({request: ctx.req, response: ctx.res}, mergedActionConfig);
-  if (mergedActionConfig.responseCode) {
-    ctx.status = ctx.res.statusCode;
-  }
+
   ctx.body = resData;
 });
 
@@ -77,4 +91,4 @@ const uploadMiddleware: Koa.Middleware = async ctx => {
 };
 router.all('/upload', uploadMiddleware);
 
-export const requestMiddleware = router.routes();
+export const requestMiddleware = router.routes() as Koa.Middleware;
