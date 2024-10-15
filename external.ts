@@ -21,6 +21,7 @@ export {
   NormalizedUrlProps,
   deepMerge,
   customDeepMerge,
+  deepClone,
 } from '../fe';
 export {
   fromBuffer,

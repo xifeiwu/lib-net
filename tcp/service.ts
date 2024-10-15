@@ -6,7 +6,7 @@ import {KOA_CONFIG, serializeKoaConfig} from '../koa';
 
 export const localTcpServerConfig: TcpServerConfig = {
   port: PORT.fullFeatureTcpServer.port,
-  host: '0.0.0.0',
+  host: '127.0.0.1',
 };
 
 const NoHandleMiddleware = (ctx: Ctx4TcpHandler, next) => {

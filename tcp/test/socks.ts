@@ -6,14 +6,14 @@ import {
   serializableSocksClientInfo,
   SocksClientConfig,
 } from '../../external';
-import {startFullFeatureTcpGateWay, tcpGateWayConfig} from './server.test';
+import {startCustomTcpGateWay, customConfig} from './server';
 
 export async function testSocksApi() {
-  const {host, port} = await startFullFeatureTcpGateWay();
+  const {host, port} = await startCustomTcpGateWay();
   const origin = `http://${host}:${port}`;
   const {
-    mwConfig: {socksConfig: socksConfig},
-  } = tcpGateWayConfig;
+    mwConfig: {socksConfig},
+  } = customConfig;
   const requestTarget = 'http://elif.site/api/debug/echo';
   const v1Http: SocksClientConfig<1> = {
     socksVersion: 1,
