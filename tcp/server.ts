@@ -18,7 +18,7 @@ export async function startTcpGateWay(options?: TcpGateWayConfig) {
   }
   let tcpHandler: TcpHandler;
   const middlewareList: TcpHandlerMiddleware[] = [...middlewares];
-  const {socksConfig} = mwConfig ?? {};
+  const {socks: socksConfig} = mwConfig ?? {};
   socksConfig && middlewareList.push(getTcpHandlerMw4Socks(socksConfig));
   if (middlewareList.length > 0) {
     tcpHandler = getTcpHandler(middlewareList);

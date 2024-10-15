@@ -12,7 +12,7 @@ export async function testSocksApi() {
   const {host, port} = await startFullFeatureTcpGateWay();
   const origin = `http://${host}:${port}`;
   const {
-    mwConfig: {socksConfig},
+    mwConfig: {socks: socksConfig},
   } = tcpGateWayConfig;
   const requestTarget = 'http://elif.site/api/debug/echo';
   const v1Http: SocksClientConfig<1> = {

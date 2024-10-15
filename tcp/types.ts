@@ -10,7 +10,7 @@ export interface Ctx4TcpHandler {
 export type TcpHandlerMiddleware = (ctx: Ctx4TcpHandler, next) => Promise<void>;
 
 export interface TcpHandlerMiddlewareConfig {
-  socksConfig: Partial<SocksServerConfigPerVersion>;
+  socks: Partial<SocksServerConfigPerVersion>;
 }
 
 

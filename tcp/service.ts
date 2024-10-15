@@ -1,6 +1,8 @@
 import {PORT, TcpHandler, TcpServerConfig} from '../external';
 import compose from 'koa-compose';
-import {Ctx4TcpHandler, TcpHandlerMiddleware} from './types';
+import {Ctx4TcpHandler, TcpGateWayConfig, TcpHandlerMiddleware} from './types';
+import {SOCKS_SERVER_CONFIG} from '../koa/middleware/socks/service';
+import {KOA_CONFIG} from '../koa';
 
 export const localTcpServerConfig: TcpServerConfig = {
   port: PORT.fullFeatureTcpServer.port,
@@ -20,3 +22,11 @@ export function getTcpHandler(middlewareList: TcpHandlerMiddleware[]): TcpHandle
   return tcpHandler;
 }
 
+export const TCP_GATEWAY_CONFIG: TcpGateWayConfig = {
+  tcpServerConfig: localTcpServerConfig,
+  mwConfig: {socks: SOCKS_SERVER_CONFIG},
+  middlewares: [],
+  koa: {
+    config: KOA_CONFIG,
+  },
+};
