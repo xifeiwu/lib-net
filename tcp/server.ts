@@ -1,23 +1,28 @@
-import {Socket} from 'net';
-import {startKoaServer} from '../koa';
+import {KoaServerInfo, startKoaServer} from '../koa';
 import {TcpGateWayConfig, TcpHandlerMiddleware} from './types';
-import {startSocketClient, startTcpProxyServer} from '../external';
+import {HttpHandler, startSocketClient, startTcpProxyServer, TcpHandler} from '../external';
 import {getTcpHandlerMiddleware as getTcpHandlerMw4Socks} from '../koa/middleware/socks/index';
 import {getTcpHandler} from './service';
 
 export async function startTcpGateWay(options?: TcpGateWayConfig) {
-  const {tcpServerConfig, mwConfig, koaConfig, koaShortCutConfig} = options ?? {};
-  const koaServerInfo = await startKoaServer(koaConfig, koaShortCutConfig);
-  async function httpHandler(socket: Socket) {
-    const {host, port} = koaServerInfo;
-    const proxyClient = await startSocketClient({host, port});
-    socket.pipe(proxyClient).pipe(socket);
+  const {tcpServerConfig, mwConfig, middlewares = [], koa} = options ?? {};
+  let httpHandler: HttpHandler;
+  let koaServerInfo: KoaServerInfo;
+  if (koa) {
+    koaServerInfo = await startKoaServer(koa.config, koa.shortCut);
+    httpHandler = async socket => {
+      const {host, port} = koaServerInfo;
+      const proxyClient = await startSocketClient({host, port});
+      socket.pipe(proxyClient).pipe(socket);
+    };
   }
-  const middlewareList: TcpHandlerMiddleware[] = [];
+  let tcpHandler: TcpHandler;
+  const middlewareList: TcpHandlerMiddleware[] = [...middlewares];
   const {socksConfig} = mwConfig ?? {};
   socksConfig && middlewareList.push(getTcpHandlerMw4Socks(socksConfig));
-  const tcpHandler = getTcpHandler(middlewareList);
-
+  if (middlewareList.length > 0) {
+    tcpHandler = getTcpHandler(middlewareList);
+  }
   const {host, port, server} = await startTcpProxyServer(
     {
       httpHandler,

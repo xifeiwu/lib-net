@@ -74,7 +74,6 @@ export {
   UPGRADE_PROTOCOL_SOCKS_PREFIX,
   getUpgradeResponse,
   Protocol,
-  TcpHandler,
   SocksServerConfigPerVersion,
   SocksServerConfig,
   getOneLineFromReader,
@@ -86,6 +85,8 @@ export {
   SocksClientConfig,
   connectToSocksServer,
   serializableSocksClientInfo,
+  HttpHandler,
+  TcpHandler,
 } from '../node';
 
 export {Store as MemcachedStore, getConnectionHandler, getClient} from '../node/lib/memcached';

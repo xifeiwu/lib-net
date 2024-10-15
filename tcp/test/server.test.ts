@@ -11,13 +11,15 @@ const koaShortCutConfig: KoaShortCutConfig = {
 };
 
 export const tcpGateWayConfig: TcpGateWayConfig = {
-  koaConfig,
-  koaShortCutConfig,
   mwConfig: {
     socksConfig: SOCKS_SERVER_CONFIG,
   },
   tcpServerConfig: {
     // port: await getAFreePort(),
+  },
+  koa: {
+    config: koaConfig,
+    shortCut: koaShortCutConfig,
   },
 };
 export async function startFullFeatureTcpGateWay() {

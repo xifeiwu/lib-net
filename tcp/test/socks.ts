@@ -1,6 +1,8 @@
+import assert from 'assert';
 import {
   connectToSocksServer,
   logColorful,
+  requestAndGetResponseInfo,
   serializableSocksClientInfo,
   SocksClientConfig,
 } from '../../external';
@@ -29,4 +31,6 @@ export async function testSocksApi() {
   const info2 = await connectToSocksServer(v1Tcp);
   logColorful({}, serializableSocksClientInfo(info1));
   logColorful({}, serializableSocksClientInfo(info2));
+  const {data: resData} = await requestAndGetResponseInfo({href: origin + '/api/socks/list'})
+  assert.equal(resData.length, 2);
 }

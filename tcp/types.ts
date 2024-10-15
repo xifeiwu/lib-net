@@ -13,9 +13,13 @@ export interface TcpHandlerMiddlewareConfig {
   socksConfig: Partial<SocksServerConfigPerVersion>;
 }
 
+
 export interface TcpGateWayConfig {
   tcpServerConfig?: TcpServerConfig;
+  middlewares?: TcpHandlerMiddleware[]
   mwConfig?: TcpHandlerMiddlewareConfig;
-  koaConfig?: KoaConfig;
-  koaShortCutConfig?: KoaShortCutConfig;
+  koa?: {
+    config?: KoaConfig;
+    shortCut?: KoaShortCutConfig;
+  }
 }

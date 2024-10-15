@@ -29,7 +29,7 @@ import {
   getLocalIpAddress,
   customDeepMerge,
 } from '../external';
-import {KoaConfig, KoaMiddlewareConfig, KoaShortCutConfig, UpgradeMiddleware} from './types';
+import {KoaConfig, KoaMiddlewareConfig, KoaServerInfo, KoaShortCutConfig, UpgradeMiddleware} from './types';
 import path from 'path';
 import {KOA_CONFIG} from './service';
 
@@ -118,14 +118,7 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
 export async function startKoaServer(
   koaConfig: KoaConfig = {},
   shortCutConfig?: KoaShortCutConfig
-): Promise<{
-  origin: string;
-  host: string;
-  port: number;
-  server: http.Server;
-  app: Koa;
-  koaConfig: KoaConfig;
-}> {
+): Promise<KoaServerInfo> {
   /**
    * When host is set to '0.0.0.0', the service can be accessed from outside
    */

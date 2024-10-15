@@ -1,5 +1,6 @@
 import Koa from 'koa';
 import {Socket} from 'net';
+import http from 'http';
 import WebSocket from 'ws';
 import session from 'koa-session';
 import {ParserOptions, SocksServerConfigPerVersion} from '../external';
@@ -66,3 +67,12 @@ export interface Ctx4Upgrade {
   ws?: WebSocket;
 }
 export type UpgradeMiddleware = (ctx: Ctx4Upgrade, next) => Promise<void>;
+
+export interface KoaServerInfo {
+  origin: string;
+  host: string;
+  port: number;
+  server: http.Server;
+  app: Koa;
+  koaConfig: KoaConfig;
+}
