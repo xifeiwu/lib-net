@@ -2,7 +2,7 @@ import {PORT, TcpHandler, TcpServerConfig} from '../external';
 import compose from 'koa-compose';
 import {Ctx4TcpHandler, TcpGateWayConfig, TcpHandlerMiddleware} from './types';
 import {SOCKS_SERVER_CONFIG} from '../koa/middleware/socks/service';
-import {KOA_CONFIG} from '../koa';
+import {KOA_CONFIG, serializeKoaConfig} from '../koa';
 
 export const localTcpServerConfig: TcpServerConfig = {
   port: PORT.fullFeatureTcpServer.port,
@@ -30,3 +30,18 @@ export const TCP_GATEWAY_CONFIG: TcpGateWayConfig = {
     config: KOA_CONFIG,
   },
 };
+
+export function serializeTcpGatewayConfig(config: TcpGateWayConfig) {
+  const {tcpServerConfig, mwConfig, middlewares, koa} = config;
+  const {config: koaConfig, shortCut} = koa;
+
+  return {
+    tcpServerConfig,
+    mwConfig,
+    middlewares,
+    koa: {
+      config: serializeKoaConfig(koaConfig),
+      shortCut,
+    },
+  };
+}

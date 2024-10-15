@@ -13,7 +13,6 @@ export interface TcpHandlerMiddlewareConfig {
   socksConfig: Partial<SocksServerConfigPerVersion>;
 }
 
-
 export interface TcpGateWayConfig {
   tcpServerConfig?: TcpServerConfig;
   middlewares?: TcpHandlerMiddleware[]
