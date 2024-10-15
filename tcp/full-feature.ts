@@ -5,14 +5,14 @@ import {
   MemcachedStore,
   PORT,
   startSocketClient,
-  startRedirectSocketServer,
+  startTcpProxyServer,
 } from '../external';
-import {KoaConfig, KoaShortCutConfig, localKoaConfig, serializeKoaConfig, startKoaServer} from '../koa';
+import {KoaConfig, KoaShortCutConfig, KOA_CONFIG, serializeKoaConfig, startKoaServer} from '../koa';
 import {customDeepMerge, TcpServerConfig} from '../../node';
 
 const store = new MemcachedStore();
 const memcachedHandler = getConnectionHandler(store);
-function tcpHandler(socket: Socket, firstChunk?: Buffer) {
+async function tcpHandler(socket: Socket, info) {
   memcachedHandler(socket);
 }
 
@@ -37,7 +37,7 @@ export async function startLocalFullFeatureServer(options: {
 }) {
   const {koaConfig, koaShortCutConfig, tcpServerConfig} = options ?? {};
   const mergedKoaConfig = customizeDeepMerge<KoaConfig, KoaConfig, KoaConfig>(
-    localKoaConfig,
+    KOA_CONFIG,
     {
       requestMiddlewares: [getMemcachedMw()],
     },
@@ -49,7 +49,7 @@ export async function startLocalFullFeatureServer(options: {
     const proxyClient = await startSocketClient({host, port});
     socket.pipe(proxyClient).pipe(socket);
   }
-  const {host, port, server} = await startRedirectSocketServer(
+  const {host, port, server} = await startTcpProxyServer(
     {
       httpHandler,
       tcpHandler,

@@ -1,0 +1,21 @@
+import {Socket} from 'net';
+import {Protocol, SocksServerConfigPerVersion, TcpServerConfig} from '../external';
+import {KoaConfig, KoaShortCutConfig} from '../koa';
+
+export interface Ctx4TcpHandler {
+  protocol: Protocol;
+  socket: Socket;
+}
+
+export type TcpHandlerMiddleware = (ctx: Ctx4TcpHandler, next) => Promise<void>;
+
+export interface TcpHandlerMiddlewareConfig {
+  socksConfig: Partial<SocksServerConfigPerVersion>;
+}
+
+export interface TcpGateWayConfig {
+  tcpServerConfig?: TcpServerConfig;
+  mwConfig?: TcpHandlerMiddlewareConfig;
+  koaConfig?: KoaConfig;
+  koaShortCutConfig?: KoaShortCutConfig;
+}
