@@ -61,6 +61,7 @@ export interface Ctx4Upgrade {
   req: IncomingMessage;
   socket: Socket;
   head: Buffer;
+  protocol: string;
   ws?: WebSocket;
 }
 export type UpgradeMiddleware = (ctx: Ctx4Upgrade, next) => Promise<void>;

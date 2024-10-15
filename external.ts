@@ -63,12 +63,18 @@ export {
   getLocalIpAddress,
   getRequestHeaderInfo,
   getSocketInfo,
-  startRedirectSocketServer,
+  startTcpProxyServer,
   CustomHandleRequestOptions,
   customHandleRequest,
   getIncomingMessageData,
   uploadDirOnCwd,
   TcpServerConfig,
+  SocksServerInfo,
+  getUpgradeProtocol,
+  UPGRADE_PROTOCOL_SOCKS_PREFIX,
+  getUpgradeResponse,
+  Protocol,
+  TcpHandler,
 } from '../node';
 
 export {Store as MemcachedStore, getConnectionHandler, getClient} from '../node/lib/memcached';

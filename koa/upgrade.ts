@@ -25,7 +25,8 @@ const NotFoundMiddleware = (ctx: Ctx4Upgrade, next) => {
 export function getUpgradeHandler(middlewareList: UpgradeMiddleware[]) {
   const fn = compose([...middlewareList, NotFoundMiddleware]);
   async function handleUpgrade(req: IncomingMessage, socket: Socket, head: Buffer) {
-    const ctx: Ctx4Upgrade = {req, socket, head};
+    const protocol = getUpgradeProtocol(req);
+    const ctx: Ctx4Upgrade = {req, socket, head, protocol};
     await fn(ctx);
   }
   return handleUpgrade;

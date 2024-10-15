@@ -26,10 +26,9 @@ export function wsConnections() {
 }
 
 export const upgradeMiddelware: UpgradeMiddleware = async (ctx, next) => {
-  const {req, socket, head} = ctx;
+  const {req, socket, head, protocol} = ctx;
   const {url} = req;
   const {pathname} = toUrlProps(url);
-  const protocol = getUpgradeProtocol(req);
   if (!protocol || protocol.toLowerCase() !== 'websocket' || pathname !== path4Broadcast) {
     return await next();
   }
