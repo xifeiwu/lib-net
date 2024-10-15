@@ -24,7 +24,7 @@ export function getTcpHandler(middlewareList: TcpHandlerMiddleware[]): TcpHandle
 
 export const TCP_GATEWAY_CONFIG: TcpGateWayConfig = {
   tcpServerConfig: localTcpServerConfig,
-  mwConfig: {socks: SOCKS_SERVER_CONFIG},
+  mwConfig: {socksConfig: SOCKS_SERVER_CONFIG},
   middlewares: [],
   koa: {
     config: KOA_CONFIG,
