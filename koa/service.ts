@@ -4,6 +4,7 @@ import {Socket} from 'net';
 import Koa from 'koa';
 import {KoaConfig, KoaMiddlewareConfig} from './types';
 import {PORT, uploadDirOnCwd} from '../external';
+import {SOCKS_SERVER_CONFIG} from './middleware/socks/service';
 
 /**
  * @param options
@@ -53,7 +54,7 @@ export const mwConfigDefault: KoaMiddlewareConfig = {
   useForumMW: true,
 };
 
-export const localKoaConfig: KoaConfig = {
+export const KOA_CONFIG: KoaConfig = {
   port: PORT.fullFeatureHttpServer.port,
   bodyParserOptions: {
     uploadDir: uploadDirOnCwd,
@@ -73,6 +74,7 @@ export const localKoaConfig: KoaConfig = {
         },
       ],
     },
+    socksConfig: SOCKS_SERVER_CONFIG,
   },
   printOrigin: true,
 };

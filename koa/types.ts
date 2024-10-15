@@ -2,14 +2,14 @@ import Koa from 'koa';
 import {Socket} from 'net';
 import WebSocket from 'ws';
 import session from 'koa-session';
-import {ParserOptions} from '../external';
+import {ParserOptions, SocksServerConfigPerVersion} from '../external';
 import {StaticMiddlewareOptions} from './middleware/static';
 import {IncomingMessage} from 'http';
 import {CorsMWOptions} from './middleware/cors';
 import {LogsMWOptions} from './middleware/logs';
 import {LogMWOptions} from './middleware/log';
 
-export {StaticMiddlewareOptions}
+export {StaticMiddlewareOptions};
 export interface SpaDirInfo {
   fullpath: string;
   entries: string[];
@@ -30,6 +30,7 @@ export interface KoaMiddlewareConfig {
   logsMWOptions?: LogsMWOptions;
   useForumMW?: boolean;
   staticWMConfig?: StaticMWConfig;
+  socksConfig?: Partial<SocksServerConfigPerVersion>;
 }
 
 export interface KoaConfig {

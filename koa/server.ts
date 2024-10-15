@@ -13,6 +13,10 @@ import {
   getStaticMiddleware,
 } from './middleware/static';
 import logs from './middleware/logs';
+import {
+  requestMiddleware as requestMw4Socks,
+  getUpgradeMiddleware as getUpgradeMw4Socks,
+} from './middleware/socks/index';
 import {forumMiddleware, forumWsMiddleware} from './forum';
 import errorCatchMiddleware from './middleware/error-catch';
 import {getUpgradeHandler} from './upgrade';
@@ -27,7 +31,7 @@ import {
 } from '../external';
 import {KoaConfig, KoaMiddlewareConfig, KoaShortCutConfig, UpgradeMiddleware} from './types';
 import path from 'path';
-import {localKoaConfig} from './service';
+import {KOA_CONFIG} from './service';
 
 export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutConfig) {
   const {
@@ -39,13 +43,16 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
     mwConfig = {},
   } = koaConfig;
   const {staticDir, uploadDir} = shortCutConfig ?? {};
-  const {logMWOptions, useDebugMW, corsWMOptions, logsMWOptions, useForumMW} = mwConfig;
+  const {logMWOptions, useDebugMW, corsWMOptions, logsMWOptions, socksConfig, useForumMW} = mwConfig;
   let {staticWMConfig} = mwConfig;
   useDebugMW &&
     requestMiddlewares.push(requestMiddlewareOfDebug) &&
     upgradeMiddlewares.push(upgradeMiddelwareOfDebug);
   corsWMOptions && requestMiddlewares.push(cors(corsWMOptions));
   logsMWOptions && requestMiddlewares.push(logs(logsMWOptions));
+  socksConfig &&
+    requestMiddlewares.push(requestMw4Socks) &&
+    upgradeMiddlewares.push(getUpgradeMw4Socks(socksConfig));
   useForumMW && requestMiddlewares.push(forumMiddleware) && upgradeMiddlewares.push(forumWsMiddleware);
   if (staticDir) {
     const staticDirList = Array.isArray(staticDir) ? staticDir : [staticDir];
@@ -168,6 +175,6 @@ export async function startKoaDebugServer(koaConfig?: KoaConfig) {
 }
 
 export async function startKoaFullFeatureServer(koaConfig?: KoaConfig) {
-  const mergedConfig = customizeDeepMerge<KoaConfig, KoaConfig>(localKoaConfig, koaConfig ?? {});
+  const mergedConfig = customizeDeepMerge<KoaConfig, KoaConfig>(KOA_CONFIG, koaConfig ?? {});
   return await startKoaServer(mergedConfig);
 }

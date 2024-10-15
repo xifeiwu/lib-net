@@ -75,6 +75,17 @@ export {
   getUpgradeResponse,
   Protocol,
   TcpHandler,
+  SocksServerConfigPerVersion,
+  SocksServerConfig,
+  getOneLineFromReader,
+  handleSocksConnection,
+  isSocksProtocol,
+  simplifySocksServerInfo,
+  toHtml,
+  toUl,
+  SocksClientConfig,
+  connectToSocksServer,
+  serializableSocksClientInfo,
 } from '../node';
 
 export {Store as MemcachedStore, getConnectionHandler, getClient} from '../node/lib/memcached';
