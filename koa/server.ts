@@ -89,6 +89,7 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
   }
   const app = new Koa();
   /**
+   * Will override bodyParserOptions.uploadDir if it exist
    * add bodyParserOptions to context
    * so we can get bodyParserOptions by ctx.bodyParserOptions for parseBody function
    */
