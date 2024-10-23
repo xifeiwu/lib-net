@@ -1,4 +1,3 @@
-import http from 'http';
 import Koa from 'koa';
 import session from 'koa-session';
 import cors from './middleware/cors';
@@ -29,11 +28,18 @@ import {
   getLocalIpAddress,
   customDeepMerge,
 } from '../external';
-import {KoaConfig, KoaMiddlewareConfig, KoaServerInfo, KoaShortCutConfig, UpgradeMiddleware} from './types';
-import path from 'path';
+import {KoaConfig, KoaServerInfo, KoaShortCutConfig} from './types';
 import {KOA_CONFIG} from './service';
 
 export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutConfig) {
+  const configKeys = Object.keys(koaConfig) as Array<keyof KoaConfig>;
+  const requestMiddlewaresIndex = configKeys.indexOf('requestMiddlewares');
+  const upgradeMiddlewaresIndex = configKeys.indexOf('upgradeMiddlewares');
+  const mwConfigIndex = configKeys.indexOf('mwConfig');
+  const requestMiddlewareAction: 'push' | 'unshift' =
+    requestMiddlewaresIndex <= mwConfigIndex ? 'push' : 'unshift';
+  const upgradeMiddlewareAction: 'push' | 'unshift' =
+    upgradeMiddlewaresIndex <= mwConfigIndex ? 'push' : 'unshift';
   const {
     bodyParserOptions = {},
     keys,
@@ -46,14 +52,16 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
   const {logMWOptions, useDebugMW, corsWMOptions, logsMWOptions, socksConfig, useForumMW} = mwConfig;
   let {staticWMConfig} = mwConfig;
   useDebugMW &&
-    requestMiddlewares.push(requestMiddlewareOfDebug) &&
-    upgradeMiddlewares.push(upgradeMiddelwareOfDebug);
-  corsWMOptions && requestMiddlewares.push(cors(corsWMOptions));
-  logsMWOptions && requestMiddlewares.push(logs(logsMWOptions));
+    requestMiddlewares[requestMiddlewareAction](requestMiddlewareOfDebug) &&
+    upgradeMiddlewares[upgradeMiddlewareAction](upgradeMiddelwareOfDebug);
+  corsWMOptions && requestMiddlewares[requestMiddlewareAction](cors(corsWMOptions));
+  logsMWOptions && requestMiddlewares[requestMiddlewareAction](logs(logsMWOptions));
   socksConfig &&
-    requestMiddlewares.push(requestMw4Socks) &&
-    upgradeMiddlewares.push(getUpgradeMw4Socks(socksConfig));
-  useForumMW && requestMiddlewares.push(forumMiddleware) && upgradeMiddlewares.push(forumWsMiddleware);
+    requestMiddlewares[requestMiddlewareAction](requestMw4Socks) &&
+    upgradeMiddlewares[upgradeMiddlewareAction](getUpgradeMw4Socks(socksConfig));
+  useForumMW &&
+    requestMiddlewares[requestMiddlewareAction](forumMiddleware) &&
+    upgradeMiddlewares[upgradeMiddlewareAction](forumWsMiddleware);
   if (staticDir) {
     const staticDirList = Array.isArray(staticDir) ? staticDir : [staticDir];
     if (!staticWMConfig) {
