@@ -4,11 +4,17 @@ import assert from 'assert';
 import {startKoaServer} from '../../server';
 import {
   CustomHandleRequestOptions,
+  logColorful,
   ParsedFileInfo,
   ParserOptions,
   requestAndGetResponseInfo,
+  requestAndGetUpgradeInfo,
+  watchSocketState,
+  getResponseInfo,
+  fromBuffer,
 } from '../../../external';
-import {EchoConfig, requestMiddleware} from './mw-request';
+import {requestMiddleware} from './mw-request';
+import {upgradeMiddelware} from './mw-upgrade';
 
 export async function testEcho() {
   const {origin, server} = await startKoaServer({requestMiddlewares: [requestMiddleware]});
@@ -42,6 +48,23 @@ export async function testEcho() {
   server.close();
 }
 
+export async function testUpgradeEcho() {
+  const {origin, server} = await startKoaServer({
+    requestMiddlewares: [requestMiddleware],
+    upgradeMiddlewares: [upgradeMiddelware],
+  });
+  const {socket, response, head} = await requestAndGetUpgradeInfo({
+    origin,
+    pathname: '/api/debug/echo',
+    headers: {
+      upgrade: 'any',
+    },
+  });
+  logColorful({}, {responseInfo: await getResponseInfo(response), head: fromBuffer(head, 'json')});
+  watchSocketState(socket, {colorStyle: {color: 'green'}});
+  socket.write('abc');
+}
+
 /**
  * Emitted when the underlying socket times out from inactivity.
  * This only notifies that the socket has been idle. The request must be destroyed manually.
@@ -62,7 +85,7 @@ export async function testTimeout() {
       data: {
         timeout: 25,
         target: 'test-timeout',
-        config: customOptions
+        config: customOptions,
       },
       timeout: 5000,
     });

@@ -88,6 +88,7 @@ export {
   serializableSocksClientInfo,
   HttpHandler,
   TcpHandler,
+  getResponseInfo
 } from '../node';
 
 export {Store as MemcachedStore, getConnectionHandler, getClient} from '../node/lib/memcached';
