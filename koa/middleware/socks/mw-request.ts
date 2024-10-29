@@ -1,7 +1,7 @@
 import Koa from 'koa';
 import KoaRouter from 'koa-router';
 import {infoList, urlPrefix} from './service';
-import {toHtml, toUl} from '../../../external';
+import {isNumber, toHtml, toUl} from '../../../external';
 
 const router = new KoaRouter({
   prefix: urlPrefix,
@@ -26,8 +26,15 @@ router.get('/', async (ctx, next) => {
 });
 
 router.get('/list', async (ctx, next) => {
+  const {query} = ctx;
+  const sizeStr = Array.isArray(query?.size) ? query.size[0] : query.size;
+  const size = parseInt(sizeStr);
   ctx.type = 'json';
-  ctx.body = infoList;
+  let result = infoList;
+  if (isNumber(size)) {
+    result = result.slice(0, size);
+  }
+  ctx.body = result;
 });
 
 router.get('/clear', async (ctx, next) => {

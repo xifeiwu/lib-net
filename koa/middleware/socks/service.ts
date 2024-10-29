@@ -10,7 +10,7 @@ import {
 
 export const urlPrefix = '/api/socks';
 export const infoList: any[] = [];
-export const MAX_INFO_LENGTH = 200;
+export const MAX_INFO_LENGTH = 100;
 
 export async function handleSocksProtocol(
   protocol: Protocol | string | number,
