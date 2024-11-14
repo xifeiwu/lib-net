@@ -3,7 +3,7 @@ import {
   ColorStyle,
   logColorful,
   getRandomBase64String,
-  getRequestHeaderInfo,
+  getHttpRequestHeaderPartInfo,
   toBuffer,
   CanConvertToBuffer,
   getSocketInfo,
@@ -31,8 +31,7 @@ export function getLogMiddleware(options: LogMWOptions) {
     const startTime = Date.now();
     const requestId = getRandomBase64String(8);
     const {type, req, socket} = ctx;
-    const {method, url, httpVersion, headers} = getRequestHeaderInfo(req);
-    // watchSocketState(req.socket, {color: 'blue'});
+    const {method, url, httpVersion, headers} = getHttpRequestHeaderPartInfo(req);
     logColorful(
       theme,
       `${requestId}[${getSocketInfo(socket).id}] Header`,

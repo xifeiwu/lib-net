@@ -65,6 +65,7 @@ export const KOA_CONFIG: KoaConfig = {
       logBody: {
         maxSize: 1024,
       },
+      catchAndWrapError: true,
     },
     staticWMConfig: {
       spaDirList: [

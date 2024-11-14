@@ -35,6 +35,7 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
   const configKeys = Object.keys(koaConfig) as Array<keyof KoaConfig>;
   const requestMiddlewaresIndex = configKeys.indexOf('requestMiddlewares');
   const upgradeMiddlewaresIndex = configKeys.indexOf('upgradeMiddlewares');
+  /** if mwConfig in front, use middleware from wmConfig first, else use requestMiddlewares first */
   const mwConfigIndex = configKeys.indexOf('mwConfig');
   const requestMiddlewareAction: 'push' | 'unshift' =
     requestMiddlewaresIndex <= mwConfigIndex ? 'push' : 'unshift';

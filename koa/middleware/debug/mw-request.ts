@@ -3,8 +3,8 @@ import KoaRouter from 'koa-router';
 import {urlPrefix} from './service';
 import {broadcastData, wsConnections} from './mw-upgrade';
 import {
-  TcpHttpRequestProps,
-  getRequestInfo,
+  HttpRequestInfo,
+  getHttpRequestInfo,
   parseBody,
   ParserOptions,
   toUrlProps,
@@ -22,7 +22,7 @@ const router = new KoaRouter({
 
 router.all('/echo', async (ctx, next) => {
   const {method, url, headers, req} = ctx;
-  const resData: TcpHttpRequestProps & NormalizedUrlProps = {
+  const resData: HttpRequestInfo & NormalizedUrlProps = {
     method,
     url,
     httpVersion: req.httpVersion,
@@ -39,7 +39,7 @@ router.all('/echo', async (ctx, next) => {
 router.all('/custom', async ctx => {
   const {method, url, headers, req} = ctx;
   const {query, pathname} = toUrlProps(url);
-  const resData: TcpHttpRequestProps & NormalizedUrlProps = {
+  const resData: HttpRequestInfo & NormalizedUrlProps = {
     method,
     url,
     httpVersion: req.httpVersion,
@@ -78,7 +78,7 @@ router.all('/error', async (ctx, next) => {
  * curl -X POST http://127.0.0.1:3180/api/debug/ws/broadcast -d the-data
  */
 router.post('/ws/broadcast', async ctx => {
-  const requestInfo = await getRequestInfo(ctx.req);
+  const requestInfo = await getHttpRequestInfo(ctx.req);
   broadcastData(requestInfo.data);
   ctx.status = 200;
   ctx.body = {
@@ -90,7 +90,7 @@ router.post('/ws/broadcast', async ctx => {
  * curl http://127.0.0.1:3180/api/debug/ws/connections
  */
 router.get('/ws/connections', async ctx => {
-  const requestInfo = await getRequestInfo(ctx.req);
+  const requestInfo = await getHttpRequestInfo(ctx.req);
   ctx.body = wsConnections();
 });
 
