@@ -7,11 +7,12 @@ import {requestAndGetResponseInfo} from '../../../external';
 export async function testGetDefaultStaticOptionsForDirs() {
   const staticOptions = getDefaultStaticOptionsForDirs([__dirname]);
   const staticMiddlewares = staticOptions.map(getStaticMiddleware);
-  const {origin} = await startKoaServer({}, [...staticMiddlewares]);
+  const {origin, server} = await startKoaServer({requestMiddlewares: [...staticMiddlewares]});
   const responseInfo = await requestAndGetResponseInfo({
     origin,
     pathname: '/utils.test.ts',
   });
   assert.equal(responseInfo.statusCode, 200);
   console.log(responseInfo);
+  server.close();
 }
