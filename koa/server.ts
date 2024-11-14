@@ -1,21 +1,12 @@
 import Koa from 'koa';
 import session from 'koa-session';
-import cors from './middleware/cors';
 import {
-  requestMiddleware as requestMiddlewareOfDebug,
-  upgradeMiddelware as upgradeMiddelwareOfDebug,
-} from './middleware/debug';
-import {getLogMiddleware} from './middleware/log';
-import {
+  requestMiddleware,
+  upgradeMiddleware,
   getDefaultStaticOptionsForDirs,
   getDefaultStaticOptionsForSpaDirs,
-  getStaticMiddleware,
-} from './middleware/static';
-import logs from './middleware/logs';
-import {
-  requestMiddleware as requestMw4Socks,
-  getUpgradeMiddleware as getUpgradeMw4Socks,
-} from './middleware/socks/index';
+} from './middleware';
+
 import {forumMiddleware, forumWsMiddleware} from './forum';
 import {getUpgradeHandler} from './upgrade';
 import {
@@ -52,13 +43,13 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
   const {logMWOptions, useDebugMW, corsWMOptions, logsMWOptions, socksConfig, useForumMW} = mwConfig;
   let {staticWMConfig} = mwConfig;
   useDebugMW &&
-    requestMiddlewares[requestMiddlewareAction](requestMiddlewareOfDebug) &&
-    upgradeMiddlewares[upgradeMiddlewareAction](upgradeMiddelwareOfDebug);
-  corsWMOptions && requestMiddlewares[requestMiddlewareAction](cors(corsWMOptions));
-  logsMWOptions && requestMiddlewares[requestMiddlewareAction](logs(logsMWOptions));
+    requestMiddlewares[requestMiddlewareAction](requestMiddleware.debug) &&
+    upgradeMiddlewares[upgradeMiddlewareAction](upgradeMiddleware.debug);
+  corsWMOptions && requestMiddlewares[requestMiddlewareAction](requestMiddleware.cors(corsWMOptions));
+  logsMWOptions && requestMiddlewares[requestMiddlewareAction](requestMiddleware.logs(logsMWOptions));
   socksConfig &&
-    requestMiddlewares[requestMiddlewareAction](requestMw4Socks) &&
-    upgradeMiddlewares[upgradeMiddlewareAction](getUpgradeMw4Socks(socksConfig));
+    requestMiddlewares[requestMiddlewareAction](requestMiddleware.socks) &&
+    upgradeMiddlewares[upgradeMiddlewareAction](upgradeMiddleware.socks(socksConfig));
   useForumMW &&
     requestMiddlewares[requestMiddlewareAction](forumMiddleware) &&
     upgradeMiddlewares[upgradeMiddlewareAction](forumWsMiddleware);
@@ -91,7 +82,7 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
     const staticSpaDirOptionsList = getDefaultStaticOptionsForSpaDirs(spaDirList, mwOptions);
     const staticDirOptionsList = getDefaultStaticOptionsForDirs(dirList, mwOptions);
     const staticMiddlewares = [...staticSpaDirOptionsList, ...staticDirOptionsList].map(config =>
-      getStaticMiddleware(config)
+      requestMiddleware.static(config)
     );
     requestMiddlewares.push(...staticMiddlewares);
   }
