@@ -17,7 +17,6 @@ import {
   getUpgradeMiddleware as getUpgradeMw4Socks,
 } from './middleware/socks/index';
 import {forumMiddleware, forumWsMiddleware} from './forum';
-import errorCatchMiddleware from './middleware/error-catch';
 import {getUpgradeHandler} from './upgrade';
 import {
   getAFreePort,

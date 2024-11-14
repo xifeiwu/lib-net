@@ -1,3 +1,7 @@
+/**
+ * Should be set as first middleware:
+ * Log request info, wrap error message
+ */
 import Koa from 'koa';
 import {
   ColorStyle,
@@ -8,7 +12,7 @@ import {
   CanConvertToBuffer,
   getSocketInfo,
 } from '../../external';
-import {INVALIDATE_PAYLOAD} from './error-catch';
+export const INVALIDATE_PAYLOAD = 'invalidate payload';
 
 export interface LogMWOptions {
   theme?: ColorStyle;
