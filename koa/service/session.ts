@@ -1,7 +1,7 @@
 import Koa from 'koa';
 import KoaSession from 'koa-session';
 
-export function getStore() {
+export function getMemStore() {
   const sessionData = {};
   const store: KoaSession.opts['store'] = {
     async get(key) {
@@ -17,7 +17,7 @@ export function getStore() {
   return {store, sessionData};
 }
 
-export function getContextStore() {
+export function getMemContextStore() {
   const sessionData = {};
   class ContextStore {
     ctx: Koa.Context;
