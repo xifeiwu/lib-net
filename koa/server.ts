@@ -105,7 +105,7 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
   }
   /** errorCatchMiddleware should be set as first koa middleware */
   if (logMWOptions) {
-    requestMiddlewares.unshift(getLogMiddleware(logMWOptions));
+    requestMiddlewares.unshift(requestMiddleware.log(logMWOptions));
   }
 
   /** app.middleware assginment should happen before app.listen */
