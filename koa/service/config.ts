@@ -1,5 +1,4 @@
 import path from 'path';
-import Koa from 'koa';
 import KoaSession from 'koa-session';
 import {KoaConfig, KoaMiddlewareConfig} from '../types';
 import {PORT, uploadDirOnCwd} from '../../external';

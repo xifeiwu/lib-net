@@ -91,11 +91,21 @@ export function getLogMiddleware(options: LogMWOptions) {
         } else {
           const message = err.message;
           ctx.status = 505;
-          ctx.body = {
+          const body: {
+            url: string;
+            message?: string;
+            errorStr?: string;
+            moreError?: string;
+          } = {
             url,
-            message,
           };
-          // ctx.throw({url, message}, 400);
+          try {
+            body.message = err.message;
+            body.errorStr = err.toString();
+          } catch (err) {
+            body.moreError = err.message;
+          }
+          ctx.body = body;
         }
       }
     } finally {
