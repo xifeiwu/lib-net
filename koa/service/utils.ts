@@ -11,7 +11,7 @@ export function generateKoaCtx<KoaState = Koa.DefaultState>(options?: {
   requestBody?: object;
   keyForRequestBody?: string;
   state?: KoaState;
-}): any {
+}) {
   const {
     requestHeaders = {},
     state = {},
