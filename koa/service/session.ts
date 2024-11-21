@@ -1,6 +1,6 @@
 import Koa from 'koa';
 import KoaSession from 'koa-session';
-import {getRandomBase64String} from '../../external';
+import {getRandomBase64String} from '../../service/external';
 
 export const DEFAULT_SESSION_CONFIG: Partial<KoaSession.opts> = {
   /** (string) cookie key (default is koa.sess) */
