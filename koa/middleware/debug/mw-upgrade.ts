@@ -7,7 +7,7 @@ import {
   toBuffer,
   responseInfoToBuffer,
   getUpgradeResponse,
-} from '../../../external';
+} from '../../../service/external';
 import {UpgradeMiddleware} from '../../types';
 
 export const path4Broadcast = `${wsPrefix}/broadcast`;

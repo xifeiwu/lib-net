@@ -6,7 +6,7 @@ import {
   RequestConfig,
   getMockFileFinderByDir,
   MockFileContentWithPathInfo,
-} from '../../external';
+} from '../../service/external';
 // import {MockFileFinder} from '../../node/http/mock/find';
 // import {deepEqual} from '@modules/lib/fe/common';
 // import {GeneralDataToSave} from '@modules/conviva/service/request-by-select-config';

@@ -17,7 +17,7 @@ import {
   closePortIfInUse,
   getLocalIpAddress,
   customDeepMerge,
-} from '../external';
+} from '../service/external';
 import {KoaConfig, KoaServerInfo, KoaShortCutConfig} from './types';
 import {KOA_CONFIG} from './service';
 

@@ -4,7 +4,7 @@ import {
   responseInfoToBuffer,
   SocksServerConfigPerVersion,
   UPGRADE_PROTOCOL_SOCKS_PREFIX,
-} from '../../../external';
+} from '../../../service/external';
 import {TcpHandlerMiddleware} from '../../../tcp/types';
 import {UpgradeMiddleware} from '../../types';
 import {handleSocksProtocol} from './service';

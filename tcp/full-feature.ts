@@ -6,7 +6,7 @@ import {
   PORT,
   startSocketClient,
   startTcpProxyServer,
-} from '../external';
+} from '../service/external';
 import {KoaConfig, KoaShortCutConfig, KOA_CONFIG, serializeKoaConfig, startKoaServer} from '../koa';
 import {customDeepMerge, TcpServerConfig} from '../../node';
 

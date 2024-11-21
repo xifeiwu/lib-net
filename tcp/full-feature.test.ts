@@ -1,6 +1,6 @@
 import path from 'path';
 import {startLocalFullFeatureServer} from './full-feature';
-import {logColorful} from '../external';
+import {logColorful} from '../service/external';
 
 export async function testFullFeatureServer() {
   const {host, port, koaConfig} = await startLocalFullFeatureServer({

@@ -8,7 +8,7 @@ import {
   requestAndGetResponseInfo,
   serializableSocksClientInfo,
   SocksClientConfig,
-} from '../../external';
+} from '../../service/external';
 import {startTcpGateWay} from '../server';
 import {serializeTcpGatewayConfig, TCP_GATEWAY_CONFIG} from '../service';
 

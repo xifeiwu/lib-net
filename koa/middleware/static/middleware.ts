@@ -3,7 +3,7 @@ import path from 'path';
 import zlib from 'zlib';
 import Koa from 'koa';
 import {Readable} from 'stream';
-import {toReadable, mime, getFileList, isFunction} from '../../../external';
+import {toReadable, mime, getFileList, isFunction} from '../../../service/external';
 
 interface HttpHeaderConfig {
   maxAge?: number;

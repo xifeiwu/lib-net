@@ -22,7 +22,7 @@ export {
   deepMerge,
   customDeepMerge,
   deepClone,
-} from '../fe';
+} from '../../fe';
 export {
   fromBuffer,
   getAFreePort,
@@ -89,6 +89,6 @@ export {
   HttpHandler,
   TcpHandler,
   getResponseInfo
-} from '../node';
+} from '../../node';
 
-export {Store as MemcachedStore, getConnectionHandler, getClient} from '../node/lib/memcached';
+export {Store as MemcachedStore, getConnectionHandler, getClient} from '../../node/lib/memcached';

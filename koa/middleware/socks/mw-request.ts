@@ -1,7 +1,7 @@
 import Koa from 'koa';
 import KoaRouter from 'koa-router';
 import {infoList, urlPrefix} from './service';
-import {isNumber, toHtml, toUl} from '../../../external';
+import {isNumber, toHtml, toUl} from '../../../service/external';
 
 const router = new KoaRouter({
   prefix: urlPrefix,

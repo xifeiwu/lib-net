@@ -1,7 +1,7 @@
 import Koa from 'koa';
 import assert from 'assert';
 import {Socket} from 'net';
-import {handleSocketEvents} from '../external';
+import {handleSocketEvents} from '../service/external';
 import {startTcpServer} from './on-tcp';
 import {requestAndGetResponseInfo, startSocketClient, waitFor} from '../../node';
 

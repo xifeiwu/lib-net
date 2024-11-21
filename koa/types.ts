@@ -3,7 +3,7 @@ import {Socket} from 'net';
 import http from 'http';
 import WebSocket from 'ws';
 import session from 'koa-session';
-import {ParserOptions, SocksServerConfigPerVersion} from '../external';
+import {ParserOptions, SocksServerConfigPerVersion} from '../service/external';
 import {StaticMiddlewareOptions} from './middleware/static';
 import {IncomingMessage} from 'http';
 import {CorsMWOptions} from './middleware/cors';

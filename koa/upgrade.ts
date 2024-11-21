@@ -1,7 +1,7 @@
 import {IncomingMessage} from 'http';
 import {Socket} from 'net';
 import compose from 'koa-compose';
-import {responseInfoToBuffer} from '../external';
+import {responseInfoToBuffer} from '../service/external';
 import {Ctx4Upgrade, UpgradeMiddleware} from './types';
 import {getUpgradeProtocol} from '../../node';
 

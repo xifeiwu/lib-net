@@ -1,6 +1,6 @@
 import {KoaServerInfo, startKoaServer} from '../koa';
 import {TcpGateWayConfig, TcpHandlerMiddleware} from './types';
-import {HttpHandler, startSocketClient, startTcpProxyServer, TcpHandler} from '../external';
+import {HttpHandler, startSocketClient, startTcpProxyServer, TcpHandler} from '../service/external';
 import {getTcpHandlerMiddleware as getTcpHandlerMw4Socks} from '../koa/middleware/socks/index';
 import {getTcpHandler} from './service';
 

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import logs from './logs';
 import {startKoaServer} from '../server';
-import {requestAndGetResponseInfo} from '../../external';
+import {requestAndGetResponseInfo} from '../../service/external';
 
 export async function testUploadLog() {
   const {origin, server} = await startKoaServer({printOrigin: true, requestMiddlewares: [logs()]});

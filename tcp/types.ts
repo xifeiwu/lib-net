@@ -1,5 +1,5 @@
 import {Socket} from 'net';
-import {Protocol, SocksServerConfigPerVersion, TcpServerConfig} from '../external';
+import {Protocol, SocksServerConfigPerVersion, TcpServerConfig} from '../service/external';
 import {KoaConfig, KoaShortCutConfig} from '../koa';
 
 export interface Ctx4TcpHandler {

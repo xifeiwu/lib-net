@@ -12,7 +12,7 @@ import {
   watchSocketState,
   getResponseInfo,
   fromBuffer,
-} from '../../../external';
+} from '../../../service/external';
 import {requestMiddleware} from './mw-request';
 import {upgradeMiddelware} from './mw-upgrade';
 

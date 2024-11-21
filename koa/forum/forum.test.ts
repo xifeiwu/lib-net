@@ -9,7 +9,7 @@ import {
   PORT,
   logWithColor,
   waitFor,
-} from '../../external';
+} from '../../service/external';
 import {startKoaServer} from '../server';
 import {users, posts} from './mock-data';
 import middlewareForum, {handleUpgrade} from './index';

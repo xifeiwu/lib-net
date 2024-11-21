@@ -14,7 +14,7 @@ import {
   isPlainObject,
   fromBuffer,
   getIncomingMessageData,
-} from '../../../external';
+} from '../../../service/external';
 
 const router = new KoaRouter({
   prefix: urlPrefix,

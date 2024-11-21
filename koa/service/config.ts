@@ -1,7 +1,7 @@
 import path from 'path';
 import KoaSession from 'koa-session';
 import {KoaConfig, KoaMiddlewareConfig} from '../types';
-import {PORT, uploadDirOnCwd} from '../../external';
+import {PORT, uploadDirOnCwd} from '../../service/external';
 import {SOCKS_SERVER_CONFIG} from '../middleware/socks/service';
 
 export const mwConfigDefault: KoaMiddlewareConfig = {

@@ -1,5 +1,5 @@
 import KoaRouter from 'koa-router';
-import {formatDate, fromBuffer, getDataFromReadable} from '../../external';
+import {formatDate, fromBuffer, getDataFromReadable} from '../../service/external';
 const MAX_DATA_LIST_LENGTH = 200;
 
 export interface LogsMWOptions {

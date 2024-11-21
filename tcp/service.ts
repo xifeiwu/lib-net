@@ -1,4 +1,4 @@
-import {PORT, TcpHandler, TcpServerConfig} from '../external';
+import {PORT, TcpHandler, TcpServerConfig} from '../service/external';
 import compose from 'koa-compose';
 import {Ctx4TcpHandler, TcpGateWayConfig, TcpHandlerMiddleware} from './types';
 import {SOCKS_SERVER_CONFIG} from '../koa/middleware/socks/service';

@@ -5,7 +5,7 @@ import {
   requestAndGetResponseInfo,
   serializableSocksClientInfo,
   SocksClientConfig,
-} from '../../external';
+} from '../../service/external';
 import {startCustomTcpGateWay, customConfig} from './server';
 
 export async function testSocksApi() {

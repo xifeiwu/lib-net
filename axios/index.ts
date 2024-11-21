@@ -4,7 +4,7 @@ import {
   isObject,
   logWithColor,
   urlPropsToHref,
-} from '../external';
+} from '../service/external';
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 
 export type CustomizedAxiosRequestConfig = GeneralRequestConfig<AxiosRequestConfig>;

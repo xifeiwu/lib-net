@@ -2,7 +2,7 @@ import path from 'path';
 import {KOA_CONFIG, KoaShortCutConfig} from '../../koa';
 import {TcpGateWayConfig} from '../types';
 import {SOCKS_SERVER_CONFIG} from '../../koa/middleware/socks/service';
-import {deepClone, getAFreePort, logColorful} from '../../external';
+import {deepClone, getAFreePort, logColorful} from '../../service/external';
 import {startTcpGateWay} from '../server';
 import {serializeTcpGatewayConfig, TCP_GATEWAY_CONFIG} from '../service';
 

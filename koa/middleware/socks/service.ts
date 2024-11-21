@@ -6,7 +6,7 @@ import {
   simplifySocksServerInfo,
   SocksServerConfig,
   SocksServerConfigPerVersion,
-} from '../../../external';
+} from '../../../service/external';
 
 export const urlPrefix = '/api/socks';
 export const infoList: any[] = [];

@@ -11,7 +11,7 @@ import {
   toBuffer,
   CanConvertToBuffer,
   getSocketInfo,
-} from '../../external';
+} from '../../service/external';
 export const INVALIDATE_PAYLOAD = 'invalidate payload';
 
 export interface LogMWOptions {

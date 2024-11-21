@@ -5,7 +5,7 @@ import {
   tcpResponsePropsToBuffer,
   tryParseHttpHeaderPart,
   startSocketServer,
-} from '../external';
+} from '../service/external';
 import {Socket, ServerOpts} from 'net';
 
 const KoaInstanceNotFound: HttpResponseInfo = {

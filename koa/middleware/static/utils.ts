@@ -1,5 +1,5 @@
 import fs from 'fs';
-import {htmlDirContent} from '../../../external';
+import {htmlDirContent} from '../../../service/external';
 import {StaticMiddlewareOptions} from './middleware';
 
 export const handleDirByHtmlDirContent: StaticMiddlewareOptions['handleDir'] = (fullpath: string) => {
