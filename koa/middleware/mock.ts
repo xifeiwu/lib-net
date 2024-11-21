@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import Application from 'koa';
 import {
   MockFileFinder,
@@ -7,7 +5,7 @@ import {
   ParamsForFindMockInfoInDir,
   RequestConfig,
   getMockFileFinderByDir,
-  MockFileContentWithRelativePath,
+  MockFileContentWithPathInfo,
 } from '../../external';
 // import {MockFileFinder} from '../../node/http/mock/find';
 // import {deepEqual} from '@modules/lib/fe/common';
@@ -57,7 +55,7 @@ function getRequestConfigFromKoaCtx(ctx: Application.ParameterizedContext<any, a
 export const getMockMiddleware = (
   mockParams?: ParamsForFindMockInfoInDir[],
   options?: {
-    allMockFileList: MockFileContentWithRelativePath[];
+    allMockFileList: MockFileContentWithPathInfo[];
   }
 ) => {
   const {allMockFileList = []} = options ?? {};

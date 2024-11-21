@@ -36,7 +36,7 @@ export {
   toReadable,
   getFileList,
   mime,
-  MockFileContentWithRelativePath,
+  MockFileContentWithPathInfo,
   MockFileFinder,
   MockFileContent,
   ParamsForFindMockInfoInDir,
