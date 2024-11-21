@@ -8,7 +8,7 @@ export const DEFAULT_SESSION_CONFIG: Partial<KoaSession.opts> = {
   /** (number || 'session') maxAge in ms (default is 1 days) */
   /** 'session' will result in a cookie that expires when session/browser is closed */
   /** Warning: If a session cookie is stolen, this cookie will never expire */
-  maxAge: 86400000,
+  maxAge: 86400000 * 2,
   /** (boolean) automatically commit headers (default true) */
   autoCommit: true,
   /** (boolean) can overwrite or not (default true) */
@@ -26,11 +26,11 @@ export const DEFAULT_SESSION_CONFIG: Partial<KoaSession.opts> = {
   /** (string) session cookie sameSite options (default null, don't set it) */
   sameSite: null,
   genid() {
-    return getRandomBase64String(36);
+    return getRandomBase64String(20);
   },
 };
 
-export function getMemStore() {
+export function getSessionMemStore() {
   const sessionData = {};
   const store: KoaSession.opts['store'] = {
     async get(key) {
@@ -46,7 +46,7 @@ export function getMemStore() {
   return {store, sessionData};
 }
 
-export function getMemContextStore() {
+export function getSessionMemContextStore() {
   const sessionData = {};
   class ContextStore {
     ctx: Koa.Context;

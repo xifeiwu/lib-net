@@ -108,6 +108,9 @@ export function getLogMiddleware(options: LogMWOptions) {
           ctx.body = body;
         }
       }
+      if (err.stack) {
+        console.log(err.stack)
+      }
     } finally {
       const responseBody = toBuffer(ctx.body as CanConvertToBuffer);
       let length = -1;
