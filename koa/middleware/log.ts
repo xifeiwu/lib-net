@@ -76,6 +76,7 @@ export function getLogMiddleware(options: LogMWOptions) {
     try {
       await next();
     } catch (err) {
+      throw err;
       if (catchAndWrapError) {
         const {url} = ctx;
         /** Error of async-validator */
@@ -108,9 +109,9 @@ export function getLogMiddleware(options: LogMWOptions) {
           ctx.body = body;
         }
       }
-      if (err.stack) {
-        console.log(err.stack)
-      }
+      // if (err.stack) {
+      //   console.log(err.stack);
+      // }
     } finally {
       const responseBody = toBuffer(ctx.body as CanConvertToBuffer);
       let length = -1;
