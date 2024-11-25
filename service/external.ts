@@ -7,7 +7,7 @@ export {
   urlPropsToHref,
   deepEqual,
   isPlainObject,
-  toNumber as toNumber,
+  toNumber,
   getUrlPropsFromConfig,
   waitFor,
   PORT,
@@ -53,7 +53,8 @@ export {
   getHttpRequestInfo,
   HttpRequestInfo,
   toBuffer,
-  responseInfoToBuffer,
+  httpResponseInfoToBuffer,
+  responseHttpRequestInfo,
   CanConvertToBuffer,
   checkPort,
   closePortIfInUse,
@@ -81,14 +82,14 @@ export {
   handleSocksConnection,
   isSocksProtocol,
   simplifySocksServerInfo,
-  toHtml,
-  toUl,
+  htmlUlItems,
+  ulItems,
   SocksClientConfig,
   connectToSocksServer,
   serializableSocksClientInfo,
   HttpHandler,
   TcpHandler,
-  getResponseInfo
+  getHttpResponseInfo
 } from '../../node';
 
 export {Store as MemcachedStore, getConnectionHandler, getClient} from '../../node/lib/memcached';

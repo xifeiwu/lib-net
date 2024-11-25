@@ -2,7 +2,7 @@ import Koa from 'koa';
 import {IncomingMessage, ServerResponse} from 'http';
 import {
   HttpResponseInfo,
-  tcpResponsePropsToBuffer,
+  httpResponseInfoToBuffer,
   tryParseHttpHeaderPart,
   startSocketServer,
 } from '../service/external';
@@ -50,7 +50,7 @@ export async function startTcpServer(
       return;
     }
     if (!koa) {
-      socket.end(tcpResponsePropsToBuffer(KoaInstanceNotFound));
+      socket.end(httpResponseInfoToBuffer(KoaInstanceNotFound));
       return;
     }
     req.method = headerPartProps.method;

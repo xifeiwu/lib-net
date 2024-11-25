@@ -1,7 +1,7 @@
 import {
   getOneLineFromReader,
   getUpgradeResponse,
-  responseInfoToBuffer,
+  httpResponseInfoToBuffer,
   SocksServerConfigPerVersion,
   UPGRADE_PROTOCOL_SOCKS_PREFIX,
 } from '../../../service/external';
@@ -15,7 +15,7 @@ export function getUpgradeMiddleware(socksServerConfigMap: Partial<SocksServerCo
     if (!protocol.startsWith(UPGRADE_PROTOCOL_SOCKS_PREFIX)) {
       return await next();
     }
-    socket.write(responseInfoToBuffer(getUpgradeResponse(protocol)));
+    socket.write(httpResponseInfoToBuffer(getUpgradeResponse(protocol)));
     /** Get version from protocol string first */
     let version: string | number = protocol.replace(UPGRADE_PROTOCOL_SOCKS_PREFIX, '');
     if (!version) {

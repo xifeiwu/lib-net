@@ -10,7 +10,7 @@ import {
   requestAndGetResponseInfo,
   requestAndGetUpgradeInfo,
   watchSocketState,
-  getResponseInfo,
+  getHttpResponseInfo,
   fromBuffer,
 } from '../../../service/external';
 import {requestMiddleware} from './mw-request';
@@ -60,7 +60,7 @@ export async function testUpgradeEcho() {
       upgrade: 'any',
     },
   });
-  logColorful({}, {responseInfo: await getResponseInfo(response), head: fromBuffer(head, 'json')});
+  logColorful({}, {responseInfo: await getHttpResponseInfo(response), head: fromBuffer(head, 'json')});
   watchSocketState(socket, {colorStyle: {color: 'green'}});
   socket.write('abc');
 }

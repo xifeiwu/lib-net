@@ -1,7 +1,7 @@
 import Koa from 'koa';
 import KoaRouter from 'koa-router';
 import {infoList, urlPrefix} from './service';
-import {isNumber, toHtml, toUl} from '../../../service/external';
+import {htmlUlItems, isNumber} from '../../../service/external';
 
 const router = new KoaRouter({
   prefix: urlPrefix,
@@ -9,20 +9,12 @@ const router = new KoaRouter({
 
 router.get('/', async (ctx, next) => {
   ctx.type = 'html';
-  ctx.body = toHtml(
-    toUl(
-      [
-        {href: '/list', content: '/list'},
-        {href: '/clear', content: '/clear'},
-      ].map(it => {
-        const {href} = it;
-        return {
-          ...it,
-          href: urlPrefix + href,
-        };
-      })
-    )
-  );
+  ctx.body = htmlUlItems({
+    items: [
+      {href: '/list', label: '/list'},
+      {href: '/clear', label: '/clear'},
+    ],
+  });
 });
 
 router.get('/list', async (ctx, next) => {

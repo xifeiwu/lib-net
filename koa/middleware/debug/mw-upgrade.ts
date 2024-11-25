@@ -5,7 +5,7 @@ import {
   toUrlProps,
   CanConvertToBuffer,
   toBuffer,
-  responseInfoToBuffer,
+  httpResponseInfoToBuffer,
   getUpgradeResponse,
 } from '../../../service/external';
 import {UpgradeMiddleware} from '../../types';
@@ -40,7 +40,7 @@ export const upgradeMiddelware: UpgradeMiddleware = async (ctx, next) => {
    * It's better list this middleware ahead of other middlewares
    */
   if (pathname === urlPrefix + '/echo') {
-    socket.write(responseInfoToBuffer(getUpgradeResponse(protocol)));
+    socket.write(httpResponseInfoToBuffer(getUpgradeResponse(protocol)));
     socket.on('data', chunk => {
       if (socket.writable) {
         socket.write(chunk);

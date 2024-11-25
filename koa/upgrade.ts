@@ -1,7 +1,7 @@
 import {IncomingMessage} from 'http';
 import {Socket} from 'net';
 import compose from 'koa-compose';
-import {responseInfoToBuffer} from '../service/external';
+import {httpResponseInfoToBuffer} from '../service/external';
 import {Ctx4Upgrade, UpgradeMiddleware} from './types';
 import {getUpgradeProtocol} from '../../node';
 
@@ -11,7 +11,7 @@ const NotFoundMiddleware = (ctx: Ctx4Upgrade, next) => {
   const protocol = getUpgradeProtocol(req);
   const data = Buffer.from(`Not found upgrade handler for protocol[${protocol}], url[${url}]`);
   socket.end(
-    responseInfoToBuffer({
+    httpResponseInfoToBuffer({
       statusCode: 400,
       statusMessage: 'Not Found',
       headers: {
