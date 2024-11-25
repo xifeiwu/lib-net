@@ -19,7 +19,7 @@ import {
   customDeepMerge,
 } from '../service/external';
 import {KoaConfig, KoaServerInfo, KoaShortCutConfig} from './types';
-import {KOA_CONFIG} from './service';
+import {DEFAULT_KOA_CONFIG} from './service';
 
 export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutConfig) {
   const configKeys = Object.keys(koaConfig) as Array<keyof KoaConfig>;
@@ -168,6 +168,6 @@ export async function startKoaDebugServer(koaConfig?: KoaConfig) {
 }
 
 export async function startKoaFullFeatureServer(koaConfig?: KoaConfig) {
-  const mergedConfig = customizeDeepMerge<KoaConfig, KoaConfig>(KOA_CONFIG, koaConfig ?? {});
+  const mergedConfig = customizeDeepMerge<KoaConfig, KoaConfig>(DEFAULT_KOA_CONFIG, koaConfig ?? {});
   return await startKoaServer(mergedConfig);
 }

@@ -1,12 +1,12 @@
 import path from 'path';
-import {KOA_CONFIG, KoaShortCutConfig} from '../../koa';
+import {DEFAULT_KOA_CONFIG, KoaShortCutConfig} from '../../koa';
 import {TcpGateWayConfig} from '../types';
 import {SOCKS_SERVER_CONFIG} from '../../koa/middleware/socks/service';
 import {deepClone, getAFreePort, logColorful} from '../../service/external';
 import {startTcpGateWay} from '../server';
 import {serializeTcpGatewayConfig, TCP_GATEWAY_CONFIG} from '../service';
 
-const koaConfig = KOA_CONFIG;
+const koaConfig = DEFAULT_KOA_CONFIG;
 const koaShortCutConfig: KoaShortCutConfig = {
   staticDir: path.resolve(__dirname, '..'),
 };

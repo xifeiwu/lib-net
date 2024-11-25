@@ -7,7 +7,7 @@ import {
   startSocketClient,
   startTcpProxyServer,
 } from '../service/external';
-import {KoaConfig, KoaShortCutConfig, KOA_CONFIG, serializeKoaConfig, startKoaServer} from '../koa';
+import {KoaConfig, KoaShortCutConfig, DEFAULT_KOA_CONFIG, serializeKoaConfig, startKoaServer} from '../koa';
 import {customDeepMerge, TcpServerConfig} from '../../node';
 
 const store = new MemcachedStore();
@@ -37,7 +37,7 @@ export async function startLocalFullFeatureServer(options: {
 }) {
   const {koaConfig, koaShortCutConfig, tcpServerConfig} = options ?? {};
   const mergedKoaConfig = customizeDeepMerge<KoaConfig, KoaConfig, KoaConfig>(
-    KOA_CONFIG,
+    DEFAULT_KOA_CONFIG,
     {
       requestMiddlewares: [getMemcachedMw()],
     },
