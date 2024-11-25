@@ -89,6 +89,7 @@ export {
   serializableSocksClientInfo,
   HttpHandler,
   TcpHandler,
+  Cookies,
   getHttpResponseInfo
 } from '../../node';
 

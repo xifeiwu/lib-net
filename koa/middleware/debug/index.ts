@@ -1,2 +1,2 @@
-export {requestMiddleware} from './mw-request';
+export {debugRouter} from './mw-request';
 export {upgradeMiddelware} from './mw-upgrade';
