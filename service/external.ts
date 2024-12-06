@@ -65,7 +65,7 @@ export {
   getLocalIpAddress,
   getHttpRequestHeaderPartInfo,
   getSocketInfo,
-  startTcpProxyServer,
+  startTcpGateWay,
   CustomHandleRequestOptions,
   customHandleRequest,
   getIncomingMessageData,
