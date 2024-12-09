@@ -7,7 +7,7 @@ import {
   getDefaultStaticOptionsForSpaDirs,
 } from './middleware';
 
-import {forumMiddleware, forumWsMiddleware} from './forum';
+// import {forumMiddleware, forumWsMiddleware} from './forum';
 import {getUpgradeHandler} from './upgrade';
 import {
   getAFreePort,
@@ -51,8 +51,8 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
     requestMiddlewares[requestMiddlewareAction](requestMiddleware.socks) &&
     upgradeMiddlewares[upgradeMiddlewareAction](upgradeMiddleware.socks(socksConfig));
   useForumMW &&
-    requestMiddlewares[requestMiddlewareAction](forumMiddleware) &&
-    upgradeMiddlewares[upgradeMiddlewareAction](forumWsMiddleware);
+    requestMiddlewares[requestMiddlewareAction](requestMiddleware.forum) &&
+    upgradeMiddlewares[upgradeMiddlewareAction](upgradeMiddleware.forum);
   if (staticDir) {
     const staticDirList = Array.isArray(staticDir) ? staticDir : [staticDir];
     if (!staticWMConfig) {

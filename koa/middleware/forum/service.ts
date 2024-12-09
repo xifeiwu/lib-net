@@ -1,4 +1,4 @@
-import {uuid} from '../../service/external';
+import {uuid} from '../../../service/external';
 import {users} from './mock-data';
 
 export const prefix = '/api/forum';

@@ -16,7 +16,9 @@ import {
 } from './socks/index';
 import {getMockMiddleware} from './mock';
 import {sessionRouter} from './session';
-export {debugRouter, sessionRouter};
+import {forumRouter, upgradeMiddleware as forumUpgradeMw} from './forum';
+
+export {debugRouter, sessionRouter, forumRouter};
 
 export const requestMiddleware = {
   cors,
@@ -26,10 +28,12 @@ export const requestMiddleware = {
   logs,
   socks: requestMw4Socks,
   mock: getMockMiddleware,
+  forum: forumRouter.routes(),
 };
 export const upgradeMiddleware = {
   debug: upgradeMiddelwareOfDebug,
   socks: getUpgradeMw4Socks,
+  forum: forumUpgradeMw,
 };
 
 export {getDefaultStaticOptionsForDirs, getDefaultStaticOptionsForSpaDirs};

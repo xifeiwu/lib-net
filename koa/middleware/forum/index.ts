@@ -1,7 +1,7 @@
 import KoaRouter from 'koa-router';
 import {notifications, posts, users} from './mock-data';
 import Koa from 'koa';
-import {formatDate, getDataFromReadable, toBuffer, uuid} from '../../service/external';
+import {formatDate, getDataFromReadable, toBuffer, uuid} from '../../../service/external';
 import {Post} from './types/backend';
 import {postValidator, reactionValidator} from './rules';
 import {Reaction} from './types/frontend';
@@ -100,6 +100,6 @@ router.get('/ws/notifications/broadcast', async (ctx: Koa.Context, next) => {
   ctx.body = notifications;
 });
 
-const forumMiddleware = router.routes();
+const forumRouter = router;
 
-export {forumMiddleware, forumWsMiddleware, websocketMap};
+export {forumRouter, forumWsMiddleware as upgradeMiddleware, websocketMap};

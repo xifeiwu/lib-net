@@ -1,8 +1,8 @@
 import WebSocket, {WebSocketServer} from 'ws';
 import {parse} from 'url';
 import {wsPrefix} from './service';
-import {uuid} from '../../service/external';
-import {UpgradeMiddleware} from '../types';
+import {uuid} from '../../../service/external';
+import {UpgradeMiddleware} from '../../types';
 export const wsPath = `${wsPrefix}/notifications`;
 
 const wss = new WebSocketServer({noServer: true, clientTracking: false});
