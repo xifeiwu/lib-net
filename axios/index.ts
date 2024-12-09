@@ -2,7 +2,7 @@ import {
   GeneralRequestConfig,
   getUrlPropsFromConfig,
   isObject,
-  logWithColor,
+  logColorful,
   urlPropsToHref,
 } from '../service/external';
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
@@ -31,8 +31,8 @@ export function prettyConsoleAxiosError(err: AxiosError | Error, v1: boolean = t
     throw err;
   }
   const {config, message, code, stack, request, response} = err as AxiosError;
-  logWithColor('red', axiosConfigToCurlCommand(config));
-  logWithColor('red', message, code);
+  logColorful({color: 'red'}, axiosConfigToCurlCommand(config));
+  logColorful({color: 'red'}, message, code);
   if (v1) {
     if (config.maxRedirects === 0) {
       const {data, method, baseURL, url} = config;
@@ -40,7 +40,7 @@ export function prettyConsoleAxiosError(err: AxiosError | Error, v1: boolean = t
         const {method, host, path, protocol} = request;
         // const firstLine = `${method} ${protocol}//${host}${path}`;
         const firstLine = `${method.toUpperCase()} ${baseURL}${url}`;
-        logWithColor('black', firstLine, {...request.getHeaders()}, data);
+        logColorful({color: 'black'}, firstLine, {...request.getHeaders()}, data);
       }
     } else {
       throw err;
@@ -49,15 +49,15 @@ export function prettyConsoleAxiosError(err: AxiosError | Error, v1: boolean = t
     const {data} = config;
     if (request) {
       const {method, host, path, protocol} = request;
-      logWithColor('black', `${method} ${protocol}//${host}${path}`, {...request.getHeaders()}, data);
+      logColorful({color: 'black'}, `${method} ${protocol}//${host}${path}`, {...request.getHeaders()}, data);
     }
   }
   if (response) {
     const {status, statusText, headers, data} = response;
-    logWithColor('red', `${status} ${statusText}`);
-    logWithColor('black', {...headers}, data as any);
+    logColorful({color: 'red'}, `${status} ${statusText}`);
+    logColorful({color: 'black'}, {...headers}, data as any);
   } else {
-    logWithColor('red', 'No response');
+    logColorful({color: 'red'}, 'No response');
   }
 }
 
@@ -69,10 +69,15 @@ export function axiosConfigToCurlCommand(axiosConfig: AxiosRequestConfig) {
       const {username, password} = auth;
       headers.Authorization = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');
     }
+    let parsedData;
+    /** As for content-type of application/json, the data is string, so try to parse to JSON for pretty console */
+    try {
+      parsedData = JSON.parse(data);
+    } catch {
+      parsedData = data;
+    }
     const command = [
-      'curl',
-      `-X ${method.toUpperCase()}`,
-      concatenateURL(url, baseURL),
+      `curl -X ${method.toUpperCase()} ${concatenateURL(url, baseURL)}`,
       ...Object.entries(headers)
         .filter(([_k, v]) => {
           return !isObject(v);
@@ -80,9 +85,12 @@ export function axiosConfigToCurlCommand(axiosConfig: AxiosRequestConfig) {
         .map(([k, v]) => {
           return `-H '${k}: ${v}'`;
         }),
-      data !== undefined ? `-d ${isObject(data) ? "'" + JSON.stringify(data) + "'" : data}` : '',
+      parsedData !== undefined
+        ? `-d ${isObject(parsedData) ? "'" + JSON.stringify(parsedData, null, 2) + "'\n" : parsedData}`
+        : '',
     ];
-    return command.join(' ');
+    const result = command.join('\n');
+    return result;
   } catch (err) {
     /** Ignore */
   }
