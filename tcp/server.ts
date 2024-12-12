@@ -3,13 +3,13 @@ import {TcpGateWayConfig, TcpHandlerMiddleware} from './types';
 import {
   HttpHandler,
   startSocketClient,
-  startTcpGateWay as startTcpGateWayBaseOnNative,
+  startTcpGateway,
   TcpHandler,
 } from '../service/external';
 import {getTcpHandlerMiddleware as getTcpHandlerMw4Socks} from '../koa/middleware/socks/index';
 import {getTcpHandler} from './service';
 
-export async function startTcpGateWay(options?: TcpGateWayConfig) {
+export async function startCustomizedTcpGateway(options?: TcpGateWayConfig) {
   const {tcpServerConfig, mwConfig, middlewares = [], koa} = options ?? {};
   let httpHandler: HttpHandler;
   let koaServerInfo: KoaServerInfo;
@@ -28,7 +28,7 @@ export async function startTcpGateWay(options?: TcpGateWayConfig) {
   if (middlewareList.length > 0) {
     tcpHandler = getTcpHandler(middlewareList);
   }
-  const {host, port, server} = await startTcpGateWayBaseOnNative(
+  const {host, port, server} = await startTcpGateway(
     {
       httpHandler,
       tcpHandler,

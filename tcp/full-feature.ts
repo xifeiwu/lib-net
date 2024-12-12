@@ -5,7 +5,7 @@ import {
   MemcachedStore,
   PORT,
   startSocketClient,
-  startTcpGateWay,
+  startTcpGateway,
 } from '../service/external';
 import {KoaConfig, KoaShortCutConfig, DEFAULT_KOA_CONFIG, serializeKoaConfig, startKoaServer} from '../koa';
 import {customDeepMerge, TcpServerConfig} from '../../node';
@@ -49,7 +49,7 @@ export async function startLocalFullFeatureServer(options: {
     const proxyClient = await startSocketClient({host, port});
     socket.pipe(proxyClient).pipe(socket);
   }
-  const {host, port, server} = await startTcpGateWay(
+  const {host, port, server} = await startTcpGateway(
     {
       httpHandler,
       tcpHandler,
