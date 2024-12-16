@@ -90,7 +90,7 @@ export {
   HttpHandler,
   TcpHandler,
   Cookies,
-  getHttpResponseInfo
+  getHttpResponseInfo,
 } from '../../node';
 
 export {Store as MemcachedStore, getConnectionHandler, getClient} from '../../node/lib/memcached';

@@ -3,12 +3,12 @@ import KoaRouter from 'koa-router';
 import {
   getConnectionHandler,
   MemcachedStore,
-  PORT,
   startSocketClient,
   startTcpGateway,
+  customDeepMerge,
+  TcpServerConfig,
 } from '../service/external';
 import {KoaConfig, KoaShortCutConfig, DEFAULT_KOA_CONFIG, serializeKoaConfig, startKoaServer} from '../koa';
-import {customDeepMerge, TcpServerConfig} from '../../node';
 
 const store = new MemcachedStore();
 const memcachedHandler = getConnectionHandler(store);
