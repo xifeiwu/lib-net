@@ -13,9 +13,10 @@ import {
   getHttpResponseInfo,
   fromBuffer,
 } from '../../../service/external';
-import {requestMiddleware} from './mw-request';
+import {requestRouter} from './mw-request';
 import {upgradeMiddelware} from './mw-upgrade';
 
+const requestMiddleware = requestRouter.routes();
 export async function testEcho() {
   const {origin, server} = await startKoaServer({requestMiddlewares: [requestMiddleware]});
   const {

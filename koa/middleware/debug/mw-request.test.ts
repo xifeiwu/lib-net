@@ -3,10 +3,10 @@ import path from 'path';
 import assert from 'assert';
 import {requestAndGetResponseInfo} from '../../../service/external';
 import {startKoaServer} from '../../server';
-import {debugRouter} from './mw-request';
+import {requestRouter} from './mw-request';
 export async function testUpload() {
   const {origin, server, app} = await startKoaServer({
-    requestMiddlewares: [debugRouter.routes()],
+    requestMiddlewares: [requestRouter.routes()],
     bodyParserOptions: {
       uploadDir: path.resolve(__dirname, 'uploads'),
       wayOfHandleFile: 'cacheAndSave',

@@ -1,8 +1,5 @@
 import cors from './cors';
-import {
-  debugRouter,
-  upgradeMiddelware as upgradeMiddelwareOfDebug,
-} from './debug';
+import {requestRouter as debugRequestRouter, upgradeMiddelware as upgradeMiddelwareOfDebug} from './debug';
 import {getLogMiddleware} from './log';
 import {
   getDefaultStaticOptionsForDirs,
@@ -16,24 +13,24 @@ import {
 } from './socks/index';
 import {getMockMiddleware} from './mock';
 import {sessionRouter} from './session';
-import {forumRouter, upgradeMiddleware as forumUpgradeMw} from './forum';
+import {requestRouter as forumRequestRouter, upgradeMiddleware as forumUpgradeMiddleware} from './forum';
 
-export {debugRouter, sessionRouter, forumRouter};
+export {debugRequestRouter, sessionRouter, forumRequestRouter};
 
 export const requestMiddleware = {
   cors,
-  debug: debugRouter.routes(),
+  debug: debugRequestRouter.routes(),
   log: getLogMiddleware,
   static: getStaticMiddleware,
   logs,
   socks: requestMw4Socks,
   mock: getMockMiddleware,
-  forum: forumRouter.routes(),
+  forum: forumRequestRouter.routes(),
 };
 export const upgradeMiddleware = {
   debug: upgradeMiddelwareOfDebug,
   socks: getUpgradeMw4Socks,
-  forum: forumUpgradeMw,
+  forum: forumUpgradeMiddleware,
 };
 
 export {getDefaultStaticOptionsForDirs, getDefaultStaticOptionsForSpaDirs};

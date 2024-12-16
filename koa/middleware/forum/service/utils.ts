@@ -1,8 +1,5 @@
-import {uuid} from '../../../service/external';
-import {users} from './mock-data';
-
-export const prefix = '/api/forum';
-export const wsPrefix = '/ws/forum';
+import {uuid} from '../../../../service/external';
+import {mocked} from './mock-data';
 
 const notificationTemplates = ['poked you', 'says hi!', `is glad we're friends`, 'sent you a gift'];
 export function getRandom(max: number) {
@@ -35,7 +32,7 @@ export function generateRandomNotifications(since: string | number, numNotificat
   // Create N random notifications. We won't bother saving these
   // in the DB - just generate a new batch and return them.
   const notifications = [...Array(numNotifications)].map(() => {
-    const user = randomFromArray(users);
+    const user = randomFromArray(mocked.users);
     const template = randomFromArray(notificationTemplates);
     return {
       id: uuid(),

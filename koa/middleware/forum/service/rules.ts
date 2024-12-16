@@ -1,6 +1,5 @@
 import Schema, {Rules} from 'async-validator';
-import {Post} from './types/backend';
-import {users} from './mock-data';
+import {mocked} from './mock-data';
 
 const reactionRule: Rules = {
   thumbsUp: {
@@ -50,7 +49,7 @@ export const postRule: Rules = {
   user: {
     type: 'string',
     validator(rule, value) {
-      return users.some(it => it.id === value);
+      return mocked.users.some(it => it.id === value);
     },
   },
 };

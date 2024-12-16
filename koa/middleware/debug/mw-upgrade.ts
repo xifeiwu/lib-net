@@ -1,8 +1,7 @@
 import WebSocket, {WebSocketServer} from 'ws';
-import {urlPrefix, WS_PATH, wsPrefix} from './service';
+import {WS_PATH, wsPrefix} from './service';
 import {
   uuid,
-  toUrlProps,
   CanConvertToBuffer,
   toBuffer,
   httpResponseInfoToBuffer,

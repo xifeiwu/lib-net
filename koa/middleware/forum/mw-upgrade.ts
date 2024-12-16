@@ -1,9 +1,7 @@
 import WebSocket, {WebSocketServer} from 'ws';
-import {parse} from 'url';
-import {wsPrefix} from './service';
+import {WS_PATH} from './service';
 import {uuid} from '../../../service/external';
 import {UpgradeMiddleware} from '../../types';
-export const wsPath = `${wsPrefix}/notifications`;
 
 const wss = new WebSocketServer({noServer: true, clientTracking: false});
 
@@ -12,11 +10,15 @@ wss.on('wsClientError', err => {
 });
 
 export const websocketMap = new Map<string, WebSocket>();
-export const forumWsMiddleware: UpgradeMiddleware = async (ctx, next) => {
-  const {req, socket, head} = ctx;
-  const {url} = req;
-  const {pathname} = parse(url);
-  if (pathname === wsPath) {
+export const upgradeMiddleware: UpgradeMiddleware = async (ctx, next) => {
+  const {
+    req,
+    socket,
+    head,
+    protocol,
+    urlProps: {pathname},
+  } = ctx;
+  if (pathname === WS_PATH.notifications && protocol === 'websocket') {
     wss.handleUpgrade(req, socket, head, ws => {
       wss.emit('connection', ws, req);
       ctx.ws = ws;
