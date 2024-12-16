@@ -1,5 +1,5 @@
 import WebSocket, {WebSocketServer} from 'ws';
-import {urlPrefix, wsPrefix} from './service';
+import {urlPrefix, WS_PATH, wsPrefix} from './service';
 import {
   uuid,
   toUrlProps,
@@ -32,24 +32,25 @@ export function wsConnections() {
 }
 
 export const upgradeMiddelware: UpgradeMiddleware = async (ctx, next) => {
-  const {req, socket, head, protocol} = ctx;
-  const {url} = req;
-  const {pathname} = toUrlProps(url);
+  const {
+    req,
+    socket,
+    head,
+    protocol,
+    urlProps: {pathname},
+  } = ctx;
   /**
    * Echo original data send from client side for debug
    * It's better list this middleware ahead of other middlewares
    */
-  if (pathname === urlPrefix + '/echo') {
+  if (pathname === WS_PATH.echo) {
     socket.write(httpResponseInfoToBuffer(getUpgradeResponse(protocol)));
     socket.on('data', chunk => {
       if (socket.writable) {
         socket.write(chunk);
       }
     });
-  } else if (protocol && protocol.toLowerCase() !== 'websocket') {
-    if (pathname !== path4Broadcast) {
-      return await next();
-    }
+  } else if (pathname === WS_PATH.broadcast && protocol === 'websocket') {
     wss.handleUpgrade(req, socket, head, ws => {
       // wss.emit('connection', ws, req);
       ctx.ws = ws;
@@ -69,5 +70,7 @@ export const upgradeMiddelware: UpgradeMiddleware = async (ctx, next) => {
         wsMap.delete(key);
       });
     });
+  } else {
+    await next();
   }
 };
