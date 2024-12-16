@@ -1,7 +1,7 @@
 import {IncomingMessage} from 'http';
 import {Socket} from 'net';
 import compose from 'koa-compose';
-import {httpResponseInfoToBuffer} from '../service/external';
+import {httpResponseInfoToBuffer, toUrlProps} from '../service/external';
 import {Ctx4Upgrade, UpgradeMiddleware} from './types';
 import {getUpgradeProtocol} from '../../node';
 
@@ -26,7 +26,8 @@ export function getUpgradeHandler(middlewareList: UpgradeMiddleware[]) {
   const fn = compose([...middlewareList, NotFoundMiddleware]);
   async function handleUpgrade(req: IncomingMessage, socket: Socket, head: Buffer) {
     const protocol = getUpgradeProtocol(req);
-    const ctx: Ctx4Upgrade = {req, socket, head, protocol};
+    const urlProps = toUrlProps(req.url);
+    const ctx: Ctx4Upgrade = {req, socket, head, protocol: protocol.toLowerCase(), urlProps};
     await fn(ctx);
   }
   return handleUpgrade;

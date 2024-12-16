@@ -3,7 +3,7 @@ import {Socket} from 'net';
 import http from 'http';
 import WebSocket from 'ws';
 import session from 'koa-session';
-import {ParserOptions, SocksServerConfigPerVersion} from '../service/external';
+import {NormalizedUrlProps, ParserOptions, SocksServerConfigPerVersion} from '../service/external';
 import {StaticMiddlewareOptions} from './middleware/static';
 import {IncomingMessage} from 'http';
 import {CorsMWOptions} from './middleware/cors';
@@ -64,6 +64,7 @@ export interface Ctx4Upgrade {
   req: IncomingMessage;
   socket: Socket;
   head: Buffer;
+  urlProps: NormalizedUrlProps;
   protocol: string;
   ws?: WebSocket;
 }
