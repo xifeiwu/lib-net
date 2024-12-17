@@ -1,5 +1,6 @@
-import Schema, {Rules} from 'async-validator';
+import Schema, {Rules, ValidateError} from 'async-validator';
 import {mocked} from './mock-data';
+import { Post } from './types/frontend';
 
 const reactionRule: Rules = {
   thumbsUp: {
@@ -55,3 +56,16 @@ export const postRule: Rules = {
 };
 
 export const postValidator = new Schema(postRule);
+
+export async function validatePost(post: Post) {
+  try {
+    const success = await postValidator.validate(post);
+    return {success};
+  } catch (err) {
+    // return err;
+    return {
+      success: false,
+      response: err.fields,
+    }
+  }
+}
