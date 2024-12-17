@@ -1,6 +1,6 @@
 import Schema, {Rules, ValidateError} from 'async-validator';
 import {mocked} from './mock-data';
-import { Post } from './types/frontend';
+import {Post} from './types/frontend';
 
 const reactionRule: Rules = {
   thumbsUp: {
@@ -65,7 +65,7 @@ export async function validatePost(post: Post) {
     // return err;
     return {
       success: false,
-      response: err.fields,
-    }
+      response: JSON.stringify(err.fields),
+    };
   }
 }

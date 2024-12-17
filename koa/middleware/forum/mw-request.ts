@@ -97,7 +97,7 @@ router.get('/notifications', async (ctx: Koa.Context, next) => {
   ctx.body = notifications;
 });
 /** broadcast notification to all connected websocket */
-router.get('/ws/notifications/broadcast', async (ctx: Koa.Context, next) => {
+router.get('/notifications/broadcast', async (ctx: Koa.Context, next) => {
   const numNotifications = getRandom(5) + 1;
   const notifications = generateRandomNotifications(Date.now() - 5 * 3600 * 1000, numNotifications);
   const buf = await toBuffer({type: 'notifications', payload: notifications});

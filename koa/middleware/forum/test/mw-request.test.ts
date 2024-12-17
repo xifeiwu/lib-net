@@ -9,7 +9,7 @@ import {
 import {requestRouter} from '../mw-request';
 import {startKoaServer} from '../../../server';
 import {mocked, urlPrefix} from '../service';
-import { Post } from '../service/types/frontend';
+import {Post} from '../service/types/frontend';
 
 export async function testRequestRouter() {
   const pathnameList = requestRouter.stack.map(it => {
@@ -140,16 +140,74 @@ export async function testValidate() {
       },
       user: mocked.users[0].id,
     };
-    const {statusCode, headers, data} = await requestAndGetResponseInfo(
+    const {statusCode, headers, data} = await requestAndGetResponseInfo({
+      origin,
+      method: 'post',
+      pathname,
+      data: post,
+    });
+    assert.equal(statusCode, 400);
+    // assert.equal(data.message, INVALIDATE_PAYLOAD);
+  }
+  server.close();
+}
+
+export async function patchPost() {
+  const pathname = `${urlPrefix}/posts`;
+  const {origin, server} = await startKoaServer({
+    requestMiddlewares: [requestRouter.routes()],
+  });
+  const [firstPost] = mocked.posts;
+  firstPost.title = `modified: ${firstPost.title}`;
+  /** data is not passed */
+  {
+    const {data} = await requestAndGetResponseInfo<Post, Partial<Post>>(
+      {
+        url: origin,
+        method: 'patch',
+        path: urlPropsToHref({
+          pathname,
+        }),
+        data: firstPost,
+      },
+      {
+        dataType: 'json',
+      }
+    );
+    assert.deepEqual(firstPost, data);
+  }
+  server.close();
+}
+
+export async function testReaction() {
+  const pathname = `${urlPrefix}/posts/:postId/reactions`;
+  const {origin, server} = await startKoaServer({
+    requestMiddlewares: [requestRouter.routes()],
+  });
+  const [firstPost] = mocked.posts;
+  {
+    const {id: postId} = firstPost;
+    const {data} = await requestAndGetResponseInfo(
       {
         origin,
         method: 'post',
-        pathname,
-        data: post,
+        pathname: urlPropsToHref({
+          pathname,
+          pathnameParams: {
+            postId,
+          },
+        }),
+        data: {
+          thumbsUp: 1,
+          heart: 1,
+        },
+      },
+      {
+        dataType: 'json',
       }
     );
-    assert.equal(statusCode, 400);
-    // assert.equal(data.message, INVALIDATE_PAYLOAD);
+    assert.equal(data.heart, 1);
+    assert.equal(data.thumbsUp, 1);
   }
   server.close();
 }
