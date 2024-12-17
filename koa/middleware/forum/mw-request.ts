@@ -10,6 +10,7 @@ import {
   mocked,
   postValidator,
   reactionValidator,
+  validatePost,
 } from './service';
 import {websocketMap} from './mw-upgrade';
 
@@ -50,7 +51,8 @@ router.post('/posts', async (ctx: Koa.Context, next) => {
     rocket: 0,
     eyes: 0,
   };
-  await postValidator.validate(post);
+  const result = await validatePost(post);
+  ctx.assert(result.success, 400, result.response);
   mocked.posts.push(post);
   ctx.body = post;
 });
