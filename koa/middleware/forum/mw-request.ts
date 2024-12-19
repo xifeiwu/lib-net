@@ -1,6 +1,6 @@
 import KoaRouter from 'koa-router';
 import Koa from 'koa';
-import {formatDate, getDataFromReadable, toBuffer, uuid} from '../../../service/external';
+import {formatDate, getDataFromReadable, convertToBuffer, uuid} from '../../../service/external';
 import {Post} from './service/types/backend';
 import {Reaction} from './service/types/frontend';
 import {
@@ -8,9 +8,10 @@ import {
   getRandom,
   urlPrefix,
   mocked,
-  postValidator,
+  postPostValidator,
   reactionValidator,
-  validatePost,
+  validate,
+  patchPostValidator,
 } from './service';
 import {websocketMap} from './mw-upgrade';
 
@@ -46,32 +47,34 @@ router.post('/posts', async (ctx: Koa.Context, next) => {
   post.date = formatDate(Date.now(), 'yyyy-MM-dd hh:mm:ss');
   post.reactions = {
     thumbsUp: 0,
-    hooray: 0,
+    tada: 0,
     heart: 0,
     rocket: 0,
     eyes: 0,
   };
-  const result = await validatePost(post);
-  ctx.assert(result.success, 400, result.response);
+  const result = await validate(postPostValidator, post);
+  ctx.assert(result.success, 400, result.message);
   mocked.posts.push(post);
   ctx.body = post;
 });
 
-router.patch('/posts', async (ctx: Koa.Context, next) => {
+router.patch('/posts/:postId', async (ctx: Koa.Context) => {
+  const {postId} = ctx.params;
   const data = await getDataFromReadable(ctx.req);
   if (!data || data.length === 0) {
     ctx.throw('data is empty', 400);
   }
   const post = JSON.parse(data.toString()) as Post;
-  await postValidator.validate(post);
-  const target = mocked.posts.find(it => it.id === post.id);
+  const result = await validate(patchPostValidator, post);
+  ctx.assert(result.success, 400, result.message);
+  const target = mocked.posts.find(it => it.id === postId);
   Object.entries(post).forEach(([key, value]) => {
     target[key] = value;
   });
   ctx.body = target;
 });
 
-router.post('/posts/:postId/reactions', async (ctx: Koa.Context, next) => {
+router.post('/posts/:postId/reactions', async (ctx: Koa.Context) => {
   const {postId} = ctx.params;
   ctx.assert(postId, 400, 'postId not found in url');
   const post = mocked.posts.find(it => it.id === postId);
@@ -100,7 +103,7 @@ router.get('/notifications', async (ctx: Koa.Context, next) => {
 router.get('/notifications/broadcast', async (ctx: Koa.Context, next) => {
   const numNotifications = getRandom(5) + 1;
   const notifications = generateRandomNotifications(Date.now() - 5 * 3600 * 1000, numNotifications);
-  const buf = await toBuffer({type: 'notifications', payload: notifications});
+  const buf = await convertToBuffer({type: 'notifications', payload: notifications});
   for (const socket of websocketMap.values()) {
     socket.send(buf, {binary: false});
   }

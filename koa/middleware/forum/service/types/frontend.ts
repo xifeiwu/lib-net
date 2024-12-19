@@ -19,7 +19,7 @@ export interface Post {
 export interface Reaction {
   // id: string;
   thumbsUp: number;
-  hooray: number;
+  tada: number;
   heart: number;
   rocket: number;
   eyes: number;

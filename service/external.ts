@@ -53,6 +53,7 @@ export {
   getHttpRequestInfo,
   HttpRequestInfo,
   toBuffer,
+  convertToBuffer,
   httpResponseInfoToBuffer,
   responseHttpRequestInfo,
   CanConvertToBuffer,

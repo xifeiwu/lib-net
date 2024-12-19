@@ -35,7 +35,7 @@ const posts: Post[] = [
     reactions: {
       // id: '_guP56j4P9jJBtxKcliOi',
       thumbsUp: 0,
-      hooray: 0,
+      tada: 0,
       heart: 0,
       rocket: 0,
       eyes: 0,
@@ -51,7 +51,7 @@ const posts: Post[] = [
     reactions: {
       // id: 'uHGf4sCeJBc-zKA4u_uYR',
       thumbsUp: 0,
-      hooray: 0,
+      tada: 0,
       heart: 0,
       rocket: 0,
       eyes: 0,
@@ -67,7 +67,7 @@ const posts: Post[] = [
     reactions: {
       // id: '-lO7g8m9h3YCk_85HDVwe',
       thumbsUp: 0,
-      hooray: 0,
+      tada: 0,
       heart: 0,
       rocket: 0,
       eyes: 0,
@@ -83,7 +83,7 @@ const posts: Post[] = [
     reactions: {
       // id: 'MvDD_kvyI1q_fYtA1sXf8',
       thumbsUp: 0,
-      hooray: 0,
+      tada: 0,
       heart: 0,
       rocket: 0,
       eyes: 0,
@@ -99,7 +99,7 @@ const posts: Post[] = [
     reactions: {
       // id: 'watwd2b0kECz2faZYRlDL',
       thumbsUp: 0,
-      hooray: 0,
+      tada: 0,
       heart: 0,
       rocket: 0,
       eyes: 0,
@@ -115,7 +115,7 @@ const posts: Post[] = [
     reactions: {
       // id: '1bbHcr-Dd-vWI6PyYDdQt',
       thumbsUp: 0,
-      hooray: 0,
+      tada: 0,
       heart: 0,
       rocket: 0,
       eyes: 0,
@@ -131,7 +131,7 @@ const posts: Post[] = [
     reactions: {
       // id: 'm-eYEIOF74-LfjFAgedgN',
       thumbsUp: 0,
-      hooray: 0,
+      tada: 0,
       heart: 0,
       rocket: 0,
       eyes: 0,
@@ -147,7 +147,7 @@ const posts: Post[] = [
     reactions: {
       // id: 'cOHWZ165yXEfc-fBncrVV',
       thumbsUp: 0,
-      hooray: 0,
+      tada: 0,
       heart: 0,
       rocket: 0,
       eyes: 0,
@@ -163,7 +163,7 @@ const posts: Post[] = [
     reactions: {
       // id: '0hePbf2YcxDbOr04Rw1C1',
       thumbsUp: 0,
-      hooray: 0,
+      tada: 0,
       heart: 0,
       rocket: 0,
       eyes: 0,

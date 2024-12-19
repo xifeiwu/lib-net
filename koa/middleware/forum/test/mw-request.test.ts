@@ -93,7 +93,7 @@ export async function postPost() {
       content: `content` + uuid(21),
       reactions: {
         thumbsUp: 0,
-        hooray: 0,
+        tada: 0,
         heart: 0,
         rocket: 0,
         eyes: 0,
@@ -119,39 +119,6 @@ export async function postPost() {
   }
   server.close();
 }
-
-export async function testValidate() {
-  const pathname = `${urlPrefix}/posts`;
-  const {origin, server} = await startKoaServer({
-    requestMiddlewares: [requestRouter.routes()],
-  });
-  /** validate post payload */
-  {
-    const post: Post = {
-      title: `title` + uuid(21),
-      // @ts-ignore content should be string
-      content: 0,
-      reactions: {
-        thumbsUp: 0,
-        hooray: 0,
-        heart: 0,
-        rocket: 0,
-        eyes: 0,
-      },
-      user: mocked.users[0].id,
-    };
-    const {statusCode, headers, data} = await requestAndGetResponseInfo({
-      origin,
-      method: 'post',
-      pathname,
-      data: post,
-    });
-    assert.equal(statusCode, 400);
-    // assert.equal(data.message, INVALIDATE_PAYLOAD);
-  }
-  server.close();
-}
-
 export async function patchPost() {
   const pathname = `${urlPrefix}/posts`;
   const {origin, server} = await startKoaServer({
@@ -175,6 +142,38 @@ export async function patchPost() {
       }
     );
     assert.deepEqual(firstPost, data);
+  }
+  server.close();
+}
+
+export async function testValidate() {
+  const pathname = `${urlPrefix}/posts`;
+  const {origin, server} = await startKoaServer({
+    requestMiddlewares: [requestRouter.routes()],
+  });
+  /** validate post payload */
+  {
+    const post: Post = {
+      title: `title` + uuid(21),
+      // @ts-ignore content should be string
+      content: 0,
+      reactions: {
+        thumbsUp: 0,
+        tada: 0,
+        heart: 0,
+        rocket: 0,
+        eyes: 0,
+      },
+      user: mocked.users[0].id,
+    };
+    const {statusCode, headers, data} = await requestAndGetResponseInfo({
+      origin,
+      method: 'post',
+      pathname,
+      data: post,
+    });
+    assert.equal(statusCode, 400);
+    // assert.equal(data.message, INVALIDATE_PAYLOAD);
   }
   server.close();
 }
