@@ -14,6 +14,7 @@ import {
   patchPostValidator,
 } from './service';
 import {websocketMap} from './mw-upgrade';
+import {wrapValidate} from '../../service';
 
 const router = new KoaRouter({
   prefix: urlPrefix,
@@ -84,6 +85,8 @@ router.post('/posts/:postId/reactions', async (ctx: Koa.Context) => {
     ctx.throw('data is empty', 400);
   }
   const payload = JSON.parse(data.toString()) as Reaction;
+  const result = await wrapValidate(postPostValidator, post);
+  ctx.assert(result.success, 400, result.message);
   await reactionValidator.validate(payload);
   Object.entries(payload).forEach(([key, _value]) => {
     if (!Object.prototype.hasOwnProperty.call(post.reactions, key)) {

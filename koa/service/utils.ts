@@ -2,6 +2,7 @@ import http from 'http';
 import {Socket} from 'net';
 import Koa from 'koa';
 import {KoaConfig} from '../types';
+import Schema, {Values} from 'async-validator';
 /**
  * @param options
  * @returns Koa.Context, return any to avoid type difference on differnt Koa version
@@ -42,4 +43,17 @@ export function serializeKoaConfig(koaConfig: KoaConfig) {
     requestMiddlewares: requestMiddlewares.map(it => it.name),
     upgradeMiddlewares: upgradeMiddlewares.map(it => it.name),
   };
+}
+
+export async function wrapValidate(rules: Schema, data: Values) {
+  try {
+    const success = await rules.validate(data);
+    return {success};
+  } catch (err) {
+    // return err;
+    return {
+      success: false,
+      message: JSON.stringify(err.fields),
+    };
+  }
 }
