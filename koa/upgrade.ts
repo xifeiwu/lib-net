@@ -12,7 +12,7 @@ const NotFoundMiddleware = (ctx: Ctx4Upgrade, next) => {
   const data = Buffer.from(`Not found upgrade handler for protocol[${protocol}], url[${url}]`);
   socket.end(
     httpResponseInfoToBuffer({
-      statusCode: 400,
+      statusCode: 404,
       statusMessage: 'Not Found',
       headers: {
         'content-length': String(data.byteLength),
