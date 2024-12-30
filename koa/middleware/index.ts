@@ -17,6 +17,9 @@ import {requestRouter as forumRequestRouter, upgradeMiddleware as forumUpgradeMi
 
 export {debugRequestRouter, sessionRouter, forumRequestRouter};
 
+/**
+ * @deprecated by koaRequestMiddleware
+ */
 export const requestMiddleware = {
   cors,
   debug: debugRequestRouter.routes(),
@@ -27,10 +30,17 @@ export const requestMiddleware = {
   mock: getMockMiddleware,
   forum: forumRequestRouter.routes(),
 };
+export const koaRequestMiddleware = requestMiddleware;
+
+/**
+ * @deprecated by koaUpgradeMiddleware
+ */
 export const upgradeMiddleware = {
   debug: upgradeMiddelwareOfDebug,
   socks: getUpgradeMw4Socks,
   forum: forumUpgradeMiddleware,
 };
+
+export const koaUpgradeMiddleware = upgradeMiddleware;
 
 export {getDefaultStaticOptionsForDirs, getDefaultStaticOptionsForSpaDirs};

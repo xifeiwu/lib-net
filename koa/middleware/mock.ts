@@ -1,4 +1,4 @@
-import Application from 'koa';
+import Koa from 'koa';
 import {
   MockFileFinder,
   MockFileContent,
@@ -6,6 +6,7 @@ import {
   RequestConfig,
   getMockFileFinderByDir,
   MockFileContentWithPathInfo,
+  parseHttpBody,
 } from '../../service/external';
 // import {MockFileFinder} from '../../node/http/mock/find';
 // import {deepEqual} from '@modules/lib/fe/common';
@@ -34,7 +35,7 @@ import {
 //   return mock.fileList.map(getMockFileInfo).filter(it => it);
 // }
 
-function getRequestConfigFromKoaCtx(ctx: Application.ParameterizedContext<any, any, any>): RequestConfig {
+function getRequestConfigFromKoaCtx(ctx: Koa.ParameterizedContext<any, any, any>): RequestConfig {
   const {
     method = 'get',
     path,
@@ -50,7 +51,8 @@ function getRequestConfigFromKoaCtx(ctx: Application.ParameterizedContext<any, a
 }
 
 /**
- * Notice: This middleware should append to koa after bodyparser, as payload is got from ctx.state.payload
+ * Notice:
+ * If ctx.req already parsed, save it in ctx.state.payload
  */
 export const getMockMiddleware = (
   mockParams?: ParamsForFindMockInfoInDir[],
@@ -66,8 +68,11 @@ export const getMockMiddleware = (
     allMockFileList.push(...mockFileList);
     finderList.push(finder);
   }
-  const middleware = async (ctx, next) => {
+  const middleware = async (ctx: Koa.Context, next) => {
     const requestConfig = getRequestConfigFromKoaCtx(ctx);
+    if (requestConfig.data === undefined && ctx.req.readable) {
+      requestConfig.data = await parseHttpBody(ctx.req);
+    }
     let target: (MockFileContent & {relativePath?: string}) | null = null;
     for (const finder of finderList) {
       target = finder(requestConfig);
