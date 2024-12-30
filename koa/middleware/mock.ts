@@ -8,6 +8,7 @@ import {
   MockFileContentWithPathInfo,
   parseHttpBody,
 } from '../../service/external';
+import {getRequestBodyOfCtx} from '../service';
 // import {MockFileFinder} from '../../node/http/mock/find';
 // import {deepEqual} from '@modules/lib/fe/common';
 // import {GeneralDataToSave} from '@modules/conviva/service/request-by-select-config';
@@ -52,7 +53,7 @@ function getRequestConfigFromKoaCtx(ctx: Koa.ParameterizedContext<any, any, any>
 
 /**
  * Notice:
- * If ctx.req already parsed, save it in ctx.state.payload
+ * If ctx.req already parsed, save it in ctx.state.requestBody
  */
 export const getMockMiddleware = (
   mockParams?: ParamsForFindMockInfoInDir[],
@@ -71,7 +72,7 @@ export const getMockMiddleware = (
   const middleware = async (ctx: Koa.Context, next) => {
     const requestConfig = getRequestConfigFromKoaCtx(ctx);
     if (requestConfig.data === undefined && ctx.req.readable) {
-      requestConfig.data = await parseHttpBody(ctx.req);
+      requestConfig.data = await getRequestBodyOfCtx(ctx);
     }
     let target: (MockFileContent & {relativePath?: string}) | null = null;
     for (const finder of finderList) {

@@ -3,6 +3,7 @@ import {Socket} from 'net';
 import Koa from 'koa';
 import {KoaConfig} from '../types';
 import Schema, {Values} from 'async-validator';
+import {parseHttpBody} from '../../service/external';
 /**
  * @param options
  * @returns Koa.Context, return any to avoid type difference on differnt Koa version
@@ -56,4 +57,21 @@ export async function wrapValidate(rules: Schema, data: Values) {
       message: JSON.stringify(err.fields),
     };
   }
+}
+
+export function setRequestBodyOfCtx(ctx: Koa.Context, requestBody: any) {
+  ctx.state.requestBody = requestBody;
+}
+/**
+ * Get requestBody of ctx.state if exist, or parse request body and save parsed data in ctx.state.requestBody.
+ * @param ctx
+ * @returns
+ */
+export async function getRequestBodyOfCtx(ctx: Koa.Context) {
+  let {requestBody} = ctx.state;
+  if (requestBody === undefined) {
+    requestBody = await parseHttpBody(ctx.req);
+    ctx.state.requestBody = requestBody;
+  }
+  return requestBody;
 }
