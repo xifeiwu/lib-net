@@ -16,6 +16,10 @@ export const INVALIDATE_PAYLOAD = 'invalidate payload';
 
 export interface LogMWOptions {
   theme?: ColorStyle;
+  /**
+   * prefix is useful to identify which service the log comes from 
+   * when more than one services share the same log file or terminal
+   */
   prefix?: string;
   logHeaders?: boolean;
   logBody?: {
@@ -26,11 +30,17 @@ export interface LogMWOptions {
 export function getLogMiddleware(options: LogMWOptions) {
   const {
     theme = {color: 'blue'},
-    prefix = '->',
+    prefix = '',
     logHeaders = true,
     logBody,
     catchAndWrapError = true,
   } = options;
+  function addPrefix(str: string) {
+    if (!prefix) {
+      return str;
+    }
+    return `[${prefix}] str`;
+  }
   return async (ctx: Koa.Context, next: Koa.Next) => {
     const startTime = Date.now();
     const requestId = getRandomBase64String(8);
@@ -38,7 +48,7 @@ export function getLogMiddleware(options: LogMWOptions) {
     const {method, url, httpVersion, headers} = getHttpRequestHeaderPartInfo(req);
     logColorful(
       theme,
-      `${requestId}[${getSocketInfo(socket).id}] Header`,
+      addPrefix(`${requestId}[${getSocketInfo(socket).id}] Header`),
       [method, url, httpVersion].join(' ')
     );
     if (logHeaders) {
@@ -63,7 +73,7 @@ export function getLogMiddleware(options: LogMWOptions) {
         });
       })
         .then(buf => {
-          logColorful(theme, `${requestId} Body`);
+          logColorful(theme, addPrefix(`${requestId} Body`));
           logColorful({}, buf.toString());
           // if (type === 'application/json') {
           //   console.log(buf.toString());
@@ -118,7 +128,7 @@ export function getLogMiddleware(options: LogMWOptions) {
       if (Buffer.isBuffer(responseBody)) {
         length = responseBody.byteLength;
       }
-      logColorful(theme, `${requestId} End`);
+      logColorful(theme, addPrefix(`${requestId} End`));
       logColorful(
         {},
         {
