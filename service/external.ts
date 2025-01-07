@@ -60,7 +60,7 @@ export {
   checkPort,
   closePortIfInUse,
   parseBody,
-  ParserOptions,
+  HttpBodyParserOptions as ParserOptions,
   htmlDirContent,
   ParsedFileInfo,
   getLocalIpAddress,
