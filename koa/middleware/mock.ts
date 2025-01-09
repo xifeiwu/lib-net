@@ -2,11 +2,10 @@ import Koa from 'koa';
 import {
   MockFileFinder,
   MockFileContent,
-  ParamsForFindMockInfoInDir,
-  RequestConfig,
+  FindMockInfoInDirOptions,
+  RequestOptionsForMock,
   getMockFileFinderByDir,
   MockFileContentWithPathInfo,
-  parseHttpBody,
 } from '../../service/external';
 import {getRequestBodyOfCtx} from '../service';
 // import {MockFileFinder} from '../../node/http/mock/find';
@@ -36,7 +35,7 @@ import {getRequestBodyOfCtx} from '../service';
 //   return mock.fileList.map(getMockFileInfo).filter(it => it);
 // }
 
-function getRequestConfigFromKoaCtx(ctx: Koa.ParameterizedContext<any, any, any>): RequestConfig {
+function getRequestConfigFromKoaCtx(ctx: Koa.ParameterizedContext<any, any, any>): RequestOptionsForMock {
   const {
     method = 'get',
     path,
@@ -56,7 +55,7 @@ function getRequestConfigFromKoaCtx(ctx: Koa.ParameterizedContext<any, any, any>
  * If ctx.req already parsed, save it in ctx.state.requestBody
  */
 export const getMockMiddleware = (
-  mockParams?: ParamsForFindMockInfoInDir[],
+  mockParams?: FindMockInfoInDirOptions[],
   options?: {
     allMockFileList: MockFileContentWithPathInfo[];
   }
