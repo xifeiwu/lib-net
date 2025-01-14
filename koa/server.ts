@@ -155,7 +155,7 @@ export async function startKoaServer(
   });
 }
 
-const customizeDeepMerge = customDeepMerge({mergeArraySolution: 'concat'});
+const customizeDeepMerge = customDeepMerge({handleConflictWay: 'concat'});
 /**
  * A http server mainly used for debug, with two koa middleware: cors, debug.
  */

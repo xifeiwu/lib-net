@@ -1,11 +1,8 @@
 import Koa from 'koa';
 import {
-  MockFileFinder,
-  MockFileContent,
-  FindMockInfoInDirOptions,
-  RequestOptionsForMock,
-  getMockFileFinderByDir,
-  MockFileContentWithPathInfo,
+  FindRecordFileOptions,
+  getHttpRecordFinder,
+  HttpRequestOptions,
 } from '../../service/external';
 import {getRequestBodyOfCtx} from '../service';
 // import {MockFileFinder} from '../../node/http/mock/find';
@@ -35,13 +32,11 @@ import {getRequestBodyOfCtx} from '../service';
 //   return mock.fileList.map(getMockFileInfo).filter(it => it);
 // }
 
-function getRequestConfigFromKoaCtx(ctx: Koa.ParameterizedContext<any, any, any>): RequestOptionsForMock {
-  const {
-    method = 'get',
-    path,
-    query,
-    state: {payload},
-  } = ctx;
+async function getRequestConfigFromKoaCtx(
+  ctx: Koa.ParameterizedContext<any, any, any>
+): Promise<HttpRequestOptions> {
+  const {method = 'get', path, query} = ctx;
+  const payload = await getRequestBodyOfCtx(ctx);
   return {
     method: method.toLowerCase(),
     pathname: path,
@@ -50,41 +45,24 @@ function getRequestConfigFromKoaCtx(ctx: Koa.ParameterizedContext<any, any, any>
   };
 }
 
+export const PATHNAME_MOCK_LIST = '/api/mock/list';
 /**
  * Notice:
  * If ctx.req already parsed, save it in ctx.state.requestBody
  */
-export const getMockMiddleware = (
-  mockParams?: FindMockInfoInDirOptions[],
-  options?: {
-    allMockFileList: MockFileContentWithPathInfo[];
-  }
-) => {
-  const {allMockFileList = []} = options ?? {};
-  const finderList: MockFileFinder[] = [];
-  for (const {mockFileList, finder} of (mockParams ?? [])
-    .filter(param => !param.ingore)
-    .map(param => getMockFileFinderByDir(param))) {
-    allMockFileList.push(...mockFileList);
-    finderList.push(finder);
-  }
+export const getMockMiddleware = (mockParams?: FindRecordFileOptions) => {
+  const {getRecordFileList, finder} = getHttpRecordFinder(mockParams);
   const middleware = async (ctx: Koa.Context, next) => {
-    const requestConfig = getRequestConfigFromKoaCtx(ctx);
-    if (requestConfig.data === undefined && ctx.req.readable) {
-      requestConfig.data = await getRequestBodyOfCtx(ctx);
-    }
-    let target: (MockFileContent & {relativePath?: string}) | null = null;
-    for (const finder of finderList) {
-      target = finder(requestConfig);
-      if (target) {
-        break;
-      }
-    }
+    const requestConfig = await getRequestConfigFromKoaCtx(ctx);
+    const target = finder(requestConfig);
     if (target) {
       ctx.status = 200;
       ctx.type = 'json';
       ctx.set('z-mock-source', `${target.relativePath}`);
-      ctx.body = target.resData;
+      ctx.body = target.responseInfo?.data;
+    } else if (requestConfig.pathname === PATHNAME_MOCK_LIST) {
+      ctx.type = 'json';
+      ctx.body = getRecordFileList();
     } else {
       await next();
     }
