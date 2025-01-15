@@ -5,9 +5,9 @@ import {broadcastData, wsConnections} from './mw-upgrade';
 import {
   HttpRequestInfo,
   getHttpRequestInfo,
-  parseBody,
+  parseHttpBody,
   ParserOptions,
-  toUrlProps,
+  toNormalizedUrlProps,
   NormalizedUrlProps,
   CustomHandleRequestOptions,
   customHandleRequest,
@@ -15,6 +15,7 @@ import {
   fromBuffer,
   getIncomingMessageData,
 } from '../../../service/external';
+import {getRequestBodyOfCtx} from '../../service';
 
 const router = new KoaRouter({
   prefix: urlPrefix,
@@ -38,7 +39,7 @@ router.all('/echo', async (ctx, next) => {
 
 router.all('/custom', async ctx => {
   const {method, url, headers, req} = ctx;
-  const {query, pathname} = toUrlProps(url);
+  const {query, pathname} = toNormalizedUrlProps(url);
   const resData: HttpRequestInfo & NormalizedUrlProps = {
     method,
     url,
@@ -47,8 +48,7 @@ router.all('/custom', async ctx => {
     pathname,
     query,
   };
-  // const reqData = await getDataFromReadable(req);
-  const reqData = await parseBody(ctx.req);
+  const reqData = await getRequestBodyOfCtx(ctx);
   if (reqData) {
     const isJson = isPlainObject(reqData);
     if (isJson) {
@@ -97,7 +97,7 @@ router.get('/ws/connections', async ctx => {
 const uploadMiddleware: Koa.Middleware = async ctx => {
   const parseOptionsFromQuery = ctx.query as Partial<ParserOptions>;
   const {bodyParserOptions} = ctx;
-  ctx.body = await parseBody(ctx.req, {
+  ctx.body = await parseHttpBody(ctx.req, {
     ...bodyParserOptions,
     ...parseOptionsFromQuery,
   });

@@ -1,10 +1,11 @@
 import Koa from 'koa';
 import {
+  convertKeyToLowerCase,
   FindRecordFileOptions,
   getHttpRecordFinder,
   HttpRequestOptions,
-} from '../../service/external';
-import {getRequestBodyOfCtx} from '../service';
+} from '../../../service/external';
+import {getRequestBodyOfCtx} from '../../service';
 // import {MockFileFinder} from '../../node/http/mock/find';
 // import {deepEqual} from '@modules/lib/fe/common';
 // import {GeneralDataToSave} from '@modules/conviva/service/request-by-select-config';
@@ -56,10 +57,16 @@ export const getMockMiddleware = (mockParams?: FindRecordFileOptions) => {
     const requestConfig = await getRequestConfigFromKoaCtx(ctx);
     const target = finder(requestConfig);
     if (target) {
-      ctx.status = 200;
-      ctx.type = 'json';
-      ctx.set('z-mock-source', `${target.relativePath}`);
-      ctx.body = target.responseInfo?.data;
+      const {
+        responseInfo: {statusCode, headers = {}, data},
+      } = target;
+      ctx.status = statusCode;
+      const normalizedHeaders = convertKeyToLowerCase(headers);
+      if (normalizedHeaders['content-type']) {
+        ctx.type = normalizedHeaders['content-type'];
+      }
+      ctx.set('z-source', `${target.relativePath}`);
+      ctx.body = data;
     } else if (requestConfig.pathname === PATHNAME_MOCK_LIST) {
       ctx.type = 'json';
       ctx.body = getRecordFileList();

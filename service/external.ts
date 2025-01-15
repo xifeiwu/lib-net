@@ -15,6 +15,7 @@ export {
   getRandomBase64String,
   urlPropsToInstance,
   toUrlProps,
+  toNormalizedUrlProps,
   isFunction,
   isString,
   isObject,
@@ -90,6 +91,10 @@ export {
   Cookies,
   getHttpResponseInfo,
   parseHttpBody,
+  recordHttpRequest,
+  convertKeyToLowerCase,
+  getHashDigest as getHash,
+  recursiveDeleteFile,
 } from '../../node';
 
 export {Store as MemcachedStore, getConnectionHandler, getClient} from '../../node/lib/memcached';
