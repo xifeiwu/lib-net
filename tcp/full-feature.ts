@@ -26,7 +26,7 @@ function getMemcachedMw() {
   return router.routes();
 }
 
-const customizeDeepMerge = customDeepMerge({handleConflictWay: 'concat'});
+const customizeDeepMerge = customDeepMerge();
 /**
  * Start a tcp server that can handle any kinds of request, include http, memcached, ...
  */

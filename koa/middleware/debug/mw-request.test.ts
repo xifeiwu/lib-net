@@ -14,9 +14,7 @@ export async function testUpload() {
   });
 
   const {
-    statusCode,
-    headers,
-    data: resData,
+    responseInfo: {statusCode, headers, data: resData},
   } = await requestAndGetResponseInfo({
     origin,
     pathname: '/api/debug/upload',

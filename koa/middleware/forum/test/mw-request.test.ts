@@ -25,7 +25,9 @@ export async function testGetPosts() {
   const {origin, server} = await startKoaServer({
     requestMiddlewares: [requestRouter.routes()],
   });
-  const {statusCode, headers, data} = await requestAndGetResponseInfo({
+  const {
+    responseInfo: {statusCode, headers, data},
+  } = await requestAndGetResponseInfo({
     url: origin,
     method: 'get',
     path: url,
@@ -43,7 +45,9 @@ export async function getPostById() {
     requestMiddlewares: [requestRouter.routes()],
   });
   {
-    const {statusCode, headers, data} = await requestAndGetResponseInfo({
+    const {
+      responseInfo: {statusCode, headers, data},
+    } = await requestAndGetResponseInfo({
       url: origin,
       method: 'get',
       path: urlPropsToHref({
@@ -57,7 +61,9 @@ export async function getPostById() {
     assert(deepEqual(data, secondPost));
   }
   {
-    const {statusCode, headers, data} = await requestAndGetResponseInfo({
+    const {
+      responseInfo: {statusCode, headers, data},
+    } = await requestAndGetResponseInfo({
       url: origin,
       method: 'get',
       path: urlPropsToHref({
@@ -79,7 +85,9 @@ export async function postPost() {
   });
   /** data is not passed */
   {
-    const {data} = await requestAndGetResponseInfo({
+    const {
+      responseInfo: {data},
+    } = await requestAndGetResponseInfo({
       origin,
       method: 'post',
       pathname,
@@ -100,19 +108,16 @@ export async function postPost() {
       },
       user: mocked.users[0].id,
     };
-    const {statusCode, headers, data} = await requestAndGetResponseInfo(
-      {
-        url: origin,
-        method: 'post',
-        path: urlPropsToHref({
-          pathname,
-        }),
-        data: post,
-      },
-      {
-        dataType: 'json',
-      }
-    );
+    const {
+      responseInfo: {statusCode, headers, data},
+    } = await requestAndGetResponseInfo({
+      url: origin,
+      method: 'post',
+      path: urlPropsToHref({
+        pathname,
+      }),
+      data: post,
+    });
     assert(deepEqual(post, data, {}, {refer: 'first'}));
     // console.log({statusCode, headers, data});
     // assert(deepEqual(JSON.parse(data as string), secondPost));
@@ -128,19 +133,16 @@ export async function patchPost() {
   firstPost.title = `modified: ${firstPost.title}`;
   /** data is not passed */
   {
-    const {data} = await requestAndGetResponseInfo<Post, Partial<Post>>(
-      {
-        url: origin,
-        method: 'patch',
-        path: urlPropsToHref({
-          pathname,
-        }),
-        data: firstPost,
-      },
-      {
-        dataType: 'json',
-      }
-    );
+    const {
+      responseInfo: {data},
+    } = await requestAndGetResponseInfo<Post, Partial<Post>>({
+      url: origin,
+      method: 'patch',
+      path: urlPropsToHref({
+        pathname,
+      }),
+      data: firstPost,
+    });
     assert.deepEqual(firstPost, data);
   }
   server.close();
@@ -166,7 +168,9 @@ export async function testValidate() {
       },
       user: mocked.users[0].id,
     };
-    const {statusCode, headers, data} = await requestAndGetResponseInfo({
+    const {
+      responseInfo: {statusCode, headers, data},
+    } = await requestAndGetResponseInfo({
       origin,
       method: 'post',
       pathname,
@@ -186,25 +190,22 @@ export async function testReaction() {
   const [firstPost] = mocked.posts;
   {
     const {id: postId} = firstPost;
-    const {data} = await requestAndGetResponseInfo(
-      {
-        origin,
-        method: 'post',
-        pathname: urlPropsToHref({
-          pathname,
-          pathnameParams: {
-            postId,
-          },
-        }),
-        data: {
-          thumbsUp: 1,
-          heart: 1,
+    const {
+      responseInfo: {data},
+    } = await requestAndGetResponseInfo({
+      origin,
+      method: 'post',
+      pathname: urlPropsToHref({
+        pathname,
+        pathnameParams: {
+          postId,
         },
+      }),
+      data: {
+        thumbsUp: 1,
+        heart: 1,
       },
-      {
-        dataType: 'json',
-      }
-    );
+    });
     assert.equal(data.heart, 1);
     assert.equal(data.thumbsUp, 1);
   }

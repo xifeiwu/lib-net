@@ -23,6 +23,7 @@ export {
   deepMerge,
   customDeepMerge,
   deepClone,
+  convertKeyToLowerCase,
 } from '../../fe';
 export {
   fromBuffer,
@@ -40,7 +41,6 @@ export {
   FindRecordFileOptions,
   HttpRequestOptions,
   HttpResponseInfo,
-  tcpResponsePropsToBuffer,
   handleSocketEvents,
   tryParseHttpHeaderPart,
   startSocketClient,
@@ -66,7 +66,8 @@ export {
   getSocketInfo,
   startTcpGateway,
   CustomHandleRequestOptions,
-  customHandleRequest,
+  customResponse,
+  customResponseByRequest,
   getIncomingMessageData,
   uploadDirOnCwd,
   TcpServerConfig,
@@ -92,7 +93,6 @@ export {
   getHttpResponseInfo,
   parseHttpBody,
   recordHttpRequest,
-  convertKeyToLowerCase,
   getHashDigest as getHash,
   recursiveDeleteFile,
 } from '../../node';

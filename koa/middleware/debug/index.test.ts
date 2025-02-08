@@ -20,9 +20,7 @@ const requestMiddleware = requestRouter.routes();
 export async function testEcho() {
   const {origin, server} = await startKoaServer({requestMiddlewares: [requestMiddleware]});
   const {
-    statusCode,
-    headers,
-    data: resData,
+    responseInfo: {statusCode, headers, data: resData},
   } = await requestAndGetResponseInfo({
     origin,
     pathname: '/api/debug/echo',
@@ -112,9 +110,7 @@ export async function testUpload() {
   try {
     const fileName = 'koa-debug-middleware.test.ts';
     const {
-      statusCode,
-      headers,
-      data: resData,
+      responseInfo: {statusCode, headers, data: resData},
     } = await requestAndGetResponseInfo({
       origin,
       pathname: '/api/debug/upload',

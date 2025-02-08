@@ -8,7 +8,7 @@ export async function testGetDefaultStaticOptionsForDirs() {
   const staticOptions = getDefaultStaticOptionsForDirs([__dirname]);
   const staticMiddlewares = staticOptions.map(getStaticMiddleware);
   const {origin, server} = await startKoaServer({requestMiddlewares: [...staticMiddlewares]});
-  const responseInfo = await requestAndGetResponseInfo({
+  const {responseInfo} = await requestAndGetResponseInfo({
     origin,
     pathname: '/utils.test.ts',
   });

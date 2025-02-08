@@ -10,7 +10,7 @@ import {
   toNormalizedUrlProps,
   NormalizedUrlProps,
   CustomHandleRequestOptions,
-  customHandleRequest,
+  customResponseByRequest,
   isPlainObject,
   fromBuffer,
   getIncomingMessageData,
@@ -58,10 +58,10 @@ router.all('/custom', async ctx => {
           config ?? {},
           query ?? {}
         ) as CustomHandleRequestOptions;
-        await customHandleRequest({request: ctx.req, response: ctx.res}, mergedConfig);
-        if (mergedConfig.responseCode) {
-          ctx.status = ctx.res.statusCode;
-        }
+        await customResponseByRequest(ctx.req, ctx.res, mergedConfig);
+        // if (mergedConfig.responseCode) {
+        //   ctx.status = ctx.res.statusCode;
+        // }
       }
     }
     resData.data = isJson ? reqData : fromBuffer(reqData, 'json');
