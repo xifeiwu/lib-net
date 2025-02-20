@@ -17,6 +17,9 @@ import {
   closePortIfInUse,
   getLocalIpAddress,
   customDeepMerge,
+  isString,
+  logColorful,
+  isObject,
 } from '../service/external';
 import {KoaConfig, KoaServerInfo, KoaShortCutConfig} from './types';
 import {DEFAULT_KOA_CONFIG} from './service';
@@ -138,8 +141,23 @@ export async function startKoaServer(
   return new Promise((res, rej) => {
     server.on('listening', () => {
       const origin = `http://${host}:${finalPort}`;
-      printOrigin && console.log(`http server started on ${origin}`);
-      printOrigin && console.log(`http server started on ${`http://${getLocalIpAddress()}:${finalPort}`}`);
+      if (printOrigin) {
+        const originInfo = {
+          local: origin,
+          ip: `http://${getLocalIpAddress()}:${finalPort}`,
+        };
+        if (isObject(printOrigin)) {
+          logColorful({}, {...(printOrigin as object), ...originInfo});
+        } else {
+          logColorful(
+            {},
+            {
+              name: isString(printOrigin) ? printOrigin : 'http server',
+              ...originInfo,
+            }
+          );
+        }
+      }
       res({
         origin,
         host,

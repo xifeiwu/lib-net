@@ -38,7 +38,7 @@ export interface KoaConfig {
   host?: string;
   port?: number;
   /** whether print server's origin or not */
-  printOrigin?: boolean;
+  printOrigin?: boolean | string | object;
   keys?: string[];
   /** config for koa-session */
   sessionOptions?: Partial<session.opts>;
