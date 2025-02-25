@@ -49,6 +49,14 @@ export const upgradeMiddelware: UpgradeMiddleware = async (ctx, next) => {
         socket.write(chunk);
       }
     });
+  } else if (pathname === WS_PATH.speedTest) {
+    socket.write(httpResponseInfoToBuffer(getUpgradeResponse(protocol)));
+    socket.on('data', chunk => {
+      if (socket.writable) {
+        const sizeHex = chunk.byteLength.toString(16);
+        socket.write(sizeHex + ',');
+      }
+    });
   } else if (pathname === WS_PATH.broadcast && protocol === 'websocket') {
     wss.handleUpgrade(req, socket, head, ws => {
       // wss.emit('connection', ws, req);

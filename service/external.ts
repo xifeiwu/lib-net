@@ -24,6 +24,7 @@ export {
   customDeepMerge,
   deepClone,
   convertKeyToLowerCase,
+  intWord,
 } from '../../fe';
 export {
   fromBuffer,
