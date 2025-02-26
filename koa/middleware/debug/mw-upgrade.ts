@@ -3,7 +3,7 @@ import {WS_PATH, wsPrefix} from './service';
 import {
   uuid,
   CanConvertToBuffer,
-  toBuffer,
+  convertToBuffer,
   httpResponseInfoToBuffer,
   getUpgradeResponse,
 } from '../../../service/external';
@@ -21,7 +21,7 @@ export const wsMap = new Map<string, WebSocket>();
 
 export function broadcastData(data: CanConvertToBuffer) {
   for (const ws of wsMap.values()) {
-    ws.send(toBuffer(data));
+    ws.send(convertToBuffer(data));
   }
 }
 
@@ -49,14 +49,23 @@ export const upgradeMiddelware: UpgradeMiddleware = async (ctx, next) => {
         socket.write(chunk);
       }
     });
-  } else if (pathname === WS_PATH.speedTest) {
+  } else if (pathname === WS_PATH.netSpeedUpload) {
     socket.write(httpResponseInfoToBuffer(getUpgradeResponse(protocol)));
+    let size = 0;
     socket.on('data', chunk => {
-      if (socket.writable) {
-        const sizeHex = chunk.byteLength.toString(16);
-        socket.write(sizeHex + ',');
-      }
+      size += chunk.byteLength;
+      // if (socket.writable) {
+      //   socket.cork();
+      //   const sizeHex = chunk.byteLength.toString(16);
+      //   socket.write(sizeHex + ',');
+      //   process.nextTick(() => socket.uncork());
+      // }
     });
+    socket.on('end', () => {
+      socket.end(size.toString(16));
+    });
+  } else if(pathname === WS_PATH.netSpeedDownload) {
+
   } else if (pathname === WS_PATH.broadcast && protocol === 'websocket') {
     wss.handleUpgrade(req, socket, head, ws => {
       // wss.emit('connection', ws, req);

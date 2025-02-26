@@ -25,6 +25,7 @@ export {
   deepClone,
   convertKeyToLowerCase,
   intWord,
+  throttle,
 } from '../../fe';
 export {
   fromBuffer,
