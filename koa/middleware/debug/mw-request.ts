@@ -6,7 +6,7 @@ import {
   HttpRequestInfo,
   getHttpRequestInfo,
   parseHttpBody,
-  ParserOptions,
+  HttpBodyParserOptions,
   toNormalizedUrlProps,
   NormalizedUrlProps,
   CustomHandleRequestOptions,
@@ -95,7 +95,7 @@ router.get('/ws/connections', async ctx => {
 });
 
 const uploadMiddleware: Koa.Middleware = async ctx => {
-  const parseOptionsFromQuery = ctx.query as Partial<ParserOptions>;
+  const parseOptionsFromQuery = ctx.query as Partial<HttpBodyParserOptions>;
   const {bodyParserOptions} = ctx;
   ctx.body = await parseHttpBody(ctx.req, {
     ...bodyParserOptions,

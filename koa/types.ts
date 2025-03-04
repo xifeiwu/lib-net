@@ -3,7 +3,7 @@ import {Socket} from 'net';
 import http from 'http';
 import WebSocket from 'ws';
 import session from 'koa-session';
-import {NormalizedUrlProps, ParserOptions, SocksServerConfigPerVersion} from '../service/external';
+import {NormalizedUrlProps, HttpBodyParserOptions, SocksServerConfigPerVersion} from '../service/external';
 import {StaticMiddlewareOptions} from './middleware/static';
 import {IncomingMessage} from 'http';
 import {CorsMWOptions} from './middleware/cors';
@@ -43,7 +43,7 @@ export interface KoaConfig {
   /** config for koa-session */
   sessionOptions?: Partial<session.opts>;
   /** bodyParserOptions is a bodyParser's config and will be added to Koa.Context, it's not a Koa middlware */
-  bodyParserOptions?: ParserOptions;
+  bodyParserOptions?: HttpBodyParserOptions;
   /** Take case: the sequence of middleware is setted by key sequence of KoaConfig */
   /** koa middleware passed by user */
   requestMiddlewares?: Array<Koa.Middleware>;

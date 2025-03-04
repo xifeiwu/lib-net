@@ -6,7 +6,7 @@ import {
   CustomHandleRequestOptions,
   logColorful,
   ParsedFileInfo,
-  ParserOptions,
+  HttpBodyParserOptions,
   requestAndGetResponseInfo,
   requestAndGetUpgradeInfo,
   watchSocketState,
@@ -98,7 +98,7 @@ export async function testTimeout() {
 
 export async function testUpload() {
   const uploadDir = path.resolve(__dirname, 'uploads');
-  const bodyParserOptions: ParserOptions = {
+  const bodyParserOptions: HttpBodyParserOptions = {
     uploadDir,
     wayOfHandleFile: 'save',
   };

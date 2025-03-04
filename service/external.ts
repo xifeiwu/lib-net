@@ -24,7 +24,7 @@ export {
   customDeepMerge,
   deepClone,
   convertKeyToLowerCase,
-  intWord,
+  intToWord,
   throttle,
 } from '../../fe';
 export {
@@ -60,7 +60,7 @@ export {
   checkPort,
   closePortIfInUse,
   parseBody,
-  HttpBodyParserOptions as ParserOptions,
+  HttpBodyParserOptions,
   htmlDirContent,
   ParsedFileInfo,
   getLocalIpAddress,
@@ -95,8 +95,12 @@ export {
   getHttpResponseInfo,
   parseHttpBody,
   recordHttpRequest,
-  getHashDigest as getHash,
+  getHashDigest,
   recursiveDeleteFile,
+  writeability,
+  getSpeedCal,
+  GetWritabilityOptions,
+  WriterSpeedInfo,
 } from '../../node';
 
 export {Store as MemcachedStore, getConnectionHandler, getClient} from '../../node/lib/memcached';

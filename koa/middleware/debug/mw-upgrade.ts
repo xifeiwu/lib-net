@@ -6,6 +6,7 @@ import {
   convertToBuffer,
   httpResponseInfoToBuffer,
   getUpgradeResponse,
+  writeability,
 } from '../../../service/external';
 import {UpgradeMiddleware} from '../../types';
 
@@ -54,18 +55,13 @@ export const upgradeMiddelware: UpgradeMiddleware = async (ctx, next) => {
     let size = 0;
     socket.on('data', chunk => {
       size += chunk.byteLength;
-      // if (socket.writable) {
-      //   socket.cork();
-      //   const sizeHex = chunk.byteLength.toString(16);
-      //   socket.write(sizeHex + ',');
-      //   process.nextTick(() => socket.uncork());
-      // }
     });
     socket.on('end', () => {
       socket.end(size.toString(16));
     });
-  } else if(pathname === WS_PATH.netSpeedDownload) {
-
+  } else if (pathname === WS_PATH.netSpeedDownload) {
+    socket.write(httpResponseInfoToBuffer(getUpgradeResponse(protocol)));
+    writeability(socket, {maxSize: '512M'});
   } else if (pathname === WS_PATH.broadcast && protocol === 'websocket') {
     wss.handleUpgrade(req, socket, head, ws => {
       // wss.emit('connection', ws, req);
