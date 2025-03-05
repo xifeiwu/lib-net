@@ -68,7 +68,6 @@ export {
   getSocketInfo,
   startTcpGateway,
   CustomHandleRequestOptions,
-  customResponse,
   customResponseByRequest,
   getIncomingMessageData,
   uploadDirOnCwd,
