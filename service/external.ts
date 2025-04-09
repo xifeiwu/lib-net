@@ -102,4 +102,4 @@ export {
   WriterSpeedInfo,
 } from '../../node';
 
-export {Store as MemcachedStore, getConnectionHandler, getClient} from '../../node/lib/memcached';
+export {Store as MemcachedStore, getConnectionHandlerToMemcached, getClient} from '../../node/lib/memcached';

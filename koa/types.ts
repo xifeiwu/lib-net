@@ -45,8 +45,9 @@ export interface KoaConfig {
   /** bodyParserOptions is a bodyParser's config and will be added to Koa.Context, it's not a Koa middlware */
   bodyParserOptions?: HttpBodyParserOptions;
   /** Take case: the sequence of middleware is setted by key sequence of KoaConfig */
-  /** koa middleware passed by user */
+  /** middlewares to handle http request event */
   requestMiddlewares?: Array<Koa.Middleware>;
+  /** middlewares to handle http upgrade event */
   upgradeMiddlewares?: UpgradeMiddleware[];
   /** config for pre-defined koa-middleware, such as debug, cors, logs, forum, static */
   mwConfig?: KoaMiddlewareConfig;

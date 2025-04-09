@@ -1,7 +1,7 @@
 import {Socket} from 'net';
 import KoaRouter from 'koa-router';
 import {
-  getConnectionHandler,
+  getConnectionHandlerToMemcached,
   MemcachedStore,
   startSocketClient,
   startTcpGateway,
@@ -11,7 +11,7 @@ import {
 import {KoaConfig, KoaShortCutConfig, DEFAULT_KOA_CONFIG, serializeKoaConfig, startKoaServer} from '../koa';
 
 const store = new MemcachedStore();
-const memcachedHandler = getConnectionHandler(store);
+const memcachedHandler = getConnectionHandlerToMemcached(store);
 async function tcpHandler(socket: Socket, info) {
   memcachedHandler(socket);
 }
