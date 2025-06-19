@@ -44,7 +44,7 @@ export {
   HttpRequestOptions,
   HttpResponseInfo,
   handleSocketEvents,
-  tryParseHttpHeaderPart,
+  tryParseHttpRequestHeaderPart,
   startSocketClient,
   startSocketServer,
   requestAndGetUpgradeInfo,
