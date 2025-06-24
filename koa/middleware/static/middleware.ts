@@ -3,7 +3,7 @@ import path from 'path';
 import zlib from 'zlib';
 import Koa from 'koa';
 import {Readable} from 'stream';
-import {toReadable, mime, getFileList, isFunction} from '../../../service/external';
+import {toReadable, mime, getFileList, isFunction, isNumber} from '../../../service/external';
 
 interface HttpHeaderConfig {
   maxAge?: number;
@@ -51,6 +51,7 @@ export interface StaticMiddlewareOptions {
   customContentType?: (fileInfo: LocalFileInfo) => string | undefined;
   /** handle original file/dir data and return new data */
   postTreatData?: (stream: Readable, fileInfo: StaticFileInfo) => Readable;
+  /** The max time get data from cache */
   maxCacheTime?: number;
 }
 
@@ -152,7 +153,8 @@ export function getStaticMiddleware(options: StaticMiddlewareOptions) {
       if (!fs.existsSync(fullpath)) {
         fileStore.delete(fullpath);
         return await next();
-      } else if (maxCacheTime && fileInfo.timestamp + maxCacheTime > Date.now()) {
+      }
+      if (!isNumber(maxCacheTime) || (fileInfo.timestamp ?? 0) + maxCacheTime < Date.now()) {
         const _fileInfo = getFileInfo(fullpath, {handleDir});
         if (_fileInfo) {
           fileStore.set(pathname, _fileInfo);
