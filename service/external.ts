@@ -36,11 +36,9 @@ export {
   logColorful,
   watchSocketState,
   requestAndGetResponseInfo,
-  getHttpRecordFinder,
   toReadable,
   getFileList,
   mime,
-  FindRecordFileOptions,
   HttpRequestOptions,
   HttpResponseInfo,
   handleSocketEvents,
@@ -93,7 +91,6 @@ export {
   Cookies,
   getHttpResponseInfo,
   parseHttpBody,
-  recordHttpRequest,
   getHashDigest,
   recursiveDeleteFile,
   writeability,
@@ -101,5 +98,5 @@ export {
   GetWritabilityOptions,
   WriterSpeedInfo,
 } from '../../node';
-
+export {getHttpRecordFinder, FindRecordFileOptions, recordHttpRequest} from '../../node/lib/http-record';
 export {Store as MemcachedStore, getConnectionHandlerToMemcached, getClient} from '../../node/lib/memcached';
