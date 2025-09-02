@@ -26,7 +26,7 @@ export {
   convertKeyToLowerCase,
   intToWord,
   throttle,
-} from '../../fe';
+} from '../../fe/common';
 export {
   fromBuffer,
   getAFreePort,
