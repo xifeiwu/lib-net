@@ -39,7 +39,7 @@ export function getLogMiddleware(options: LogMWOptions) {
     if (!prefix) {
       return str;
     }
-    return `[${prefix}] str`;
+    return `[${prefix}] ${str}`;
   }
   return async (ctx: Koa.Context, next: Koa.Next) => {
     const startTime = Date.now();

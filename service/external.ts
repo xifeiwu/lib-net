@@ -97,6 +97,8 @@ export {
   getSpeedCal,
   GetWritabilityOptions,
   WriterSpeedInfo,
+  handleIncomingMessageByConfig,
+  HttpConditionAndAction,
 } from '../../node';
 export {getHttpRecordFinder, FindRecordFileOptions, recordHttpRequest} from '../../node/lib/http-record';
 export {Store as MemcachedStore, getConnectionHandlerToMemcached, getClient} from '../../node/lib/memcached';

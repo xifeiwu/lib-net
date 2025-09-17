@@ -16,6 +16,7 @@ import {sessionRouter} from './session';
 import {requestRouter as forumRequestRouter, upgradeMiddleware as forumUpgradeMiddleware} from './forum';
 
 export {debugRequestRouter, sessionRouter, forumRequestRouter};
+export * from './others';
 
 /**
  * @deprecated by koaRequestMiddleware
