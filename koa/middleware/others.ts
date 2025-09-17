@@ -1,6 +1,6 @@
 import {handleIncomingMessageByConfig, HttpConditionAndAction} from '../../service/external';
 
-export function getCustomzeResponseMiddleware(customizeResponseConfigList: HttpConditionAndAction[]) {
+export function getCustomizeResponseMiddleware(customizeResponseConfigList: HttpConditionAndAction[]) {
   const handleRequestMiddleware = async (ctx, next) => {
     const {sentData} = await handleIncomingMessageByConfig(
       {
