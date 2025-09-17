@@ -26,6 +26,8 @@ export {
   convertKeyToLowerCase,
   intToWord,
   throttle,
+  FilterItem,
+  matchFilters,
 } from '../../fe/common';
 export {
   fromBuffer,
@@ -99,6 +101,11 @@ export {
   WriterSpeedInfo,
   handleIncomingMessageByConfig,
   HttpConditionAndAction,
+  proxyHttpRequest,
+  getPreRequestCb,
+  compareHttpRequestOptions,
+  ProxyStatus,
+  onRes2Proxy,
 } from '../../node';
 export {getHttpRecordFinder, FindRecordFileOptions, recordHttpRequest} from '../../node/lib/http-record';
 export {Store as MemcachedStore, getConnectionHandlerToMemcached, getClient} from '../../node/lib/memcached';
