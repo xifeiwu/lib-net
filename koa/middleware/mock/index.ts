@@ -65,7 +65,7 @@ export const getMockMiddleware = (mockParams?: FindRecordFileOptions) => {
       if (normalizedHeaders['content-type']) {
         ctx.type = normalizedHeaders['content-type'];
       }
-      ctx.set('z-source', `${target.relativePath}`);
+      ctx.set('z-mitm-mock', `${target.relativePath}`);
       ctx.body = data;
     } else if (requestConfig.pathname === PATHNAME_MOCK_LIST) {
       ctx.type = 'json';
