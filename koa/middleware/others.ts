@@ -10,22 +10,35 @@ import {
   onRes2Proxy,
   proxyHttpRequest,
   ProxyStatus,
+  useCachedData,
 } from '../../service/external';
 import {getRequestBodyOfCtx} from '../service';
 
 export const getProxyMiddleware = (proxyConfig: {
   /** only do proxy when request meet context filter */
   contextFilterList?: FilterItem[];
-  globalRequestOptions?: HttpRequestOptions;
+  /**
+   * The options should be add to requestOptions of every proxy request,
+   * it can be constant of dynamic(in format of function) value
+   */
+  globalRequestOptions?: {
+    get: () => Promise<HttpRequestOptions>;
+    maxAge?: number;
+  };
   proxyStatusList?: ProxyStatus[];
 }) => {
   const {contextFilterList, globalRequestOptions, proxyStatusList} = proxyConfig;
+  const {getOrFetch: getOrFetchGlobalRequestOptions} = useCachedData<HttpRequestOptions>(
+    {maxAge: globalRequestOptions?.maxAge},
+    globalRequestOptions.get
+  );
   return async (ctx: Koa.Context, next: Koa.Next) => {
     const {path: pathname} = ctx;
     if (!matchFilters(contextFilterList, pathname)) {
       return await next();
     }
     const originData = await getRequestBodyOfCtx(ctx);
+    const globalRequestOptions = await getOrFetchGlobalRequestOptions();
     ctx.respond = false;
     proxyHttpRequest(ctx.req, ctx.res, {
       originData,
@@ -49,7 +62,7 @@ export const getProxyMiddleware = (proxyConfig: {
         }
         /** Add proxy info to httpResponseInfo to origin */
         for (const [key, value] of Object.entries({
-          origin: globalRequestOptions.origin,
+          origin: globalRequestOptions?.origin,
         })) {
           if (value !== undefined) {
             headers[`z-mitm-proxy-${key}`] = value;
