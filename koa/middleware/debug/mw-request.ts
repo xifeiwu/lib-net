@@ -58,7 +58,7 @@ router.all('/custom', async ctx => {
           config ?? {},
           query ?? {}
         ) as CustomHandleRequestOptions;
-        await customResponseByRequest(ctx.req, ctx.res, mergedConfig);
+        await customResponseByRequest(ctx.res, ctx.req, mergedConfig);
         // if (mergedConfig.responseCode) {
         //   ctx.status = ctx.res.statusCode;
         // }
@@ -100,6 +100,7 @@ const uploadMiddleware: Koa.Middleware = async ctx => {
   ctx.body = await parseHttpBody(ctx.req, {
     ...bodyParserOptions,
     ...parseOptionsFromQuery,
+    // wayOfHandleFile: 'cacheAndSave',
   });
 };
 router.all('/upload', uploadMiddleware);
