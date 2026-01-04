@@ -9,12 +9,19 @@ import {parseHttpBody} from '../../service/external';
  * @returns Koa.Context, return any to avoid type difference on differnt Koa version
  */
 export function generateKoaCtx<KoaState = Koa.DefaultState>(options?: {
+  /** for controller layer */
+  path?: string;
+  query?: object;
+  method?: string;
   requestHeaders?: object;
   requestBody?: object;
   keyForRequestBody?: string;
   state?: KoaState;
 }) {
   const {
+    method = 'get',
+    path = '/',
+    query,
     requestHeaders = {},
     state = {},
     requestBody = null,
@@ -33,6 +40,9 @@ export function generateKoaCtx<KoaState = Koa.DefaultState>(options?: {
   }
   Object.entries(state).forEach(([key, value]) => {
     ctx.state[key] = value;
+  });
+  Object.entries({method, path, query}).forEach(([key, value]) => {
+    ctx[key] = value;
   });
   return ctx;
 }
