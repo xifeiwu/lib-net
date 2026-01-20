@@ -28,7 +28,7 @@ export {
   throttle,
   FilterItem,
   matchFilters,
-} from '../../fe/common';
+} from '../../js/common';
 export {
   fromBuffer,
   getAFreePort,
