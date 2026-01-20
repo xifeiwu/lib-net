@@ -7,7 +7,7 @@ import {
 } from '../../../service/external';
 import {getRequestBodyOfCtx} from '../../service';
 // import {MockFileFinder} from '../../node/http/mock/find';
-// import {deepEqual} from '@modules/lib/fe/common';
+// import {deepEqual} from '@modules/lib/js/common';
 // import {GeneralDataToSave} from '@modules/conviva/common/service/request-by-select-config';
 // import {IRequestConfig} from '@src/service/axios-wrapper';
 // const {mock} = serverConfig;
