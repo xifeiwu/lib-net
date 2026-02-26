@@ -79,14 +79,14 @@ export const getProxyMiddleware = (proxyConfig: {
 
 export function getCustomizeResponseMiddleware(customizeResponseConfigList: HttpConditionAndAction[]) {
   const handleRequestMiddleware = async (ctx, next) => {
-    const {sentData} = await handleIncomingMessageByConfig(
+    const response = await handleIncomingMessageByConfig(
       {
         request: ctx.req,
         response: ctx.res,
       },
       customizeResponseConfigList
     );
-    if (!sentData) {
+    if (!response.writableEnded) {
       await next();
     }
   };
