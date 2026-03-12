@@ -80,7 +80,7 @@ export function setRequestBodyOfCtx(ctx: Koa.Context, requestBody: any) {
 export async function getRequestBodyOfCtx(ctx: Koa.Context) {
   let {requestBody} = ctx.state;
   if (requestBody === undefined) {
-    requestBody = await parseHttpBody(ctx.req);
+    requestBody = await parseHttpBody(ctx.req) ?? null;
     ctx.state.requestBody = requestBody;
   }
   return requestBody;
