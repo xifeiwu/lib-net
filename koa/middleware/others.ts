@@ -10,7 +10,7 @@ import {
   onRes2Proxy,
   proxyHttpRequest,
   ProxyStatus,
-  useCachedData,
+  cacheData,
 } from '../../service/external';
 import {getRequestBodyOfCtx} from '../service';
 
@@ -28,7 +28,7 @@ export const getProxyMiddleware = (proxyConfig: {
   proxyStatusList?: ProxyStatus[];
 }) => {
   const {contextFilterList, globalRequestOptions, proxyStatusList} = proxyConfig;
-  const {getOrFetch: getOrFetchGlobalRequestOptions} = useCachedData<HttpRequestOptions>(
+  const {getOrFetch: getOrFetchGlobalRequestOptions} = cacheData<HttpRequestOptions>(
     {maxAge: globalRequestOptions?.maxAge},
     globalRequestOptions.get
   );

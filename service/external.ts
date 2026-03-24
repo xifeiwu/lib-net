@@ -107,6 +107,6 @@ export {
   ProxyStatus,
   onRes2Proxy,
 } from '../../node';
-export {useCachedData} from '../../node/utils';
+export {cacheData} from '../../node/utils';
 export {getHttpRecordFinder, FindRecordFileOptions, recordHttpRequest} from '../../node/lib/http-record';
 export {Store as MemcachedStore, getConnectionHandlerToMemcached, getClient} from '../../node/lib/memcached';

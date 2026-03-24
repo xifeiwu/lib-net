@@ -135,7 +135,7 @@ export async function patchPost() {
   {
     const {
       responseInfo: {data},
-    } = await requestAndGetResponseInfo<Post, Partial<Post>>({
+    } = await requestAndGetResponseInfo<Post>({
       url: origin,
       method: 'patch',
       path: urlPropsToHref({
