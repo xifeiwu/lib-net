@@ -58,7 +58,7 @@ export interface StaticMiddlewareOptions {
 /**
  * A middleware of koa for handle static files under a target folder.
  */
-export function getStaticMiddleware(options: StaticMiddlewareOptions) {
+export function staticKoaMw(options: StaticMiddlewareOptions) {
   let {
     dir,
     urlPrefix = '/',

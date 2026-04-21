@@ -1,12 +1,7 @@
 import {KoaServerInfo, startKoaServer} from '../koa';
 import {TcpGateWayConfig, TcpHandlerMiddleware} from './types';
-import {
-  HttpHandler,
-  startSocketClient,
-  startTcpGateway,
-  TcpHandler,
-} from '../service/external';
-import {getTcpHandlerMiddleware as getTcpHandlerMw4Socks} from '../koa/middleware/socks/index';
+import {HttpHandler, startSocketClient, startTcpGateway, TcpHandler} from '../service/external';
+import {socksTcpMw as getTcpHandlerMw4Socks} from '../koa/middleware/socks/index';
 import {getTcpHandler} from './service';
 
 export async function startCustomizedTcpGateway(options?: TcpGateWayConfig) {

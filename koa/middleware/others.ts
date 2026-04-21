@@ -14,7 +14,7 @@ import {
 } from '../../service/external';
 import {getRequestBodyOfCtx} from '../service';
 
-export const getProxyMiddleware = (proxyConfig: {
+export const proxyKoaMw = (proxyConfig: {
   /** only do proxy when request meet context filter */
   contextFilterList?: FilterItem[];
   /**
@@ -77,7 +77,7 @@ export const getProxyMiddleware = (proxyConfig: {
   };
 };
 
-export function getCustomizeResponseMiddleware(customizeResponseConfigList: HttpConditionAndAction[]) {
+export function customizeResponseKoaMw(customizeResponseConfigList: HttpConditionAndAction[]) {
   const handleRequestMiddleware = async (ctx, next) => {
     const response = await handleIncomingMessageByConfig(
       {

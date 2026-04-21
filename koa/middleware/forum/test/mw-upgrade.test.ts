@@ -6,10 +6,10 @@ import {
   requestAndGetUpgradeInfo,
   waitFor,
 } from '../../../../service/external';
-import {requestRouter} from '../mw-request';
+import {forumKoaRouter as requestRouter} from '../mw-koa';
 import {startKoaServer} from '../../../server';
 import {mocked, urlPrefix, WS_PATH} from '../service';
-import {upgradeMiddleware} from '../mw-upgrade';
+import {forumHttpUpgradeMw as upgradeMiddleware} from '../mw-http-upgrade';
 import {WebSocket} from 'ws';
 
 async function sendBroadcast(origin: string) {

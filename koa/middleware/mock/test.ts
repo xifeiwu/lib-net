@@ -1,14 +1,14 @@
 import path from 'path';
 import {recordHttpRequest, HttpRequestOptions, recursiveDeleteFile} from '../../../service/external';
 import {startKoaServer} from '../../server';
-import {getMockMiddleware} from '.';
+import {mockKoaMw} from '.';
 
 const MOCK_FILE_DIR = path.join(__dirname, 'mock-files');
 
 export async function testMiddleware() {
   const {server} = await startKoaServer({
     requestMiddlewares: [
-      getMockMiddleware({
+      mockKoaMw({
         getFileListOptions: [
           {
             targetDir: MOCK_FILE_DIR,

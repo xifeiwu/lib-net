@@ -3,7 +3,7 @@ import path from 'path';
 import assert from 'assert';
 import {requestAndGetResponseInfo} from '../../../service/external';
 import {startKoaServer} from '../../server';
-import {requestRouter} from './mw-request';
+import {debugKoaRouter as requestRouter} from './mw-koa';
 export async function testUpload() {
   const {origin, server, app} = await startKoaServer({
     requestMiddlewares: [requestRouter.routes()],

@@ -1,5 +1,5 @@
 import assert from 'assert';
-import logs from './logs';
+import {logsKoaMw as logs} from './logs';
 import {startKoaServer} from '../server';
 import {requestAndGetResponseInfo} from '../../service/external';
 

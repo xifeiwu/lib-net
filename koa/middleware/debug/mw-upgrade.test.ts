@@ -1,6 +1,6 @@
 import {logColorful, requestAndGetUpgradeInfo, writeability, getSpeedCal} from '../../../service/external';
 import {startKoaServer} from '../../server';
-import {upgradeMiddelware} from './mw-upgrade';
+import {debugHttpUpgradeMw as upgradeMiddelware} from './mw-http-upgrade';
 import {WS_PATH} from './service';
 
 export async function testUpload() {

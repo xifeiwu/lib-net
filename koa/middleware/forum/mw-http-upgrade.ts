@@ -10,7 +10,8 @@ wss.on('wsClientError', err => {
 });
 
 export const websocketMap = new Map<string, WebSocket>();
-export const upgradeMiddleware: UpgradeMiddleware = async (ctx, next) => {
+
+export const forumHttpUpgradeMw: UpgradeMiddleware = async (ctx, next) => {
   const {
     req,
     socket,

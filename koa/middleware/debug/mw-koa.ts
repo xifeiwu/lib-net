@@ -1,7 +1,7 @@
 import Koa from 'koa';
 import KoaRouter from 'koa-router';
 import {urlPrefix} from './service';
-import {broadcastData, wsConnections} from './mw-upgrade';
+import {broadcastData, wsConnections} from './mw-http-upgrade';
 import {
   HttpRequestInfo,
   getHttpRequestInfo,
@@ -105,4 +105,7 @@ const uploadMiddleware: Koa.Middleware = async ctx => {
 };
 router.all('/upload', uploadMiddleware);
 
-export const requestRouter = router;
+export const debugKoaRouter = router;
+export function getDebugKoaMw() {
+  return router.routes();
+}

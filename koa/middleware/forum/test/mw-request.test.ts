@@ -6,7 +6,7 @@ import {
   urlPropsToHref,
   uuid,
 } from '../../../../service/external';
-import {requestRouter} from '../mw-request';
+import {forumKoaRouter as requestRouter} from '../mw-koa';
 import {startKoaServer} from '../../../server';
 import {mocked, urlPrefix} from '../service';
 import {Post} from '../service/types/frontend';

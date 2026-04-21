@@ -31,7 +31,7 @@ export function wsConnections() {
   return connections;
 }
 
-export const upgradeMiddelware: UpgradeMiddleware = async (ctx, next) => {
+export const debugHttpUpgradeMw: UpgradeMiddleware = async (ctx, next) => {
   const {
     req,
     socket,

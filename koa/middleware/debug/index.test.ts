@@ -13,8 +13,7 @@ import {
   getHttpResponseInfo,
   fromBuffer,
 } from '../../../service/external';
-import {requestRouter} from './mw-request';
-import {upgradeMiddelware} from './mw-upgrade';
+import {debugKoaRouter as requestRouter, debugHttpUpgradeMw as upgradeMiddelware} from '.';
 
 const requestMiddleware = requestRouter.routes();
 export async function testEcho() {

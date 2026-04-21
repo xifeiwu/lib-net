@@ -13,7 +13,7 @@ import {
   validate,
   patchPostValidator,
 } from './service';
-import {websocketMap} from './mw-upgrade';
+import {websocketMap} from './mw-http-upgrade';
 import {wrapValidate} from '../../service';
 
 const router = new KoaRouter({
@@ -113,4 +113,7 @@ router.get('/notifications/broadcast', async (ctx: Koa.Context, next) => {
   ctx.body = notifications;
 });
 
-export const requestRouter = router;
+export const forumKoaRouter = router;
+export function getForumKoaMw() {
+  return router.routes();
+}

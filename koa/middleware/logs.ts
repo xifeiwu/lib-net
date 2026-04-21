@@ -5,7 +5,7 @@ const MAX_DATA_LIST_LENGTH = 200;
 export interface LogsMWOptions {
   maxCount?: number;
 }
-export default function logs(options?: LogsMWOptions) {
+export function logsKoaMw(options?: LogsMWOptions) {
   const {maxCount = MAX_DATA_LIST_LENGTH} = options ?? {};
   const router = new KoaRouter({
     prefix: '/api/log',

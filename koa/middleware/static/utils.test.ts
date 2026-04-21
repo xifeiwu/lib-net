@@ -1,12 +1,12 @@
 import assert from 'assert';
 import {getDefaultStaticOptionsForDirs} from './utils';
 import {startKoaServer} from '../../server';
-import {getStaticMiddleware} from './middleware';
+import {staticKoaMw} from './middleware';
 import {requestAndGetResponseInfo} from '../../../service/external';
 
 export async function testGetDefaultStaticOptionsForDirs() {
   const staticOptions = getDefaultStaticOptionsForDirs([__dirname]);
-  const staticMiddlewares = staticOptions.map(getStaticMiddleware);
+  const staticMiddlewares = staticOptions.map(staticKoaMw);
   const {origin, server} = await startKoaServer({requestMiddlewares: [...staticMiddlewares]});
   const {responseInfo} = await requestAndGetResponseInfo({
     origin,

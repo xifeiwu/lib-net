@@ -17,7 +17,7 @@ export const INVALIDATE_PAYLOAD = 'invalidate payload';
 export interface LogMWOptions {
   theme?: ColorStyle;
   /**
-   * prefix is useful to identify which service the log comes from 
+   * prefix is useful to identify which service the log comes from
    * when more than one services share the same log file or terminal
    */
   prefix?: string;
@@ -27,7 +27,7 @@ export interface LogMWOptions {
   };
   catchAndWrapError?: boolean;
 }
-export function getLogMiddleware(options: LogMWOptions) {
+export function logKoaMw(options: LogMWOptions) {
   const {
     theme = {color: 'blue'},
     prefix = '',

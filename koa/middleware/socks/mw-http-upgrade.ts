@@ -5,11 +5,10 @@ import {
   SocksServerConfigPerVersion,
   UPGRADE_PROTOCOL_SOCKS_PREFIX,
 } from '../../../service/external';
-import {TcpHandlerMiddleware} from '../../../tcp/types';
 import {UpgradeMiddleware} from '../../types';
 import {handleSocksProtocol} from './service';
 
-export function getUpgradeMiddleware(socksServerConfigMap: Partial<SocksServerConfigPerVersion>) {
+export function socksHttpUpgradeMw(socksServerConfigMap: Partial<SocksServerConfigPerVersion>) {
   const upgradeMiddelware: UpgradeMiddleware = async (ctx, next) => {
     const {protocol, socket} = ctx;
     if (!protocol.startsWith(UPGRADE_PROTOCOL_SOCKS_PREFIX)) {
@@ -29,15 +28,4 @@ export function getUpgradeMiddleware(socksServerConfigMap: Partial<SocksServerCo
     }
   };
   return upgradeMiddelware;
-}
-
-export function getTcpHandlerMiddleware(socksServerConfigMap: Partial<SocksServerConfigPerVersion>) {
-  const tcpHandlerMiddleware: TcpHandlerMiddleware = async (ctx, next) => {
-    const {protocol, socket} = ctx;
-    const isHandled = await handleSocksProtocol(protocol, socket, socksServerConfigMap, 'tcp');
-    if (!isHandled) {
-      return await next();
-    }
-  };
-  return tcpHandlerMiddleware;
 }

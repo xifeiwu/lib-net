@@ -1,35 +1,28 @@
-import cors from './cors';
-import {requestRouter as debugRequestRouter, upgradeMiddelware as upgradeMiddelwareOfDebug} from './debug';
-import {getLogMiddleware} from './log';
-import {
-  getDefaultStaticOptionsForDirs,
-  getDefaultStaticOptionsForSpaDirs,
-  getStaticMiddleware,
-} from './static';
-import logs from './logs';
-import {
-  requestMiddleware as requestMw4Socks,
-  getUpgradeMiddleware as getUpgradeMw4Socks,
-} from './socks/index';
-import {getMockMiddleware} from './mock';
+import {corsKoaMw} from './cors';
+import {getDebugKoaMw, debugKoaRouter, debugHttpUpgradeMw} from './debug';
+import {logKoaMw} from './log';
+import {getDefaultStaticOptionsForDirs, getDefaultStaticOptionsForSpaDirs, staticKoaMw} from './static';
+import {logsKoaMw} from './logs';
+import {socksKoaMw, socksHttpUpgradeMw} from './socks/index';
+import {mockKoaMw} from './mock';
 import {sessionRouter} from './session';
-import {requestRouter as forumRequestRouter, upgradeMiddleware as forumUpgradeMiddleware} from './forum';
+import {getForumKoaMw, forumKoaRouter, forumHttpUpgradeMw} from './forum';
 
-export {debugRequestRouter, sessionRouter, forumRequestRouter};
+export {debugKoaRouter, sessionRouter, forumKoaRouter};
 export * from './others';
 
 /**
  * @deprecated by koaRequestMiddleware
  */
 export const requestMiddleware = {
-  cors,
-  debug: debugRequestRouter.routes(),
-  log: getLogMiddleware,
-  static: getStaticMiddleware,
-  logs,
-  socks: requestMw4Socks,
-  mock: getMockMiddleware,
-  forum: forumRequestRouter.routes(),
+  cors: corsKoaMw,
+  debug: getDebugKoaMw(),
+  log: logKoaMw,
+  static: staticKoaMw,
+  logs: logsKoaMw,
+  socks: socksKoaMw,
+  mock: mockKoaMw,
+  forum: getForumKoaMw(),
 };
 export const koaRequestMiddleware = requestMiddleware;
 
@@ -37,9 +30,9 @@ export const koaRequestMiddleware = requestMiddleware;
  * @deprecated by koaUpgradeMiddleware
  */
 export const upgradeMiddleware = {
-  debug: upgradeMiddelwareOfDebug,
-  socks: getUpgradeMw4Socks,
-  forum: forumUpgradeMiddleware,
+  debug: debugHttpUpgradeMw,
+  socks: socksHttpUpgradeMw,
+  forum: forumHttpUpgradeMw,
 };
 
 export const koaUpgradeMiddleware = upgradeMiddleware;

@@ -1,2 +1,2 @@
-export {requestRouter} from './mw-request';
-export {upgradeMiddleware} from './mw-upgrade';
+export {getForumKoaMw, forumKoaRouter} from './mw-koa';
+export {forumHttpUpgradeMw, websocketMap} from './mw-http-upgrade';
