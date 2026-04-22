@@ -27,7 +27,7 @@ export interface LogMWOptions {
   };
   catchAndWrapError?: boolean;
 }
-export function logKoaMw(options: LogMWOptions) {
+export function getLogKoaMw(options: LogMWOptions) {
   const {
     theme = {color: 'blue'},
     prefix = '',

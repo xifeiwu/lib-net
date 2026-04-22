@@ -21,8 +21,10 @@ feature/
 
 | Export type          | Pattern                                           | Example                          |
 |----------------------|---------------------------------------------------|----------------------------------|
-| Router instance      | `${feature}KoaRouter`                             | `debugKoaRouter`, `forumKoaRouter`, `socksKoaRouter` |
-| Middleware (non-router) | `${feature}${Channel}Mw`                       | `socksHttpUpgradeMw`, `corsKoaMw` |
+| Router instance (direct) | `${feature}KoaRouter`                          | `debugKoaRouter`, `forumKoaRouter`, `socksKoaRouter` |
+| Router instance (wrapper) | `get${Feature}KoaRouter`                      | `getLogsKoaRouter` |
+| Middleware (direct)  | `${feature}${Channel}Mw`                          | `debugHttpUpgradeMw`, `forumHttpUpgradeMw` |
+| Middleware (wrapper)  | `get${Feature}${Channel}Mw`                      | `getCorsKoaMw`, `getLogKoaMw`, `getStaticKoaMw`, `getSocksHttpUpgradeMw` |
 
 - `Channel` is one of: `Koa`, `HttpUpgrade`, `Tcp`
 - `feature` is camelCase, `Feature` is PascalCase

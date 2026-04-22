@@ -12,7 +12,7 @@ import {
 } from '../../service/external';
 import {getRequestBodyOfCtx} from '../service';
 
-export const proxyKoaMw = (proxyConfig: {
+export const getProxyKoaMw = (proxyConfig: {
   /** only do proxy when request meet context filter */
   contextFilterList?: FilterItem[];
   /**

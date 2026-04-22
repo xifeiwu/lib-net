@@ -51,7 +51,7 @@ export const PATHNAME_MOCK_LIST = '/api/mock/list';
  * Notice:
  * If ctx.req already parsed, save it in ctx.state.requestBody
  */
-export const mockKoaMw = (mockParams?: FindRecordFileOptions) => {
+export const getMockKoaMw = (mockParams?: FindRecordFileOptions) => {
   const {getRecordFileList, finder} = getHttpRecordFinder(mockParams);
   const middleware = async (ctx: Koa.Context, next) => {
     const requestConfig = await getRequestConfigFromKoaCtx(ctx);

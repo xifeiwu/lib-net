@@ -1,8 +1,8 @@
 import {handleIncomingMessageByConfig, HttpConditionAndAction} from '../../service/external';
 
-export {proxyKoaMw} from './proxy';
+export {getProxyKoaMw} from './proxy';
 
-export function customizeResponseKoaMw(customizeResponseConfigList: HttpConditionAndAction[]) {
+export function getCustomizeResponseKoaMw(customizeResponseConfigList: HttpConditionAndAction[]) {
   const handleRequestMiddleware = async (ctx, next) => {
     const response = await handleIncomingMessageByConfig(
       {

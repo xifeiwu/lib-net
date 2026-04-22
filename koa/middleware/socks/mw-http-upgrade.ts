@@ -8,7 +8,7 @@ import {
 import {UpgradeMiddleware} from '../../types';
 import {handleSocksProtocol} from './service';
 
-export function socksHttpUpgradeMw(socksServerConfigMap: Partial<SocksServerConfigPerVersion>) {
+export function getSocksHttpUpgradeMw(socksServerConfigMap: Partial<SocksServerConfigPerVersion>) {
   const upgradeMiddelware: UpgradeMiddleware = async (ctx, next) => {
     const {protocol, socket} = ctx;
     if (!protocol.startsWith(UPGRADE_PROTOCOL_SOCKS_PREFIX)) {

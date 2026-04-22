@@ -24,7 +24,7 @@ export interface CorsMWOptions {
   allowHeaders?: string[] | undefined;
 }
 
-export function corsKoaMw(options: CorsMWOptions = {}) {
+export function getCorsKoaMw(options: CorsMWOptions = {}) {
   const defaultOptions = {
     allowMethods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
   };

@@ -1,10 +1,10 @@
-import {corsKoaMw} from './cors';
+import {getCorsKoaMw} from './cors';
 import {debugKoaRouter, debugHttpUpgradeMw} from './debug';
-import {logKoaMw} from './log';
-import {getDefaultStaticOptionsForDirs, getDefaultStaticOptionsForSpaDirs, staticKoaMw} from './static';
-import {logsKoaMw} from './logs';
-import {socksKoaRouter, socksHttpUpgradeMw} from './socks/index';
-import {mockKoaMw} from './mock';
+import {getLogKoaMw} from './log';
+import {getDefaultStaticOptionsForDirs, getDefaultStaticOptionsForSpaDirs, getStaticKoaMw} from './static';
+import {getLogsKoaRouter} from './logs';
+import {socksKoaRouter, getSocksHttpUpgradeMw} from './socks/index';
+import {getMockKoaMw} from './mock';
 import {sessionRouter} from './session';
 import {forumKoaRouter, forumHttpUpgradeMw} from './forum';
 import {cookieRouter} from './cookie';
@@ -16,13 +16,13 @@ export * from './others';
  * @deprecated by koaRequestMiddleware
  */
 export const requestMiddleware = {
-  cors: corsKoaMw,
+  cors: getCorsKoaMw,
   debug: debugKoaRouter.routes(),
-  log: logKoaMw,
-  static: staticKoaMw,
-  logs: (options?) => logsKoaMw(options).routes(),
+  log: getLogKoaMw,
+  static: getStaticKoaMw,
+  logs: (options?) => getLogsKoaRouter(options).routes(),
   socks: socksKoaRouter.routes(),
-  mock: mockKoaMw,
+  mock: getMockKoaMw,
   forum: forumKoaRouter.routes(),
 };
 export const koaRequestMiddleware = requestMiddleware;
@@ -32,7 +32,7 @@ export const koaRequestMiddleware = requestMiddleware;
  */
 export const upgradeMiddleware = {
   debug: debugHttpUpgradeMw,
-  socks: socksHttpUpgradeMw,
+  socks: getSocksHttpUpgradeMw,
   forum: forumHttpUpgradeMw,
 };
 
