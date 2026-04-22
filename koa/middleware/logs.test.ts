@@ -4,7 +4,7 @@ import {startKoaServer} from '../server';
 import {requestAndGetResponseInfo} from '../../service/external';
 
 export async function testUploadLog() {
-  const {origin, server} = await startKoaServer({printOrigin: true, requestMiddlewares: [logs()]});
+  const {origin, server} = await startKoaServer({printOrigin: true, requestMiddlewares: [logs().routes()]});
   const data = {a: 1, b: 2};
   const {
     responseInfo: {data: item1},

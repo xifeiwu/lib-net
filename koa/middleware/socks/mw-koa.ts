@@ -36,4 +36,4 @@ router.get('/clear', async (ctx, next) => {
   ctx.body = length;
 });
 
-export const socksKoaMw = router.routes() as Koa.Middleware;
+export const socksKoaRouter = router;

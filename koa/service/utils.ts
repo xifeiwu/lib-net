@@ -1,6 +1,7 @@
 import http from 'http';
 import {Socket} from 'net';
 import Koa from 'koa';
+import KoaRouter from 'koa-router';
 import {KoaConfig} from '../types';
 import Schema, {Values} from 'async-validator';
 import {parseHttpBody} from '../../service/external';
@@ -47,6 +48,28 @@ export function generateKoaCtx<KoaState = Koa.DefaultState>(options?: {
   return ctx;
 }
 
+export interface RouteInfo {
+  methods: string[];
+  path: string;
+}
+
+function getRouterPathnameList(router: KoaRouter, prefix = '') {
+  return router.stack.flatMap(layer => {
+    if (!layer.path) return [];
+    return [
+      {
+        name: layer.name,
+        methods: layer.methods,
+        path: prefix + layer.path,
+      },
+    ];
+  });
+}
+
+export function getAllRouterPathnameList(routers: KoaRouter[]): RouteInfo[] {
+  return routers.flatMap(router => getRouterPathnameList(router));
+}
+
 export function serializeKoaConfig(koaConfig: KoaConfig) {
   const {requestMiddlewares = [], upgradeMiddlewares = [], ...rest} = koaConfig;
   return {
@@ -80,7 +103,7 @@ export function setRequestBodyOfCtx(ctx: Koa.Context, requestBody: any) {
 export async function getRequestBodyOfCtx(ctx: Koa.Context) {
   let {requestBody} = ctx.state;
   if (requestBody === undefined) {
-    requestBody = await parseHttpBody(ctx.req) ?? null;
+    requestBody = (await parseHttpBody(ctx.req)) ?? null;
     ctx.state.requestBody = requestBody;
   }
   return requestBody;

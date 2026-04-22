@@ -114,6 +114,3 @@ router.get('/notifications/broadcast', async (ctx: Koa.Context, next) => {
 });
 
 export const forumKoaRouter = router;
-export function getForumKoaMw() {
-  return router.routes();
-}

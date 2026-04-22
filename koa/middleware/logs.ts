@@ -61,8 +61,7 @@ export function logsKoaMw(options?: LogsMWOptions) {
     ctx.type = 'json';
     ctx.body = originLength;
   });
-  const middlewareDebug = router.routes();
-  return middlewareDebug;
+  return router;
 }
 
 // export default middlewareDebug;

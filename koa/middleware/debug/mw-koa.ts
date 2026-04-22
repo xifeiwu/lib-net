@@ -106,6 +106,3 @@ const uploadMiddleware: Koa.Middleware = async ctx => {
 router.all('/upload', uploadMiddleware);
 
 export const debugKoaRouter = router;
-export function getDebugKoaMw() {
-  return router.routes();
-}
