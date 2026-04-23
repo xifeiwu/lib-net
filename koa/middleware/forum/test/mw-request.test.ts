@@ -28,7 +28,7 @@ export async function testGetPosts() {
   const {
     responseInfo: {statusCode, headers, data},
   } = await requestAndGetResponseInfo({
-    url: origin,
+    origin,
     method: 'get',
     path: url,
   });
@@ -48,7 +48,7 @@ export async function getPostById() {
     const {
       responseInfo: {statusCode, headers, data},
     } = await requestAndGetResponseInfo({
-      url: origin,
+      origin,
       method: 'get',
       path: urlPropsToHref({
         pathname,
@@ -64,7 +64,7 @@ export async function getPostById() {
     const {
       responseInfo: {statusCode, headers, data},
     } = await requestAndGetResponseInfo({
-      url: origin,
+      origin,
       method: 'get',
       path: urlPropsToHref({
         pathname,
@@ -111,7 +111,7 @@ export async function postPost() {
     const {
       responseInfo: {statusCode, headers, data},
     } = await requestAndGetResponseInfo({
-      url: origin,
+      origin,
       method: 'post',
       path: urlPropsToHref({
         pathname,
@@ -136,7 +136,7 @@ export async function patchPost() {
     const {
       responseInfo: {data},
     } = await requestAndGetResponseInfo<Post>({
-      url: origin,
+      origin,
       method: 'patch',
       path: urlPropsToHref({
         pathname,

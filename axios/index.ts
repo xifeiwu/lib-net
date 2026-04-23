@@ -1,13 +1,7 @@
-import {
-  GeneralRequestConfig,
-  getUrlPropsFromConfig,
-  isObject,
-  logColorful,
-  urlPropsToHref,
-} from '../service/external';
+import {UrlProps, getUrlPropsFromConfig, isObject, logColorful, urlPropsToHref} from '../service/external';
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 
-export type CustomizedAxiosRequestConfig = GeneralRequestConfig<AxiosRequestConfig>;
+export type CustomizedAxiosRequestConfig = UrlProps & AxiosRequestConfig;
 export type AxiosRequestFunc = <T>(config: CustomizedAxiosRequestConfig) => Promise<AxiosResponse<T>>;
 
 /**

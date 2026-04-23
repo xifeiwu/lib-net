@@ -1,9 +1,8 @@
+export type {UrlProps} from '../../../types/common';
 export {
-  UrlProps,
   formatDate,
   isNumber,
   applyPathnameParams,
-  GeneralRequestConfig,
   urlPropsToHref,
   deepEqual,
   isPlainObject,
@@ -28,7 +27,8 @@ export {
   throttle,
   FilterItem,
   matchFilters,
-} from '../../js/common';
+} from '../../js';
+export {mime} from '../../js/lib/mime';
 export {
   fromBuffer,
   getAFreePort,
@@ -40,7 +40,6 @@ export {
   requestAndGetResponseInfo,
   toReadable,
   getFileList,
-  mime,
   HttpRequestOptions,
   HttpResponseInfo,
   handleSocketEvents,
@@ -66,31 +65,19 @@ export {
   getLocalIpAddress,
   getHttpRequestHeaderPartInfo,
   getSocketInfo,
-  startTcpGateway,
   CustomHandleRequestOptions,
   customResponseByRequest,
   getIncomingMessageData,
   uploadDirOnCwd,
   TcpServerConfig,
-  SocksServerInfo,
   getUpgradeProtocol,
-  UPGRADE_PROTOCOL_SOCKS_PREFIX,
   getUpgradeResponse,
   Protocol,
-  SocksServerConfigPerVersion,
-  SocksServerConfig,
   getOneLineFromReader,
-  handleSocksConnection,
-  isSocksProtocol,
-  simplifySocksServerInfo,
   htmlUlItems,
   ulItems,
-  SocksClientConfig,
-  connectToSocksServer,
-  serializableSocksClientInfo,
   HttpHandler,
   TcpHandler,
-  Cookies,
   getHttpResponseInfo,
   parseHttpBody,
   getHashDigest,
@@ -101,12 +88,23 @@ export {
   WriterSpeedInfo,
   handleIncomingMessageByConfig,
   HttpConditionAndAction,
-  proxyHttpRequest,
-  getPreRequestCb,
   compareHttpRequestOptions,
-  ProxyStatus,
-  onRes2Proxy,
 } from '../../node';
+export {startTcpGateway} from '../../node/lib/tcp-gateway';
+export {Cookies} from '../../node/lib/cookies';
+export {proxyHttpRequest, getPreRequestCb, ProxyStatus, postResToProxy} from '../../node/lib/http-proxy';
+export {
+  SocksServerInfo,
+  UPGRADE_PROTOCOL_SOCKS_PREFIX,
+  SocksServerConfigPerVersion,
+  SocksServerConfig,
+  handleSocksConnection,
+  isSocksProtocol,
+  simplifySocksServerInfo,
+  SocksClientConfig,
+  connectToSocksServer,
+  serializableSocksClientInfo,
+} from '../../node/lib/socks';
 export {cacheData} from '../../node/utils';
 export {getHttpRecordFinder, FindRecordFileOptions, recordHttpRequest} from '../../node/lib/http-record';
 export {Store as MemcachedStore, getConnectionHandlerToMemcached, getClient} from '../../node/lib/memcached';

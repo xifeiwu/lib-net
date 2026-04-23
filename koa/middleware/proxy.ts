@@ -5,7 +5,7 @@ import {
   HttpRequestOptions,
   isString,
   matchFilters,
-  onRes2Proxy,
+  postResToProxy,
   proxyHttpRequest,
   ProxyStatus,
   cacheData,
@@ -49,7 +49,7 @@ export const getProxyKoaMw = (proxyConfig: {
       preProxyReq: getPreRequestCb({
         statusList: proxyStatusList,
       }),
-      onRes2Proxy: onRes2Proxy,
+      postResToProxy,
       async handleResponseInfoToOrigin(info) {
         const {headers, ...restProps} = info;
         for (let [key, value] of Object.entries(headers)) {
