@@ -1,8 +1,8 @@
 import Koa from 'koa';
 import session from 'koa-session';
 import {
-  requestMiddleware,
-  upgradeMiddleware,
+  koaMwMap,
+  httpUpgradeMwMap,
   getDefaultStaticOptionsForDirs,
   getDefaultStaticOptionsForSpaDirs,
 } from './middleware';
@@ -46,16 +46,16 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
   const {logMWOptions, useDebugMW, corsWMOptions, logsMWOptions, socksConfig, useForumMW} = mwConfig;
   let {staticWMConfig} = mwConfig;
   useDebugMW &&
-    requestMiddlewares[requestMiddlewareAction](requestMiddleware.debug) &&
-    upgradeMiddlewares[upgradeMiddlewareAction](upgradeMiddleware.debug);
-  corsWMOptions && requestMiddlewares[requestMiddlewareAction](requestMiddleware.cors(corsWMOptions));
-  logsMWOptions && requestMiddlewares[requestMiddlewareAction](requestMiddleware.logs(logsMWOptions));
+    requestMiddlewares[requestMiddlewareAction](koaMwMap.debug) &&
+    upgradeMiddlewares[upgradeMiddlewareAction](httpUpgradeMwMap.debug);
+  corsWMOptions && requestMiddlewares[requestMiddlewareAction](koaMwMap.cors(corsWMOptions));
+  logsMWOptions && requestMiddlewares[requestMiddlewareAction](koaMwMap.logs(logsMWOptions));
   socksConfig &&
-    requestMiddlewares[requestMiddlewareAction](requestMiddleware.socks) &&
-    upgradeMiddlewares[upgradeMiddlewareAction](upgradeMiddleware.socks(socksConfig));
+    requestMiddlewares[requestMiddlewareAction](koaMwMap.socks) &&
+    upgradeMiddlewares[upgradeMiddlewareAction](httpUpgradeMwMap.socks(socksConfig));
   useForumMW &&
-    requestMiddlewares[requestMiddlewareAction](requestMiddleware.forum) &&
-    upgradeMiddlewares[upgradeMiddlewareAction](upgradeMiddleware.forum);
+    requestMiddlewares[requestMiddlewareAction](koaMwMap.forum) &&
+    upgradeMiddlewares[upgradeMiddlewareAction](httpUpgradeMwMap.forum);
   if (staticDir) {
     const staticDirList = Array.isArray(staticDir) ? staticDir : [staticDir];
     if (!staticWMConfig) {
@@ -85,7 +85,7 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
     const staticSpaDirOptionsList = getDefaultStaticOptionsForSpaDirs(spaDirList, mwOptions);
     const staticDirOptionsList = getDefaultStaticOptionsForDirs(dirList, mwOptions);
     const staticMiddlewares = [...staticSpaDirOptionsList, ...staticDirOptionsList].map(config =>
-      requestMiddleware.static(config)
+      koaMwMap.static(config)
     );
     requestMiddlewares.push(...staticMiddlewares);
   }
@@ -108,7 +108,7 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
   }
   /** errorCatchMiddleware should be set as first koa middleware */
   if (logMWOptions) {
-    requestMiddlewares.unshift(requestMiddleware.log(logMWOptions));
+    requestMiddlewares.unshift(koaMwMap.log(logMWOptions));
   }
 
   /** app.middleware assginment should happen before app.listen */

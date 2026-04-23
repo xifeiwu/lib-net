@@ -10,12 +10,10 @@ import {forumKoaRouter, forumHttpUpgradeMw} from './forum';
 import {cookieRouter} from './cookie';
 
 export {debugKoaRouter, sessionRouter, forumKoaRouter, socksKoaRouter, cookieRouter};
-export * from './others';
+export {getProxyKoaMw} from './proxy';
+export {getCustomizeResponseKoaMw} from './others';
 
-/**
- * @deprecated by koaRequestMiddleware
- */
-export const requestMiddleware = {
+export const koaMwMap = {
   cors: getCorsKoaMw,
   debug: debugKoaRouter.routes(),
   log: getLogKoaMw,
@@ -25,17 +23,19 @@ export const requestMiddleware = {
   mock: getMockKoaMw,
   forum: forumKoaRouter.routes(),
 };
-export const koaRequestMiddleware = requestMiddleware;
-
 /**
- * @deprecated by koaUpgradeMiddleware
+ * @deprecated by koaMwMap
  */
-export const upgradeMiddleware = {
+export const koaRequestMiddleware = koaMwMap;
+
+export const httpUpgradeMwMap = {
   debug: debugHttpUpgradeMw,
   socks: getSocksHttpUpgradeMw,
   forum: forumHttpUpgradeMw,
 };
 
-export const koaUpgradeMiddleware = upgradeMiddleware;
-
+/**
+ * @deprecated by httpUpgradeMwMap
+ */
+export const koaUpgradeMiddleware = httpUpgradeMwMap;
 export {getDefaultStaticOptionsForDirs, getDefaultStaticOptionsForSpaDirs};
