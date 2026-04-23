@@ -23,11 +23,11 @@ export {
   customDeepMerge,
   deepClone,
   convertKeyToLowerCase,
-  intToWord,
   throttle,
   FilterItem,
   matchFilters,
 } from '../../js';
+export {intToWord} from '../../js/lib/humanize';
 export {mime} from '../../js/lib/mime';
 export {
   fromBuffer,
