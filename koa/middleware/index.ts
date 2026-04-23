@@ -9,10 +9,31 @@ import {sessionRouter} from './session';
 import {forumKoaRouter, forumHttpUpgradeMw} from './forum';
 import {cookieRouter} from './cookie';
 
-export {debugKoaRouter, sessionRouter, forumKoaRouter, socksKoaRouter, cookieRouter};
-export {getProxyKoaMw} from './proxy';
-export {getCustomizeResponseKoaMw} from './others';
+import {getProxyKoaMw} from './proxy';
+import {getCustomizeResponseKoaMw} from './others';
+export {
+  getCorsKoaMw,
+  debugKoaRouter,
+  debugHttpUpgradeMw,
+  getLogKoaMw,
+  getDefaultStaticOptionsForDirs,
+  getDefaultStaticOptionsForSpaDirs,
+  getStaticKoaMw,
+  getLogsKoaRouter,
+  socksKoaRouter,
+  getSocksHttpUpgradeMw,
+  getMockKoaMw,
+  sessionRouter,
+  forumKoaRouter,
+  forumHttpUpgradeMw,
+  cookieRouter,
+  getProxyKoaMw,
+  getCustomizeResponseKoaMw,
+};
 
+/**
+ * @deprecated, use mw or getMw function directly
+ */
 export const koaMwMap = {
   cors: getCorsKoaMw,
   debug: debugKoaRouter.routes(),
@@ -28,6 +49,9 @@ export const koaMwMap = {
  */
 export const koaRequestMiddleware = koaMwMap;
 
+/**
+ * @deprecated, use mw or getMw function directly
+ */
 export const httpUpgradeMwMap = {
   debug: debugHttpUpgradeMw,
   socks: getSocksHttpUpgradeMw,
@@ -38,4 +62,3 @@ export const httpUpgradeMwMap = {
  * @deprecated by httpUpgradeMwMap
  */
 export const koaUpgradeMiddleware = httpUpgradeMwMap;
-export {getDefaultStaticOptionsForDirs, getDefaultStaticOptionsForSpaDirs};
