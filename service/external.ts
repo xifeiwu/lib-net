@@ -92,7 +92,14 @@ export {
 } from '../../node';
 export {startTcpGateway} from '../../node/lib/tcp-gateway';
 export {Cookies} from '../../node/lib/cookies';
-export {proxyHttpRequest, getPreRequestCb, ProxyStatus, postResToProxy} from '../../node/lib/http-proxy';
+export {
+  proxyHttpRequest,
+  getPreRequestCb,
+  ProxyStatus,
+  HttpProxyConfig,
+  postResToProxy,
+} from '../../node/lib/http-proxy';
+export type {HttpRequestHeaderPartInfo} from '../../node';
 export {
   SocksServerInfo,
   UPGRADE_PROTOCOL_SOCKS_PREFIX,

@@ -1,76 +1,48 @@
 import Koa from 'koa';
 import {
-  FilterItem,
-  getPreRequestCb,
-  HttpRequestOptions,
-  isString,
-  matchFilters,
-  postResToProxy,
   proxyHttpRequest,
   ProxyStatus,
-  cacheData,
+  getPreRequestCb,
+  getHttpRequestHeaderPartInfo,
+  HttpProxyConfig,
+  HttpRequestHeaderPartInfo,
 } from '../../service/external';
 import {getRequestBodyOfCtx} from '../service';
 
-export const getProxyKoaMw = (proxyConfig: {
-  /** only do proxy when request meet context filter */
-  contextFilterList?: FilterItem[];
+export const getProxyKoaMw = (params: {
+  filter: (headerPart: HttpRequestHeaderPartInfo<'receiver'>) => boolean;
+  proxyConfig: HttpProxyConfig;
+  options?: {proxyStatusList?: ProxyStatus[]};
+}): Koa.Middleware => {
+  const {filter, proxyConfig, options} = params;
+  const {proxyStatusList} = options ?? {};
+
   /**
-   * The options should be add to requestOptions of every proxy request,
-   * it can be constant of dynamic(in format of function) value
+   * if proxyStatusList is provided, use it to get the preProxyReq callback
    */
-  globalRequestOptions?: {
-    get: () => Promise<HttpRequestOptions>;
-    maxAge?: number;
-  };
-  proxyStatusList?: ProxyStatus[];
-}) => {
-  const {contextFilterList, globalRequestOptions, proxyStatusList} = proxyConfig;
-  const {getOrFetch: getOrFetchGlobalRequestOptions} = cacheData<HttpRequestOptions>(
-    {maxAge: globalRequestOptions?.maxAge},
-    globalRequestOptions.get
-  );
+  const preProxyReqByStatusList = proxyStatusList
+    ? getPreRequestCb({statusList: proxyStatusList})
+    : undefined;
+
   return async (ctx: Koa.Context, next: Koa.Next) => {
-    const {path: pathname} = ctx;
-    if (!matchFilters(contextFilterList, pathname)) {
+    const headerPart = getHttpRequestHeaderPartInfo(ctx.req);
+    if (!filter(headerPart)) {
       return await next();
     }
     const originData = await getRequestBodyOfCtx(ctx);
-    const globalRequestOptions = await getOrFetchGlobalRequestOptions();
     ctx.respond = false;
+
+    const mergedPreProxyReq = preProxyReqByStatusList
+      ? (status: ProxyStatus, moreInfo: {href: string}) => {
+          preProxyReqByStatusList(status, moreInfo);
+          proxyConfig.preProxyReq?.(status, moreInfo);
+        }
+      : proxyConfig.preProxyReq;
+
     proxyHttpRequest(ctx.req, ctx.res, {
+      ...proxyConfig,
       originData,
-      globalRequestOptions,
-      async handleProxyRequestOptions(info) {
-        delete info?.headers['host'];
-        delete info?.headers['referer'];
-        return info;
-      },
-      preProxyReq: getPreRequestCb({
-        statusList: proxyStatusList,
-      }),
-      postResToProxy,
-      async handleResponseInfoToOrigin(info) {
-        const {headers, ...restProps} = info;
-        for (let [key, value] of Object.entries(headers)) {
-          /** ignore cors related headers */
-          if (isString(key) && key.toLowerCase().startsWith('access-control-')) {
-            delete headers[key];
-          }
-        }
-        /** Add proxy info to httpResponseInfo to origin */
-        for (const [key, value] of Object.entries({
-          origin: globalRequestOptions?.origin,
-        })) {
-          if (value !== undefined) {
-            headers[`z-mitm-proxy-${key}`] = value;
-          }
-        }
-        return {
-          ...restProps,
-          headers,
-        };
-      },
+      preProxyReq: mergedPreProxyReq,
     });
   };
 };
