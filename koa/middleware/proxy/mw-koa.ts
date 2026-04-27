@@ -2,7 +2,7 @@ import Koa from 'koa';
 import {
   proxyHttpRequest,
   ProxyStatus,
-  getPreRequestCb,
+  preProxyReqHook,
   getHttpRequestHeaderPartInfo,
   HttpProxyConfig,
   HttpRequestHeaderPartInfo,
@@ -21,7 +21,7 @@ export const getProxyKoaMw = (params: {
    * if proxyStatusList is provided, use it to get the preProxyReq callback
    */
   const preProxyReqByStatusList = proxyStatusList
-    ? getPreRequestCb({statusList: proxyStatusList})
+    ? preProxyReqHook({statusList: proxyStatusList})
     : undefined;
 
   return async (ctx: Koa.Context, next: Koa.Next) => {
