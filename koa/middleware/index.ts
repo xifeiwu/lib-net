@@ -10,6 +10,7 @@ import {forumKoaRouter, forumHttpUpgradeMw} from './forum';
 import {cookieRouter} from './cookie';
 
 import {getProxyKoaMw} from './proxy';
+import {getProxyHttpUpgradeMw} from './proxy/proxy-http-upgrade';
 import {getCustomizeResponseKoaMw} from './others';
 export {
   getCorsKoaMw,
@@ -28,6 +29,7 @@ export {
   forumHttpUpgradeMw,
   cookieRouter,
   getProxyKoaMw,
+  getProxyHttpUpgradeMw,
   getCustomizeResponseKoaMw,
 };
 

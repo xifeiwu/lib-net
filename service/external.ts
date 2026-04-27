@@ -94,6 +94,7 @@ export {startTcpGateway} from '../../node/lib/tcp-gateway';
 export {Cookies} from '../../node/lib/cookies';
 export {
   proxyHttpRequest,
+  proxyWebSocketRequest,
   getPreRequestCb,
   ProxyStatus,
   HttpProxyConfig,
