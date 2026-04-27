@@ -6,8 +6,8 @@ import {
   getHttpRequestHeaderPartInfo,
   HttpProxyConfig,
   HttpRequestHeaderPartInfo,
-} from '../../service/external';
-import {getRequestBodyOfCtx} from '../service';
+} from '../../../service/external';
+import {getRequestBodyOfCtx} from '../../service';
 
 export const getProxyKoaMw = (params: {
   filter: (headerPart: HttpRequestHeaderPartInfo<'receiver'>) => boolean;
