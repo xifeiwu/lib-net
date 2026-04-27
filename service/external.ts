@@ -95,7 +95,7 @@ export {Cookies} from '../../node/lib/cookies';
 export {
   proxyHttpRequest,
   proxyWebSocketRequest,
-  getPreRequestCb,
+  preProxyReqHook,
   ProxyStatus,
   HttpProxyConfig,
   postResToProxy,
