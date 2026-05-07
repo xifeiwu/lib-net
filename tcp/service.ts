@@ -30,13 +30,14 @@ export const TCP_GATEWAY_CONFIG: TcpGateWayConfig = {
 };
 
 export function serializeTcpGatewayConfig(config: TcpGateWayConfig) {
-  const {tcpServerConfig, mwConfig, middlewares, koa} = config;
+  const {tcpServerConfig, mwConfig, middlewares, koa, assetsSyncUp} = config;
   const {config: koaConfig, shortCut} = koa;
 
   return {
     tcpServerConfig,
     mwConfig,
     middlewares,
+    assetsSyncUp,
     koa: {
       config: serializeKoaConfig(koaConfig),
       shortCut,

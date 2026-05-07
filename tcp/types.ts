@@ -13,12 +13,18 @@ export interface TcpHandlerMiddlewareConfig {
   socksConfig: Partial<SocksServerConfigPerVersion>;
 }
 
+export interface AssetsSyncUpConfig {
+  dir: string;
+  git?: string;
+}
+
 export interface TcpGateWayConfig {
   tcpServerConfig?: TcpServerConfig;
-  middlewares?: TcpHandlerMiddleware[]
+  middlewares?: TcpHandlerMiddleware[];
   mwConfig?: TcpHandlerMiddlewareConfig;
+  assetsSyncUp?: AssetsSyncUpConfig;
   koa?: {
     config?: KoaConfig;
     shortCut?: KoaShortCutConfig;
-  }
+  };
 }

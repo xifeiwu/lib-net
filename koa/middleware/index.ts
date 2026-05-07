@@ -11,6 +11,7 @@ import {cookieRouter} from './cookie';
 
 import {getProxyKoaMw, getProxyHttpUpgradeMw} from './proxy';
 import {getCustomizeResponseKoaMw} from './others';
+import {getAssetsTcpMw} from './assets/index';
 export {
   getCorsKoaMw,
   debugKoaRouter,
@@ -30,6 +31,7 @@ export {
   getProxyKoaMw,
   getProxyHttpUpgradeMw,
   getCustomizeResponseKoaMw,
+  getAssetsTcpMw,
 };
 
 /**

@@ -72,12 +72,9 @@ export {
   TcpServerConfig,
   getUpgradeProtocol,
   getUpgradeResponse,
-  Protocol,
   getOneLineFromReader,
   htmlUlItems,
   ulItems,
-  HttpHandler,
-  TcpHandler,
   getHttpResponseInfo,
   parseHttpBody,
   getHashDigest,
@@ -90,7 +87,7 @@ export {
   HttpConditionAndAction,
   compareHttpRequestOptions,
 } from '../../node';
-export {startTcpGateway} from '../../node/lib/tcp-gateway';
+export {startTcpGateway, Protocol, TcpHandler, HttpHandler} from '../../node/lib/tcp-gateway';
 export {Cookies} from '../../node/lib/cookies';
 export {
   proxyHttpRequest,
@@ -116,3 +113,13 @@ export {
 export {cacheData} from '../../node/utils';
 export {getHttpRecordFinder, FindRecordFileOptions, recordHttpRequest} from '../../node/lib/http-record';
 export {Store as MemcachedStore, getConnectionHandlerToMemcached, getClient} from '../../node/lib/memcached';
+export {ASSETS_SYNC_PROTOCOL_BYTE, handleAssetsSyncConnection} from '../../node/lib/assets-management';
+export type {
+  AssetInfoFull,
+  AssetMeta,
+  AssetListMeta,
+  MetaDiffForSyncUp,
+  MetaHandlers,
+  GetMetaHandlers,
+  AssetsSyncServerConfig,
+} from '../../node/lib/assets-management';

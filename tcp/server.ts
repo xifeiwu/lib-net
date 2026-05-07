@@ -2,10 +2,11 @@ import {KoaServerInfo, startKoaServer} from '../koa';
 import {TcpGateWayConfig, TcpHandlerMiddleware} from './types';
 import {HttpHandler, startSocketClient, startTcpGateway, TcpHandler} from '../service/external';
 import {getSocksTcpMw as getTcpHandlerMw4Socks} from '../koa/middleware/socks/index';
+import {getAssetsTcpMw} from '../koa/middleware/assets/index';
 import {getTcpHandler} from './service';
 
 export async function startCustomizedTcpGateway(options?: TcpGateWayConfig) {
-  const {tcpServerConfig, mwConfig, middlewares = [], koa} = options ?? {};
+  const {tcpServerConfig, mwConfig, middlewares = [], koa, assetsSyncUp} = options ?? {};
   let httpHandler: HttpHandler;
   let koaServerInfo: KoaServerInfo;
   if (koa) {
@@ -20,6 +21,7 @@ export async function startCustomizedTcpGateway(options?: TcpGateWayConfig) {
   const middlewareList: TcpHandlerMiddleware[] = [...middlewares];
   const {socksConfig} = mwConfig ?? {};
   socksConfig && middlewareList.push(getTcpHandlerMw4Socks(socksConfig));
+  assetsSyncUp && middlewareList.push(getAssetsTcpMw(assetsSyncUp));
   if (middlewareList.length > 0) {
     tcpHandler = getTcpHandler(middlewareList);
   }
