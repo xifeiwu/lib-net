@@ -3,7 +3,6 @@ import KoaRouter from 'koa-router';
 import {
   getConnectionHandlerToMemcached,
   MemcachedStore,
-  startSocketClient,
   startTcpGateway,
   customDeepMerge,
   TcpServerConfig,
@@ -44,15 +43,12 @@ export async function startLocalFullFeatureServer(options: {
     koaConfig ?? {}
   );
   const koaServerInfo = await startKoaServer(mergedKoaConfig, koaShortCutConfig);
-  async function httpHandler(socket: Socket) {
-    const {host, port} = koaServerInfo;
-    const proxyClient = await startSocketClient({host, port});
-    socket.pipe(proxyClient).pipe(socket);
-  }
   const {host, port, server} = await startTcpGateway(
     {
-      httpHandler,
-      tcpHandler,
+      redirectByProtocol: {
+        http: koaServerInfo,
+      },
+      handleConnection: tcpHandler,
     },
     {
       ...tcpServerConfig,
