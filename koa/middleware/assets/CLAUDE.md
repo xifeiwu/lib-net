@@ -1,12 +1,12 @@
 # Assets Sync TCP Middleware
 
-Thin TCP middleware wrapper that dispatches assets sync connections to the core logic in `modules/lib/node/lib/assets-management/remote-syncup/`.
+Thin TCP middleware wrapper that dispatches assets sync connections to the core logic in `modules/lib/node/lib/assets-management/tcp-protocol/`.
 
 ## Wire Protocol
 
 Protocol identification byte: `0x10`. The TCP gateway detects this as a numeric protocol and dispatches to the middleware chain.
 
-See `remote-syncup/protocol.ts` for the full frame format and I/O utilities.
+See `tcp-protocol/protocol.ts` for the full frame format and I/O utilities.
 
 ## File Structure
 
@@ -17,7 +17,7 @@ See `remote-syncup/protocol.ts` for the full frame format and I/O utilities.
 
 ## Core Logic
 
-The sync protocol, server handler, and client logic live in `modules/lib/node/lib/assets-management/remote-syncup/`:
+The sync protocol, server handler, and client logic live in `modules/lib/node/lib/assets-management/tcp-protocol/`:
 
 | File | Purpose |
 |------|---------|
@@ -40,7 +40,7 @@ Enabled via `assetsSyncUp` in `TcpGateWayConfig`:
 
 ## Client
 
-The client CLI lives in `src/1-command/assets-sync.ts` (busybox `assets` bin). It delegates to `runAssetsSyncCommand` from `remote-syncup/client.ts`.
+The client CLI lives in `src/1-command/assets-sync.ts` (busybox `assets` bin). It delegates to `runAssetsSyncCommand` from `tcp-protocol/client.ts`.
 
 ```
 assets diff <dir> -H <host> -p <port>
