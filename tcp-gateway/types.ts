@@ -15,7 +15,7 @@ export interface AssetsSyncUpConfig {
 }
 
 export interface TcpHandlerMiddlewareConfig {
-  socks: Partial<SocksServerConfigPerVersion>;
+  socks?: Partial<SocksServerConfigPerVersion>;
   assetsSyncUp?: AssetsSyncUpConfig;
 }
 
