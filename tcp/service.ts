@@ -22,7 +22,7 @@ export const TCP_GATEWAY_CONFIG: TcpGateWayConfig = {
     port: PORT.fullFeatureTcpServer.port,
     host: '0.0.0.0',
   },
-  mwConfig: {socksConfig: SOCKS_SERVER_CONFIG},
+  mwConfig: {socks: SOCKS_SERVER_CONFIG},
   middlewares: [],
   koa: {
     config: DEFAULT_KOA_CONFIG,
@@ -30,14 +30,13 @@ export const TCP_GATEWAY_CONFIG: TcpGateWayConfig = {
 };
 
 export function serializeTcpGatewayConfig(config: TcpGateWayConfig) {
-  const {tcpServerConfig, mwConfig, middlewares, koa, assetsSyncUp} = config;
+  const {tcpServerConfig, mwConfig, middlewares, koa} = config;
   const {config: koaConfig, shortCut} = koa;
 
   return {
     tcpServerConfig,
     mwConfig,
     middlewares,
-    assetsSyncUp,
     koa: {
       config: serializeKoaConfig(koaConfig),
       shortCut,

@@ -26,7 +26,7 @@ export async function testSocksApi() {
   const host = '127.0.0.1';
   const port = TCP_GATEWAY_CONFIG.tcpServerConfig.port as number;
   const {
-    mwConfig: {socksConfig},
+    mwConfig: {socks},
   } = TCP_GATEWAY_CONFIG;
 
   const origin = `http://${host}:${port}`;
@@ -35,13 +35,13 @@ export async function testSocksApi() {
   // {
   //   const vc1Http: SocksClientConfig<1> = {
   //     socksVersion: 1,
-  //     auth: socksConfig[1].auth,
+  //     auth: socks[1].auth,
   //     socksServer: origin,
   //     requestTarget,
   //   };
   //   const vc1Tcp: SocksClientConfig<1> = {
   //     socksVersion: 1,
-  //     auth: socksConfig[1].auth,
+  //     auth: socks[1].auth,
   //     socksServer: {host, port},
   //     requestTarget,
   //   };
@@ -54,13 +54,13 @@ export async function testSocksApi() {
   {
     const v5Http: SocksClientConfig<5> = {
       socksVersion: 5,
-      methodList: socksConfig[5].methodList,
+      methodList: socks[5].methodList,
       socksServer: origin,
       requestTarget,
     };
     const v5Tcp: SocksClientConfig<5> = {
       socksVersion: 5,
-      methodList: socksConfig[5].methodList,
+      methodList: socks[5].methodList,
       socksServer: {host, port},
       requestTarget,
     };
@@ -69,6 +69,8 @@ export async function testSocksApi() {
     logColorful({}, serializableSocksClientInfo(v5Info1));
     logColorful({}, serializableSocksClientInfo(v5Info2));
   }
-  const {responseInfo: {data: resData}} = await requestAndGetResponseInfo({href: origin + '/api/socks/list'});
+  const {
+    responseInfo: {data: resData},
+  } = await requestAndGetResponseInfo({href: origin + '/api/socks/list'});
   assert.equal(resData.length, 2);
 }

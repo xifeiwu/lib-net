@@ -12,18 +12,18 @@ export async function testSocksApi() {
   const {host, port} = await startCustomTcpGateWay();
   const origin = `http://${host}:${port}`;
   const {
-    mwConfig: {socksConfig},
+    mwConfig: {socks},
   } = customConfig;
   const requestTarget = 'http://elif.site/api/debug/echo';
   const v1Http: SocksClientConfig<1> = {
     socksVersion: 1,
-    auth: socksConfig[1].auth,
+    auth: socks[1].auth,
     socksServer: origin,
     requestTarget,
   };
   const v1Tcp: SocksClientConfig<1> = {
     socksVersion: 1,
-    auth: socksConfig[1].auth,
+    auth: socks[1].auth,
     socksServer: {host, port},
     requestTarget,
   };

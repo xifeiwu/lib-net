@@ -9,20 +9,20 @@ export interface Ctx4TcpHandler {
 
 export type TcpHandlerMiddleware = (ctx: Ctx4TcpHandler, next) => Promise<void>;
 
-export interface TcpHandlerMiddlewareConfig {
-  socksConfig: Partial<SocksServerConfigPerVersion>;
-}
-
 export interface AssetsSyncUpConfig {
   dir: string;
   git?: string;
+}
+
+export interface TcpHandlerMiddlewareConfig {
+  socks: Partial<SocksServerConfigPerVersion>;
+  assetsSyncUp?: AssetsSyncUpConfig;
 }
 
 export interface TcpGateWayConfig {
   tcpServerConfig?: TcpServerConfig;
   middlewares?: TcpHandlerMiddleware[];
   mwConfig?: TcpHandlerMiddlewareConfig;
-  assetsSyncUp?: AssetsSyncUpConfig;
   koa?: {
     config?: KoaConfig;
     shortCut?: KoaShortCutConfig;

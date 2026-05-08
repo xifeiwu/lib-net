@@ -13,7 +13,7 @@ const koaShortCutConfig: KoaShortCutConfig = {
 
 export const customConfig: TcpGateWayConfig = {
   mwConfig: {
-    socksConfig: SOCKS_SERVER_CONFIG,
+    socks: SOCKS_SERVER_CONFIG,
   },
   tcpServerConfig: {
     // port: await getAFreePort(),
@@ -29,4 +29,3 @@ export async function startCustomTcpGateWay() {
   logColorful({}, `start tcp gateway`, {host, port});
   return info;
 }
-
