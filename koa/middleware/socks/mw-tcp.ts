@@ -1,5 +1,5 @@
 import {SocksServerConfigPerVersion} from '../../../service/external';
-import {TcpHandlerMiddleware} from '../../../tcp/types';
+import {TcpHandlerMiddleware} from '../../../tcp-gateway/types';
 import {handleSocksProtocol} from './service';
 
 export function getSocksTcpMw(socksServerConfigMap: Partial<SocksServerConfigPerVersion>) {

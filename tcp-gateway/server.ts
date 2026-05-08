@@ -4,7 +4,7 @@ import {startTcpServerAsGateway, TcpHandler} from '../service/external';
 import {getSocksTcpMw, getAssetsTcpMw} from '../koa/middleware';
 import {getTcpHandler} from './service';
 
-export async function startCustomizedTcpGateway(options?: TcpGateWayConfig) {
+export async function startTcpGateway(options?: TcpGateWayConfig) {
   const {tcpServerConfig, mwConfig, middlewares = [], koa} = options ?? {};
   let koaServerInfo: KoaServerInfo;
   if (koa) {

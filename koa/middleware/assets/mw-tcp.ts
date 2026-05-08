@@ -1,4 +1,4 @@
-import {AssetsSyncUpConfig, TcpHandlerMiddleware} from '../../../tcp/types';
+import {AssetsSyncUpConfig, TcpHandlerMiddleware} from '../../../tcp-gateway/types';
 import {ASSETS_SYNC_PROTOCOL_BYTE, handleAssetsSyncConnection} from '../../../service/external';
 
 export function getAssetsTcpMw(config: AssetsSyncUpConfig) {

@@ -9,7 +9,7 @@ import {
   serializableSocksClientInfo,
   SocksClientConfig,
 } from '../../service/external';
-import {startCustomizedTcpGateway} from '../server';
+import {startTcpGateway} from '../server';
 import {serializeTcpGatewayConfig, TCP_GATEWAY_CONFIG} from '../service';
 
 /**
@@ -19,7 +19,7 @@ export async function startLocalTcpGateWay() {
   const localConfig = deepClone(TCP_GATEWAY_CONFIG);
   const {koa} = localConfig;
   koa.shortCut = {staticDir: path.resolve(__dirname, '..'), uploadDir: path.resolve(__dirname, 'uploads')};
-  const {host, port} = await startCustomizedTcpGateway(localConfig);
+  const {host, port} = await startTcpGateway(localConfig);
   logColorful({}, {host, port, tcpGatewayConfig: serializeTcpGatewayConfig(localConfig)});
 }
 export async function testSocksApi() {
