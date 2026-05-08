@@ -17,9 +17,9 @@ export function getTcpHandler(middlewareList: TcpHandlerMiddleware[]): TcpHandle
   return tcpHandler;
 }
 
-export const TCP_GATEWAY_CONFIG: TcpGateWayConfig = {
+export const TCP_GATEWAY_DEFAULT_CONFIG: TcpGateWayConfig = {
   tcpServerConfig: {
-    port: PORT.fullFeatureTcpServer.port,
+    port: PORT.tcpGatewayServer.port,
     host: '0.0.0.0',
   },
   mwConfig: {socks: SOCKS_SERVER_CONFIG},

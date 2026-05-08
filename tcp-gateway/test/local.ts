@@ -10,13 +10,13 @@ import {
   SocksClientConfig,
 } from '../../service/external';
 import {startTcpGateway} from '../server';
-import {serializeTcpGatewayConfig, TCP_GATEWAY_CONFIG} from '../service';
+import {serializeTcpGatewayConfig, TCP_GATEWAY_DEFAULT_CONFIG} from '../service';
 
 /**
  * Test local tcp gateway
  */
 export async function startLocalTcpGateWay() {
-  const localConfig = deepClone(TCP_GATEWAY_CONFIG);
+  const localConfig = deepClone(TCP_GATEWAY_DEFAULT_CONFIG);
   const {koa} = localConfig;
   koa.shortCut = {staticDir: path.resolve(__dirname, '..'), uploadDir: path.resolve(__dirname, 'uploads')};
   const {host, port} = await startTcpGateway(localConfig);
@@ -24,10 +24,10 @@ export async function startLocalTcpGateWay() {
 }
 export async function testSocksApi() {
   const host = '127.0.0.1';
-  const port = TCP_GATEWAY_CONFIG.tcpServerConfig.port as number;
+  const port = TCP_GATEWAY_DEFAULT_CONFIG.tcpServerConfig.port as number;
   const {
     mwConfig: {socks},
-  } = TCP_GATEWAY_CONFIG;
+  } = TCP_GATEWAY_DEFAULT_CONFIG;
 
   const origin = `http://${host}:${port}`;
   const requestTarget = 'http://elif.site/api/debug/echo';

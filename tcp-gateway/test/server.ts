@@ -4,7 +4,7 @@ import {TcpGateWayConfig} from '../types';
 import {SOCKS_SERVER_CONFIG} from '../../koa/middleware/socks/service';
 import {deepClone, getAFreePort, logColorful} from '../../service/external';
 import {startTcpGateway} from '../server';
-import {serializeTcpGatewayConfig, TCP_GATEWAY_CONFIG} from '../service';
+import {serializeTcpGatewayConfig, TCP_GATEWAY_DEFAULT_CONFIG} from '../service';
 
 const koaConfig = DEFAULT_KOA_CONFIG;
 const koaShortCutConfig: KoaShortCutConfig = {

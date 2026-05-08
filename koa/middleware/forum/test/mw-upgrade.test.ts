@@ -14,7 +14,7 @@ import {WebSocket} from 'ws';
 
 async function sendBroadcast(origin: string) {
   const pathname = `${urlPrefix}/notifications/broadcast`;
-  // origin = origin ?? `http://127.0.0.1:${PORT.fullFeatureHttpServer.port}`;
+  // origin = origin ?? `http://127.0.0.1:${PORT.stableHttpServer.port}`;
   // const {origin, server} = await startKoaServer({
   //   requestMiddlewares: [requestRouter.routes()],
   // });

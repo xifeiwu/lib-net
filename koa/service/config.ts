@@ -12,7 +12,7 @@ export const defaultMwConfig: KoaMiddlewareConfig = {
 
 export const DEFAULT_KOA_CONFIG: KoaConfig = {
   keys: ['secret local'],
-  port: PORT.fullFeatureHttpServer.port,
+  port: PORT.stableHttpServer.port,
   bodyParserOptions: {
     uploadDir: uploadDirOnCwd,
   },
