@@ -1,7 +1,7 @@
 import {getCorsKoaMw} from './cors';
 import {debugKoaRouter, debugHttpUpgradeMw} from './debug';
 import {getLogKoaMw} from './log';
-import {getDefaultStaticOptionsForDirs, getDefaultStaticOptionsForSpaDirs, getStaticKoaMw} from './static';
+import {resolveStaticMiddlewareOptionsList, getStaticKoaMw} from './static';
 import {getLogsKoaRouter} from './logs';
 import {socksKoaRouter, getSocksHttpUpgradeMw, getSocksTcpMw} from './socks/index';
 import {getMockKoaMw} from './mock';
@@ -18,8 +18,7 @@ export {
   debugKoaRouter,
   debugHttpUpgradeMw,
   getLogKoaMw,
-  getDefaultStaticOptionsForDirs,
-  getDefaultStaticOptionsForSpaDirs,
+  resolveStaticMiddlewareOptionsList,
   getStaticKoaMw,
   getLogsKoaRouter,
   socksKoaRouter,

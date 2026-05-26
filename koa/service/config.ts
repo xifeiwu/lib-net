@@ -25,9 +25,10 @@ export const DEFAULT_KOA_CONFIG: KoaConfig = {
       catchAndWrapError: true,
     },
     staticWMConfig: {
-      spaDirList: [
+      // staticConfigList: [{dir: '/Users/Shared/assets'}],
+      spaConfigList: [
         {
-          fullpath: path.resolve(process.env.HOME, 'code/react/start/browser-feature/react-tsx-less/dist'),
+          dir: path.resolve(process.env.HOME, 'code/react/start/browser-feature/react-tsx-less/dist'),
           entries: ['net', 'browser-feature'],
         },
       ],

@@ -1,8 +1,9 @@
 import fs from 'fs';
 import {htmlDirContent} from '../../../service/external';
-import {StaticMiddlewareOptions} from './middleware';
+import {StaticMWConfig} from '../../types';
+import {KoaSpaConfig, KoaStaticConfig, KoaStaticDefaultOptions} from './types';
 
-export const handleDirByHtmlDirContent: StaticMiddlewareOptions['handleDir'] = (fullpath: string) => {
+export const handleDirByHtmlDirContent: KoaStaticConfig['handleDir'] = (fullpath: string) => {
   const buffer = Buffer.from(htmlDirContent(fullpath));
   return {
     buffer,
@@ -13,72 +14,56 @@ export const handleDirByHtmlDirContent: StaticMiddlewareOptions['handleDir'] = (
   };
 };
 
-export function getPathnameRewriteForSpa(entries: string[]) {
-  const pathnameRewrite: StaticMiddlewareOptions['pathnameRewrite'] = (pathname: string) => {
-    const target = entries.find(it => {
-      return pathname.startsWith('/' + it);
-    });
-    if (target) {
-      return '/' + target + '.html';
-    }
-    return pathname;
-  };
-  return pathnameRewrite;
-}
-
-function isDirectory(fullpath: string) {
+function isDirectory(dir: string) {
   try {
-    const stat = fs.statSync(fullpath);
-    const isDir = stat.isDirectory();
-    return isDir;
+    const stat = fs.statSync(dir);
+    return stat.isDirectory();
   } catch (err) {
     return false;
   }
 }
 
-export function getDefaultStaticOptionsForSpaDirs(
-  configs: {fullpath: string; entries: string[]}[],
-  options?: Omit<StaticMiddlewareOptions, 'dir' | 'pathnameRewrite'>
-) {
-  return configs
-    .filter(({fullpath}) => {
-      return isDirectory(fullpath);
-    })
-    .map(({fullpath, entries}) => {
-      return {
-        dir: fullpath,
-        pathnameRewrite: (pathname: string) => {
-          const target = entries.find(it => {
-            return pathname.startsWith('/' + it);
-          });
-          if (target) {
-            return '/' + target + '.html';
-          }
-          return pathname;
-        },
-        ...(options ?? {}),
-      };
-    });
+export function toStaticMiddlewareOptions(
+  config: KoaStaticConfig,
+  defaultOptions?: KoaStaticDefaultOptions
+): KoaStaticConfig {
+  const {dir, ...rest} = config;
+  return {
+    dir,
+    handleDir: handleDirByHtmlDirContent,
+    ...(defaultOptions ?? {}),
+    ...rest,
+  };
 }
 
-/**
- * Check whether dir exist and return
- * @param dirs
- * @returns
- */
-export function getDefaultStaticOptionsForDirs(
-  fullPathList: string[],
-  options?: Omit<StaticMiddlewareOptions, 'dir' | 'handleDir'>
-): StaticMiddlewareOptions[] {
-  return fullPathList
-    .filter(fullpath => {
-      return isDirectory(fullpath);
-    })
-    .map(fullpath => {
-      return {
-        dir: fullpath,
-        handleDir: handleDirByHtmlDirContent,
-        ...(options ?? {}),
-      };
-    });
+export function toSpaStaticMiddlewareOptions(
+  config: KoaSpaConfig,
+  defaultOptions?: KoaStaticDefaultOptions
+): KoaStaticConfig {
+  const {dir, entries, ...rest} = config;
+  return {
+    dir,
+    pathnameRewrite: (pathname: string) => {
+      const target = entries.find(it => {
+        return pathname.startsWith('/' + it);
+      });
+      if (target) {
+        return '/' + target + '.html';
+      }
+      return pathname;
+    },
+    ...(defaultOptions ?? {}),
+    ...rest,
+  };
+}
+
+export function toKoaStaticConfigList(staticMWConfig: StaticMWConfig): KoaStaticConfig[] {
+  const {defaultOptions, staticConfigList = [], spaConfigList = []} = staticMWConfig;
+  const spaOptionsList = spaConfigList
+    .filter(({dir}) => isDirectory(dir))
+    .map(config => toSpaStaticMiddlewareOptions(config, defaultOptions));
+  const staticOptionsList = staticConfigList
+    .filter(({dir}) => isDirectory(dir))
+    .map(config => toStaticMiddlewareOptions(config, defaultOptions));
+  return [...spaOptionsList, ...staticOptionsList];
 }

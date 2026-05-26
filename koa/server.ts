@@ -1,11 +1,6 @@
 import Koa from 'koa';
 import session from 'koa-session';
-import {
-  koaMwMap,
-  httpUpgradeMwMap,
-  getDefaultStaticOptionsForDirs,
-  getDefaultStaticOptionsForSpaDirs,
-} from './middleware';
+import {koaMwMap, httpUpgradeMwMap, resolveStaticMiddlewareOptionsList} from './middleware';
 
 // import {forumMiddleware, forumWsMiddleware} from './forum';
 import {getUpgradeHandler} from './upgrade';
@@ -58,35 +53,26 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
     upgradeMiddlewares[upgradeMiddlewareAction](httpUpgradeMwMap.forum);
   if (staticDir) {
     const staticDirList = Array.isArray(staticDir) ? staticDir : [staticDir];
+    const staticDirConfigs = staticDirList.map(dir => ({dir}));
     if (!staticWMConfig) {
       staticWMConfig = {
-        dirList: staticDirList,
+        staticConfigList: staticDirConfigs,
       };
     } else {
-      if (!Array.isArray(staticWMConfig.dirList)) {
-        staticWMConfig.dirList = [];
+      if (!Array.isArray(staticWMConfig.staticConfigList)) {
+        staticWMConfig.staticConfigList = [];
       }
-      staticWMConfig.dirList.push(...staticDirList);
+      staticWMConfig.staticConfigList.push(...staticDirConfigs);
     }
   }
-  // if (staticDir) {
-  //   staticDir = path.resolve(process.cwd(), staticDir);
-  //   const dirList = get(envConfig, ['mwConfig', 'staticWMConfig', 'dirList'], []);
-  //   !dirList.includes(staticDir) && dirList.push(staticDir);
-  //   set(envConfig, ['mwConfig', 'staticWMConfig', 'dirList'], dirList);
-  // }
   if (staticWMConfig) {
-    const {dirList = [], spaDirList = [], mwOptions} = staticWMConfig;
     /**
      * It is better to place spaStaticDir before staticDir:
      * spa files should be less than static files
      * url to spa should not intercepted by static file
      */
-    const staticSpaDirOptionsList = getDefaultStaticOptionsForSpaDirs(spaDirList, mwOptions);
-    const staticDirOptionsList = getDefaultStaticOptionsForDirs(dirList, mwOptions);
-    const staticMiddlewares = [...staticSpaDirOptionsList, ...staticDirOptionsList].map(config =>
-      koaMwMap.static(config)
-    );
+    const staticMiddlewareOptionsList = resolveStaticMiddlewareOptionsList(staticWMConfig);
+    const staticMiddlewares = staticMiddlewareOptionsList.map(config => koaMwMap.static(config));
     requestMiddlewares.push(...staticMiddlewares);
   }
   const app = new Koa();

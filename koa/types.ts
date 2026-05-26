@@ -4,22 +4,18 @@ import http from 'http';
 import WebSocket from 'ws';
 import session from 'koa-session';
 import {NormalizedUrlProps, HttpBodyParserOptions, SocksServerConfigPerVersion} from '../service/external';
-import {StaticMiddlewareOptions} from './middleware/static';
+import {KoaSpaConfig, KoaStaticConfig, KoaStaticDefaultOptions} from './middleware/static/types';
 import {IncomingMessage} from 'http';
 import {CorsMWOptions} from './middleware/cors';
 import {LogsMWOptions} from './middleware/logs';
 import {LogMWOptions} from './middleware/log';
 
-export {StaticMiddlewareOptions};
-export interface SpaDirInfo {
-  fullpath: string;
-  entries: string[];
-}
+export {KoaSpaConfig, KoaStaticConfig, KoaStaticDefaultOptions};
 
 export interface StaticMWConfig {
-  dirList?: string[];
-  spaDirList?: SpaDirInfo[];
-  mwOptions?: StaticMiddlewareOptions;
+  defaultOptions?: KoaStaticDefaultOptions;
+  staticConfigList?: KoaStaticConfig[];
+  spaConfigList?: KoaSpaConfig[];
 }
 
 export interface KoaMiddlewareConfig {
