@@ -23,8 +23,18 @@ export interface BufferFileInfo extends CommonInfo {
   contentType: string;
 }
 
+export interface SimplifiedRequestInfo {
+  headers: {accept?: string | string[]};
+  method?: string;
+  url?: string;
+}
+
 export type StaticFileInfo = LocalFileInfo | BufferFileInfo;
 
+export type FallbackUrlFunc = (req: SimplifiedRequestInfo) => string;
+export type FallbackUrlMap = {
+  [pathname: string]: string;
+};
 export interface KoaStaticConfig {
   /** target static dir */
   dir: string;
@@ -33,12 +43,18 @@ export interface KoaStaticConfig {
   store?: Map<string, StaticFileInfo>;
   /** enable gzip or not */
   enableGzip?: boolean;
-  /** alias a pathname to another name before load file */
-  pathnameRewrite?:
-    | {
-        [pathname: string]: string;
-      }
-    | ((pathname: string) => string);
+  /**
+   * alias a pathname to another name in the same dir before load file
+   * pathname passed to fallbackUrlFunc is relative to urlPrefix
+   * example:
+   * urlPrefix: '/static',
+   * fallbackUrl: {
+   *   '/index': '/index.html',
+   * }
+   * pathname: '/static/index'
+   * will be replaced to '/static/index.html'
+   */
+  fallbackUrl?: FallbackUrlMap | FallbackUrlFunc;
   /** when the target path point to is dir, how to handle it */
   handleDir?: (fullpath: string) => BufferFileInfo;
   /** return a customized contentType from origin contentType */
@@ -52,5 +68,5 @@ export interface KoaStaticConfig {
 export type KoaStaticDefaultOptions = Omit<KoaStaticConfig, 'dir'>;
 
 export interface KoaSpaConfig extends KoaStaticConfig {
-  entries: string[];
+  entries: Record<string, string>;
 }

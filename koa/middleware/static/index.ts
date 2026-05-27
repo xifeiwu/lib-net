@@ -7,9 +7,5 @@ export {
   LocalFileInfo,
   BufferFileInfo,
 } from './types';
-export {
-  showDirContentInHtmlFormat,
-  // toStaticMiddlewareOptions,
-  // spaConfigToStaticConfig,
-  toKoaStaticConfigList,
-} from './utils';
+export {showDirContentInHtmlFormat} from './service';
+export {toKoaStaticConfigList} from './utils';

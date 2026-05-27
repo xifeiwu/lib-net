@@ -1,6 +1,6 @@
 import Koa from 'koa';
 import session from 'koa-session';
-import {koaMwMap, httpUpgradeMwMap, toKoaStaticConfigList} from './middleware';
+import {koaMwMap, httpUpgradeMwMap, toKoaStaticConfigList, getStaticKoaMw} from './middleware';
 
 // import {forumMiddleware, forumWsMiddleware} from './forum';
 import {getUpgradeHandler} from './upgrade';
@@ -72,7 +72,7 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
      * url to spa should not intercepted by static file
      */
     const staticMiddlewareOptionsList = toKoaStaticConfigList(staticConfig);
-    const staticMiddlewares = staticMiddlewareOptionsList.map(config => koaMwMap.static(config));
+    const staticMiddlewares = staticMiddlewareOptionsList.map(config => getStaticKoaMw(config));
     requestMiddlewares.push(...staticMiddlewares);
   }
   const app = new Koa();

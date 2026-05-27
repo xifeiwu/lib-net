@@ -3,8 +3,22 @@ import path from 'path';
 import zlib from 'zlib';
 import Koa from 'koa';
 import {Readable} from 'stream';
-import {toReadable, mime, getFileList, isFunction, isNumber} from '../../../service/external';
+import {toReadable, mime, getFileList, isNumber} from '../../../service/external';
 import {BufferFileInfo, HttpHeaderConfig, LocalFileInfo, StaticFileInfo, KoaStaticConfig} from './types';
+import {getFallbackUrl, parseUrl} from './service';
+
+function formatUrlPrefix(urlPrefix: string) {
+  if (!urlPrefix) {
+    return '';
+  }
+  return (
+    '/' +
+    urlPrefix
+      .split('/')
+      .filter(it => it)
+      .join('/')
+  );
+}
 
 /**
  * A middleware of koa for handle static files under a target folder.
@@ -12,10 +26,9 @@ import {BufferFileInfo, HttpHeaderConfig, LocalFileInfo, StaticFileInfo, KoaStat
 export function getStaticKoaMw(options: KoaStaticConfig) {
   let {
     dir,
-    urlPrefix = '/',
     store,
     enableGzip = false,
-    pathnameRewrite,
+    fallbackUrl,
     handleDir,
     postTreatData,
     customContentType,
@@ -38,16 +51,11 @@ export function getStaticKoaMw(options: KoaStaticConfig) {
   if (!fs.existsSync(dir)) {
     throw new Error(`dir ${dir} not exist!`);
   }
-
-  if (!urlPrefix.startsWith('/')) {
-    throw new Error(`urlPrefix should starts with '/': ${urlPrefix}`);
+  if (!fs.statSync(dir).isDirectory()) {
+    throw new Error(`dir ${dir} is not a directory!`);
   }
-  urlPrefix =
-    '/' +
-    urlPrefix
-      .split('/')
-      .filter(it => it)
-      .join('/');
+
+  const urlPrefix = formatUrlPrefix(options.urlPrefix);
 
   const fileStore = store ? store : new Map();
 
@@ -56,23 +64,29 @@ export function getStaticKoaMw(options: KoaStaticConfig) {
     if (ctx.method !== 'HEAD' && ctx.method !== 'GET') {
       return await next();
     }
-    // decode for `/%E4%B8%AD%E6%96%87`
-    // normalize for `//index`
-    let pathname = path.normalize(safeDecodeURIComponent(ctx.path));
-    if (pathnameRewrite) {
-      if (isFunction(pathnameRewrite)) {
-        pathname = (pathnameRewrite as Function)(pathname);
-      } else if (pathnameRewrite[pathname]) {
-        pathname = pathnameRewrite[pathname];
-      }
-    }
+    /**
+     * pre handle url:
+     * 1. decode `/%E4%B8%AD%E6%96%87` to `/中文`
+     * 2. normalize for `//index`
+     */
+    let url = path.normalize(safeDecodeURIComponent(ctx.url));
     // check prefix first to avoid calculate
-    if (pathname.indexOf(urlPrefix) !== 0) {
+    if (urlPrefix && url.indexOf(urlPrefix) !== 0) {
       return await next();
     }
+    const cleanUrl = urlPrefix ? url.replace(urlPrefix, '') : url;
+    ctx.req.url = cleanUrl;
+    let pathname: string;
+    if (fallbackUrl) {
+      const finalUrl = getFallbackUrl(ctx.req, fallbackUrl);
+      if (finalUrl) {
+        pathname = parseUrl(finalUrl).pathname;
+      }
+    } else {
+      pathname = parseUrl(cleanUrl).pathname;
+    }
 
-    const relativePath = pathname.replace(urlPrefix, '');
-    const fullpath = path.join(dir, relativePath);
+    const fullpath = path.join(dir, cleanUrl);
     let fileInfo = fileStore.get(pathname);
     // console.log(`pathname`);
     // console.log(pathname);
@@ -81,9 +95,9 @@ export function getStaticKoaMw(options: KoaStaticConfig) {
     // try to load file
     if (!fileInfo) {
       // files that can be accessd should be under options.dir
-      if (fullpath.indexOf(dir) !== 0) {
-        return await next();
-      }
+      // if (fullpath.indexOf(dir) !== 0) {
+      //   return await next();
+      // }
       if (!fs.existsSync(fullpath)) {
         return await next();
       }
@@ -240,10 +254,10 @@ export function preLoadDir(
   }
   getFileList(fullPath, {
     includeDir,
-  }).forEach(relativePath => {
-    const fileInfo = getFileInfo(path.join(fullPath, relativePath));
+  }).forEach(relPath => {
+    const fileInfo = getFileInfo(path.join(fullPath, relPath));
     if (fileInfo) {
-      store.set(path.join(urlPrefix, relativePath), fileInfo);
+      store.set(path.join(urlPrefix, relPath), fileInfo);
     }
   });
 }
