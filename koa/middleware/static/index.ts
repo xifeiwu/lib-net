@@ -8,8 +8,8 @@ export {
   BufferFileInfo,
 } from './types';
 export {
-  handleDirByHtmlDirContent,
-  toStaticMiddlewareOptions,
-  toSpaStaticMiddlewareOptions,
-  toKoaStaticConfigList as resolveStaticMiddlewareOptionsList,
+  showDirContentInHtmlFormat,
+  // toStaticMiddlewareOptions,
+  // spaConfigToStaticConfig,
+  toKoaStaticConfigList,
 } from './utils';

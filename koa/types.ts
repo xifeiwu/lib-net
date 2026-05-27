@@ -12,7 +12,7 @@ import {LogMWOptions} from './middleware/log';
 
 export {KoaSpaConfig, KoaStaticConfig, KoaStaticDefaultOptions};
 
-export interface StaticMWConfig {
+export interface KoaStaticMiddlewareConfig {
   defaultOptions?: KoaStaticDefaultOptions;
   staticConfigList?: KoaStaticConfig[];
   spaConfigList?: KoaSpaConfig[];
@@ -20,14 +20,13 @@ export interface StaticMWConfig {
 
 export interface KoaMiddlewareConfig {
   /** http middleware config */
-  // useErrorCatchMW?: boolean;
-  logMWOptions?: LogMWOptions;
-  useDebugMW?: boolean;
-  corsWMOptions?: CorsMWOptions;
-  logsMWOptions?: LogsMWOptions;
-  useForumMW?: boolean;
-  staticWMConfig?: StaticMWConfig;
-  socksConfig?: Partial<SocksServerConfigPerVersion>;
+  log?: LogMWOptions;
+  debug?: boolean;
+  cors?: CorsMWOptions;
+  logs?: LogsMWOptions;
+  forum?: boolean;
+  static?: KoaStaticMiddlewareConfig;
+  socks?: Partial<SocksServerConfigPerVersion>;
 }
 
 export interface KoaConfig {

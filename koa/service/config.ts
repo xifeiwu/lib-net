@@ -4,10 +4,10 @@ import {PORT, uploadDirOnCwd} from '../../service/external';
 import {SOCKS_SERVER_CONFIG} from '../middleware/socks/service';
 
 export const defaultMwConfig: KoaMiddlewareConfig = {
-  useDebugMW: true,
-  corsWMOptions: {},
-  logsMWOptions: {},
-  useForumMW: true,
+  debug: true,
+  cors: {},
+  logs: {},
+  forum: true,
 };
 
 export const DEFAULT_KOA_CONFIG: KoaConfig = {
@@ -18,14 +18,16 @@ export const DEFAULT_KOA_CONFIG: KoaConfig = {
   },
   mwConfig: {
     ...defaultMwConfig,
-    logMWOptions: {
+    log: {
       logBody: {
         maxSize: 1024,
       },
       catchAndWrapError: true,
     },
-    staticWMConfig: {
-      // staticConfigList: [{dir: '/Users/Shared/assets'}],
+    static: {
+      staticConfigList: [
+        {dir: path.join(process.env.HOME, 'code/huffie/xifeiwu.github.io'), urlPrefix: '/resume'},
+      ],
       spaConfigList: [
         {
           dir: path.resolve(process.env.HOME, 'code/react/start/browser-feature/react-tsx-less/dist'),
@@ -33,7 +35,7 @@ export const DEFAULT_KOA_CONFIG: KoaConfig = {
         },
       ],
     },
-    socksConfig: SOCKS_SERVER_CONFIG,
+    socks: SOCKS_SERVER_CONFIG,
   },
   printOrigin: true,
 };

@@ -51,14 +51,6 @@ export interface KoaStaticConfig {
 
 export type KoaStaticDefaultOptions = Omit<KoaStaticConfig, 'dir'>;
 
-export interface KoaSpaConfig {
-  dir: string;
+export interface KoaSpaConfig extends KoaStaticConfig {
   entries: string[];
-  urlPrefix?: string;
-  store?: Map<string, StaticFileInfo>;
-  enableGzip?: boolean;
-  handleDir?: KoaStaticConfig['handleDir'];
-  customContentType?: KoaStaticConfig['customContentType'];
-  postTreatData?: KoaStaticConfig['postTreatData'];
-  maxCacheTime?: number;
 }

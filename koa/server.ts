@@ -1,6 +1,6 @@
 import Koa from 'koa';
 import session from 'koa-session';
-import {koaMwMap, httpUpgradeMwMap, resolveStaticMiddlewareOptionsList} from './middleware';
+import {koaMwMap, httpUpgradeMwMap, toKoaStaticConfigList} from './middleware';
 
 // import {forumMiddleware, forumWsMiddleware} from './forum';
 import {getUpgradeHandler} from './upgrade';
@@ -38,40 +38,40 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
     mwConfig = {},
   } = koaConfig;
   const {staticDir, uploadDir} = shortCutConfig ?? {};
-  const {logMWOptions, useDebugMW, corsWMOptions, logsMWOptions, socksConfig, useForumMW} = mwConfig;
-  let {staticWMConfig} = mwConfig;
-  useDebugMW &&
+  const {log, debug, cors, logs, socks, forum} = mwConfig;
+  let {static: staticConfig} = mwConfig;
+  debug &&
     requestMiddlewares[requestMiddlewareAction](koaMwMap.debug) &&
     upgradeMiddlewares[upgradeMiddlewareAction](httpUpgradeMwMap.debug);
-  corsWMOptions && requestMiddlewares[requestMiddlewareAction](koaMwMap.cors(corsWMOptions));
-  logsMWOptions && requestMiddlewares[requestMiddlewareAction](koaMwMap.logs(logsMWOptions));
-  socksConfig &&
+  cors && requestMiddlewares[requestMiddlewareAction](koaMwMap.cors(cors));
+  logs && requestMiddlewares[requestMiddlewareAction](koaMwMap.logs(logs));
+  socks &&
     requestMiddlewares[requestMiddlewareAction](koaMwMap.socks) &&
-    upgradeMiddlewares[upgradeMiddlewareAction](httpUpgradeMwMap.socks(socksConfig));
-  useForumMW &&
+    upgradeMiddlewares[upgradeMiddlewareAction](httpUpgradeMwMap.socks(socks));
+  forum &&
     requestMiddlewares[requestMiddlewareAction](koaMwMap.forum) &&
     upgradeMiddlewares[upgradeMiddlewareAction](httpUpgradeMwMap.forum);
   if (staticDir) {
     const staticDirList = Array.isArray(staticDir) ? staticDir : [staticDir];
     const staticDirConfigs = staticDirList.map(dir => ({dir}));
-    if (!staticWMConfig) {
-      staticWMConfig = {
+    if (!staticConfig) {
+      staticConfig = {
         staticConfigList: staticDirConfigs,
       };
     } else {
-      if (!Array.isArray(staticWMConfig.staticConfigList)) {
-        staticWMConfig.staticConfigList = [];
+      if (!Array.isArray(staticConfig.staticConfigList)) {
+        staticConfig.staticConfigList = [];
       }
-      staticWMConfig.staticConfigList.push(...staticDirConfigs);
+      staticConfig.staticConfigList.push(...staticDirConfigs);
     }
   }
-  if (staticWMConfig) {
+  if (staticConfig) {
     /**
      * It is better to place spaStaticDir before staticDir:
      * spa files should be less than static files
      * url to spa should not intercepted by static file
      */
-    const staticMiddlewareOptionsList = resolveStaticMiddlewareOptionsList(staticWMConfig);
+    const staticMiddlewareOptionsList = toKoaStaticConfigList(staticConfig);
     const staticMiddlewares = staticMiddlewareOptionsList.map(config => koaMwMap.static(config));
     requestMiddlewares.push(...staticMiddlewares);
   }
@@ -93,8 +93,8 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
     requestMiddlewares.unshift(session(sessionOptions, app));
   }
   /** errorCatchMiddleware should be set as first koa middleware */
-  if (logMWOptions) {
-    requestMiddlewares.unshift(koaMwMap.log(logMWOptions));
+  if (log) {
+    requestMiddlewares.unshift(koaMwMap.log(log));
   }
 
   /** app.middleware assginment should happen before app.listen */
@@ -164,10 +164,7 @@ const customizeDeepMerge = customDeepMerge();
  * A http server mainly used for debug, with two koa middleware: cors, debug.
  */
 export async function startKoaDebugServer(koaConfig?: KoaConfig) {
-  const mergedConfig = customizeDeepMerge<KoaConfig, KoaConfig>(
-    {mwConfig: {useDebugMW: true}},
-    koaConfig ?? {}
-  );
+  const mergedConfig = customizeDeepMerge<KoaConfig, KoaConfig>({mwConfig: {debug: true}}, koaConfig ?? {});
   return await startKoaServer(mergedConfig);
 }
 
