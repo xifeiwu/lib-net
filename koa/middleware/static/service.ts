@@ -8,6 +8,11 @@ import {
   SimplifiedRequestInfo,
 } from './types';
 
+function getUnifiedPathnameList(pathname: string) {
+  const v1 = formatPathname(pathname, {leadingSlash: false, trailingSlash: false});
+  return [v1, '/' + v1];
+}
+
 /**
  * show directory content in html format
  * @param fullpath static dir path
@@ -50,7 +55,8 @@ export const getFallbackUrlFuncByEntryMap: (entryToDistFile: Record<string, stri
     const parts = pathname.split('/').filter(Boolean);
     for (let i = parts.length; i >= 1; i--) {
       const key = parts.slice(0, i).join('/');
-      const distFile = entryToDistFile[key] ?? entryToDistFile['/' + key];
+      const [key1, key2] = getUnifiedPathnameList(key);
+      const distFile = entryToDistFile[key1] ?? entryToDistFile[key2];
       if (distFile) {
         return `/${distFile}${qs}`;
       }
@@ -82,7 +88,8 @@ export function getFallbackUrl(
     return (fallbackUrl as Function)(req);
   } else if (isObject(fallbackUrl)) {
     const {pathname, qs} = parseUrl(req.url ?? '');
-    return fallbackUrl[formatPathname(pathname, {leadingSlash: true, trailingSlash: false})];
+    const [key1, key2] = getUnifiedPathnameList(pathname);
+    return fallbackUrl[key1] ?? fallbackUrl[key2];
   }
 }
 
