@@ -3,22 +3,9 @@ import path from 'path';
 import zlib from 'zlib';
 import Koa from 'koa';
 import {Readable} from 'stream';
-import {toReadable, mime, getFileList, isNumber} from '../../../service/external';
+import {toReadable, mime, getFileList, isNumber, formatPathname} from '../../../service/external';
 import {BufferFileInfo, HttpHeaderConfig, LocalFileInfo, StaticFileInfo, KoaStaticConfig} from './types';
-import {getFallbackUrl, parseUrl} from './service';
-
-function formatUrlPrefix(urlPrefix: string) {
-  if (!urlPrefix) {
-    return '';
-  }
-  return (
-    '/' +
-    urlPrefix
-      .split('/')
-      .filter(it => it)
-      .join('/')
-  );
-}
+import {getFallbackUrl, parseUrl, toSimplifiedRequestInfo} from './service';
 
 /**
  * A middleware of koa for handle static files under a target folder.
@@ -55,7 +42,11 @@ export function getStaticKoaMw(options: KoaStaticConfig) {
     throw new Error(`dir ${dir} is not a directory!`);
   }
 
-  const urlPrefix = formatUrlPrefix(options.urlPrefix);
+  /** urlPrefix should have leading slash and no trailing slash */
+  const urlPrefix =
+    options.urlPrefix !== undefined
+      ? formatPathname(options.urlPrefix, {leadingSlash: true, trailingSlash: false})
+      : undefined;
 
   const fileStore = store ? store : new Map();
 
@@ -74,24 +65,20 @@ export function getStaticKoaMw(options: KoaStaticConfig) {
     if (urlPrefix && url.indexOf(urlPrefix) !== 0) {
       return await next();
     }
-    const cleanUrl = urlPrefix ? url.replace(urlPrefix, '') : url;
-    ctx.req.url = cleanUrl;
-    let pathname: string;
+    if (urlPrefix !== undefined) {
+      url = url.replace(urlPrefix, '');
+    }
+    let pathname = parseUrl(url).pathname;
     if (fallbackUrl) {
-      const finalUrl = getFallbackUrl(ctx.req, fallbackUrl);
+      const finalUrl = getFallbackUrl({...toSimplifiedRequestInfo(ctx.req), url: url}, fallbackUrl);
       if (finalUrl) {
         pathname = parseUrl(finalUrl).pathname;
       }
-    } else {
-      pathname = parseUrl(cleanUrl).pathname;
     }
+    const relativePath = formatPathname(pathname, {leadingSlash: false, trailingSlash: false});
 
-    const fullpath = path.join(dir, cleanUrl);
-    let fileInfo = fileStore.get(pathname);
-    // console.log(`pathname`);
-    // console.log(pathname);
-    // console.log(file);
-    // console.log(file.buffer ? file.buffer.toString() : file.fullPath);
+    const fullpath = path.join(dir, relativePath);
+    let fileInfo = fileStore.get(relativePath);
     // try to load file
     if (!fileInfo) {
       // files that can be accessd should be under options.dir
@@ -110,7 +97,7 @@ export function getStaticKoaMw(options: KoaStaticConfig) {
 
       const _fileInfo = getFileInfo(fullpath, {handleDir});
       if (_fileInfo) {
-        fileStore.set(pathname, _fileInfo);
+        fileStore.set(relativePath, _fileInfo);
         fileInfo = _fileInfo;
       }
     } else {
@@ -122,7 +109,7 @@ export function getStaticKoaMw(options: KoaStaticConfig) {
       if (!isNumber(maxCacheTime) || (fileInfo.timestamp ?? 0) + maxCacheTime < Date.now()) {
         const _fileInfo = getFileInfo(fullpath, {handleDir});
         if (_fileInfo) {
-          fileStore.set(pathname, _fileInfo);
+          fileStore.set(relativePath, _fileInfo);
           fileInfo = _fileInfo;
         }
       }

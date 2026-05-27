@@ -26,12 +26,23 @@ export const DEFAULT_KOA_CONFIG: KoaConfig = {
     },
     static: {
       staticConfigList: [
-        {dir: path.join(process.env.HOME, 'code/huffie/xifeiwu.github.io'), urlPrefix: '/resume'},
+        {
+          dir: path.join(process.env.HOME, 'code/huffie/xifeiwu.github.io'),
+          // urlPrefix: '/resume',
+          fallbackUrl: {
+            '/resume': '/index.html',
+          },
+        },
       ],
       spaConfigList: [
         {
-          dir: path.resolve(process.env.HOME, 'code/react/start/browser-feature/react-tsx-less/dist'),
-          entries: ['net', 'browser-feature'],
+          dir: path.resolve(process.env.HOME, 'code/react/start/small-apps-wrapper/dist'),
+          entryToDistFile: {
+            '/browser-runtime/feature': '/browser-runtime/feature.html',
+            '/react-feature/feature': '/react-feature/feature.html',
+            '/forum': '/forum.html',
+            '/auth': '/auth.html',
+          },
         },
       ],
     },

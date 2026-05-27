@@ -1,5 +1,5 @@
 import fs from 'fs';
-import {htmlDirContent, isFunction, isHtmlRequest, isObject} from '../../../service/external';
+import {formatPathname, htmlDirContent, isFunction, isHtmlRequest, isObject} from '../../../service/external';
 import {
   FallbackUrlFunc,
   KoaSpaConfig,
@@ -60,6 +60,13 @@ export const getFallbackUrlFuncByEntryMap: (entryToDistFile: Record<string, stri
   return getFallbackUrl;
 };
 
+export function toSimplifiedRequestInfo(req: SimplifiedRequestInfo): SimplifiedRequestInfo {
+  return {
+    headers: req.headers,
+    method: req.method,
+    url: req.url,
+  };
+}
 /**
  * Its a wrapper function for fallbackUrl: get fallback url by fallbackUrl function or fallbackUrl map
  * @param req its value is ctx.req, origin part is not included
@@ -75,7 +82,7 @@ export function getFallbackUrl(
     return (fallbackUrl as Function)(req);
   } else if (isObject(fallbackUrl)) {
     const {pathname, qs} = parseUrl(req.url ?? '');
-    return fallbackUrl[pathname];
+    return fallbackUrl[formatPathname(pathname, {leadingSlash: true, trailingSlash: false})];
   }
 }
 
@@ -89,11 +96,11 @@ export function spaConfigToStaticConfig(
   config: KoaSpaConfig,
   defaultOptions?: KoaStaticDefaultOptions
 ): KoaStaticConfig {
-  const {entries, fallbackUrl, ...rest} = config;
-  if (!Array.isArray(entries) || entries.length === 0) {
+  const {entryToDistFile, fallbackUrl, ...rest} = config;
+  if (!entryToDistFile || Object.keys(entryToDistFile).length === 0) {
     return config;
   }
-  const getSpaPathFallback = getFallbackUrlFuncByEntryMap(entries);
+  const getSpaPathFallback = getFallbackUrlFuncByEntryMap(entryToDistFile);
   /**
    * find spa entry fallback url first, if not found, use fallbackUrl function or fallbackUrl map
    * @param req its value is ctx.req, origin part is not included

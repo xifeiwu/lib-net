@@ -45,7 +45,7 @@ export interface KoaStaticConfig {
   enableGzip?: boolean;
   /**
    * alias a pathname to another name in the same dir before load file
-   * pathname passed to fallbackUrlFunc is relative to urlPrefix
+   * pathname passed to fallbackUrlFunc is relative to urlPrefix, and should have leading slash and no trailing slash
    * example:
    * urlPrefix: '/static',
    * fallbackUrl: {
@@ -68,5 +68,5 @@ export interface KoaStaticConfig {
 export type KoaStaticDefaultOptions = Omit<KoaStaticConfig, 'dir'>;
 
 export interface KoaSpaConfig extends KoaStaticConfig {
-  entries: Record<string, string>;
+  entryToDistFile: Record<string, string>;
 }

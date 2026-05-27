@@ -10,6 +10,7 @@ export {
   waitFor,
   PORT,
   uuid,
+  formatPathname,
   getRandomBase64String,
   urlPropsToInstance,
   toUrlProps,
