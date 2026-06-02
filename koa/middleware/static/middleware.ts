@@ -9,6 +9,8 @@ import {getFallbackUrl, parseUrl, toSimplifiedRequestInfo} from './service';
 
 /**
  * A middleware of koa for handle static files under a target folder.
+ * 1. the static middleware will have great impact on route when urlPrefix is not set,
+ *    because for each unmatched request, the static middleware will be called,
  */
 export function getStaticKoaMw(options: KoaStaticConfig) {
   let {

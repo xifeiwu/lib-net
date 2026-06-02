@@ -38,7 +38,10 @@ export type FallbackUrlMap = {
 export interface KoaStaticConfig {
   /** target static dir */
   dir: string;
-  /** urlPrefix will be replace to '' whne found a file by pathname */
+  /**
+   * 1. urlPrefix should have leading slash and no trailing slash
+   * 2. please take care about static file pathname when using urlPrefix
+   */
   urlPrefix?: string;
   store?: Map<string, StaticFileInfo>;
   /** enable gzip or not */
