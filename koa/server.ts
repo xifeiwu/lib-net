@@ -19,6 +19,12 @@ import {
 import {KoaConfig, KoaServerInfo, KoaShortCutConfig} from './types';
 import {DEFAULT_KOA_CONFIG} from './service';
 
+/**
+ * get koa server config and app
+ * @param koaConfig
+ * @param shortCutConfig have higher priority than koaConfig
+ * @returns {app, upgradeMiddlewares, koaConfig}
+ */
 export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutConfig) {
   const configKeys = Object.keys(koaConfig) as Array<keyof KoaConfig>;
   const requestMiddlewaresIndex = configKeys.indexOf('requestMiddlewares');
