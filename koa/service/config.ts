@@ -1,6 +1,5 @@
-import path from 'path';
 import {KoaConfig, KoaMiddlewareConfig} from '../types';
-import {PORT, uploadDirOnCwd} from '../../service/external';
+import {uploadDirOnCwd} from '../../service/external';
 import {SOCKS_SERVER_CONFIG} from '../middleware/socks/service';
 
 export const defaultMwConfig: KoaMiddlewareConfig = {
@@ -12,7 +11,6 @@ export const defaultMwConfig: KoaMiddlewareConfig = {
 
 export const DEFAULT_KOA_CONFIG: KoaConfig = {
   keys: ['secret local'],
-  port: PORT.stableHttpServer.port,
   bodyParserOptions: {
     uploadDir: uploadDirOnCwd,
   },
@@ -25,26 +23,8 @@ export const DEFAULT_KOA_CONFIG: KoaConfig = {
       catchAndWrapError: true,
     },
     static: {
-      staticConfigList: [
-        {
-          dir: path.join(process.env.HOME, 'code/huffie/xifeiwu.github.io'),
-          // urlPrefix: '/resume',
-          fallbackUrl: {
-            '/resume': '/index.html',
-          },
-        },
-      ],
-      spaConfigList: [
-        {
-          dir: path.resolve(process.env.HOME, 'code/react/start/small-apps-wrapper/dist'),
-          entryToDistFile: {
-            '/browser-runtime/feature': '/browser-runtime/feature.html',
-            '/react-feature/feature': '/react-feature/feature.html',
-            '/forum': '/forum.html',
-            '/auth': '/auth.html',
-          },
-        },
-      ],
+      staticConfigList: [],
+      spaConfigList: [],
     },
     socks: SOCKS_SERVER_CONFIG,
   },

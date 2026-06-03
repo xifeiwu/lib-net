@@ -22,6 +22,7 @@ export interface TcpHandlerMiddlewareConfig {
 export interface TcpGateWayConfig {
   tcpServerConfig?: TcpServerConfig;
   middlewares?: TcpHandlerMiddleware[];
+  /** middleware config for tcp layer */
   mwConfig?: TcpHandlerMiddlewareConfig;
   koa?: {
     config?: KoaConfig;
