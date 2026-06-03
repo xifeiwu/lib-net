@@ -68,7 +68,8 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
       if (!Array.isArray(staticConfig.staticConfigList)) {
         staticConfig.staticConfigList = [];
       }
-      staticConfig.staticConfigList.push(...staticDirConfigs);
+      /** static dir in shortCutConfig have higher priority than static dir in koaConfig */
+      staticConfig.staticConfigList.unshift(...staticDirConfigs);
     }
   }
   if (staticConfig) {
