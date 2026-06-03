@@ -10,7 +10,7 @@ import {forumKoaRouter, forumHttpUpgradeMw} from './forum';
 import {cookieRouter} from './cookie';
 
 import {getProxyKoaMw, getProxyHttpUpgradeMw} from './proxy';
-import {getCustomizeResponseKoaMw} from './others';
+import {getCustomizeResponseKoaMw} from './customize-response';
 import {getAssetsTcpMw} from './assets';
 
 export {
