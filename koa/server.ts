@@ -1,6 +1,18 @@
 import Koa from 'koa';
 import session from 'koa-session';
-import {koaMwMap, httpUpgradeMwMap, toKoaStaticConfigList, getStaticKoaMw} from './middleware';
+import {
+  toKoaStaticConfigList,
+  getStaticKoaMw,
+  debugKoaRouter,
+  debugHttpUpgradeMw,
+  getCorsKoaMw,
+  getLogsKoaRouter,
+  socksKoaRouter,
+  getSocksHttpUpgradeMw,
+  getLogKoaMw,
+  forumKoaRouter,
+  forumHttpUpgradeMw,
+} from './middleware';
 
 // import {forumMiddleware, forumWsMiddleware} from './forum';
 import {getUpgradeHandler} from './upgrade';
@@ -47,16 +59,16 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
   const {log, debug, cors, logs, socks, forum} = mwConfig;
   let {static: staticConfig} = mwConfig;
   debug &&
-    requestMiddlewares[requestMiddlewareAction](koaMwMap.debug) &&
-    upgradeMiddlewares[upgradeMiddlewareAction](httpUpgradeMwMap.debug);
-  cors && requestMiddlewares[requestMiddlewareAction](koaMwMap.cors(cors));
-  logs && requestMiddlewares[requestMiddlewareAction](koaMwMap.logs(logs));
+    requestMiddlewares[requestMiddlewareAction](debugKoaRouter.routes()) &&
+    upgradeMiddlewares[upgradeMiddlewareAction](debugHttpUpgradeMw);
+  cors && requestMiddlewares[requestMiddlewareAction](getCorsKoaMw(cors));
+  logs && requestMiddlewares[requestMiddlewareAction](getLogsKoaRouter(logs).routes());
   socks &&
-    requestMiddlewares[requestMiddlewareAction](koaMwMap.socks) &&
-    upgradeMiddlewares[upgradeMiddlewareAction](httpUpgradeMwMap.socks(socks));
+    requestMiddlewares[requestMiddlewareAction](socksKoaRouter.routes()) &&
+    upgradeMiddlewares[upgradeMiddlewareAction](getSocksHttpUpgradeMw(socks));
   forum &&
-    requestMiddlewares[requestMiddlewareAction](koaMwMap.forum) &&
-    upgradeMiddlewares[upgradeMiddlewareAction](httpUpgradeMwMap.forum);
+    requestMiddlewares[requestMiddlewareAction](forumKoaRouter.routes()) &&
+    upgradeMiddlewares[upgradeMiddlewareAction](forumHttpUpgradeMw);
   if (staticDir) {
     const staticDirList = Array.isArray(staticDir) ? staticDir : [staticDir];
     const staticDirConfigs = staticDirList.map(dir => ({dir}));
@@ -96,12 +108,12 @@ export function getKoa(koaConfig: KoaConfig = {}, shortCutConfig?: KoaShortCutCo
     app.keys = keys;
   }
   if (sessionOptions) {
-    /** session middle should be used as first middleware */
+    /** session middle should be set as first middleware */
     requestMiddlewares.unshift(session(sessionOptions, app));
   }
   /** errorCatchMiddleware should be set as first koa middleware */
   if (log) {
-    requestMiddlewares.unshift(koaMwMap.log(log));
+    requestMiddlewares.unshift(getLogKoaMw(log));
   }
 
   /** app.middleware assginment should happen before app.listen */
