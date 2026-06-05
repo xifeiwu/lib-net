@@ -19,11 +19,15 @@ export interface TcpHandlerMiddlewareConfig {
   assetsSyncUp?: AssetsSyncUpConfig;
 }
 
-export interface TcpGateWayConfig {
-  tcpServerConfig?: TcpServerConfig;
-  middlewares?: TcpHandlerMiddleware[];
-  /** middleware config for tcp layer */
-  mwConfig?: TcpHandlerMiddlewareConfig;
+export interface AssistServiceConfig {
+  // tcpServerConfig?: TcpServerConfig;
+  gateway?: TcpServerConfig[];
+  /** middlewares to handle tcp connection */
+  tcp: {
+    middlewares?: TcpHandlerMiddleware[];
+    /** middleware config for tcp layer */
+    mwConfig?: TcpHandlerMiddlewareConfig;
+  };
   koa?: {
     config?: KoaConfig;
     shortCut?: KoaShortCutConfig;

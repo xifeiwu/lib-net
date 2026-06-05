@@ -1,8 +1,8 @@
 import {PORT, TcpHandler} from '../service/external';
 import compose from 'koa-compose';
-import {Ctx4TcpHandler, TcpGateWayConfig, TcpHandlerMiddleware} from './types';
+import {Ctx4TcpHandler, AssistServiceConfig, TcpHandlerMiddleware} from './types';
 import {SOCKS_SERVER_CONFIG} from '../koa/middleware/socks/service';
-import {DEFAULT_KOA_CONFIG, serializeKoaConfig} from '../koa';
+import {DEFAULT_KOA_CONFIG, KoaServerInfo, serializeKoaConfig} from '../koa';
 
 const NoHandleMiddleware = (ctx: Ctx4TcpHandler, next) => {
   return false;
@@ -17,28 +17,65 @@ export function getTcpHandler(middlewareList: TcpHandlerMiddleware[]): TcpHandle
   return tcpHandler;
 }
 
-export const TCP_GATEWAY_DEFAULT_CONFIG: TcpGateWayConfig = {
-  tcpServerConfig: {
-    host: '0.0.0.0',
+/**
+ * A default assist server config contains some default config,
+ * to avoid duplicate config in different environment.
+ */
+export const ASSIST_SERVER_DEFAULT_CONFIG: AssistServiceConfig = {
+  tcp: {
+    mwConfig: {socks: SOCKS_SERVER_CONFIG},
+    middlewares: [],
   },
-  mwConfig: {socks: SOCKS_SERVER_CONFIG},
-  middlewares: [],
   koa: {
     config: DEFAULT_KOA_CONFIG,
+    shortCut: {},
   },
 };
 
-export function serializeTcpGatewayConfig(config: TcpGateWayConfig) {
-  const {tcpServerConfig, mwConfig, middlewares, koa} = config;
+export function serializeTcpGatewayConfig(config: AssistServiceConfig) {
+  const {gateway, tcp, koa} = config;
   const {config: koaConfig, shortCut} = koa;
-
   return {
-    tcpServerConfig,
-    mwConfig,
-    middlewares,
+    gateway,
+    tcp,
     koa: {
       config: serializeKoaConfig(koaConfig),
       shortCut,
     },
   };
+}
+
+export function serializeTcpGatewayInfo(info: {
+  config: AssistServiceConfig;
+  gateway: Array<{host: string; port: number; description?: string}>;
+  koaServerInfo: KoaServerInfo;
+}) {
+  const {config, gateway, koaServerInfo} = info;
+  const result = {
+    config: serializeTcpGatewayConfig(config),
+    tcpServer: gateway.map(item => {
+      const {host, port, description} = item;
+      const info: {host: string; port: number; description?: string} = {
+        host,
+        port,
+      };
+      if (description) {
+        info.description = description;
+      }
+      return info;
+    }),
+    httpServer: [koaServerInfo].map(item => {
+      const {origin} = item;
+      const url = new URL(item.origin);
+      const info: {origin: string; description?: string; viaTcp?: string} = {
+        origin: origin,
+      };
+      if (gateway.length > 0) {
+        url.port = gateway[0]?.port?.toString() ?? '';
+        info.viaTcp = url.origin;
+      }
+      return info;
+    }),
+  };
+  return result;
 }

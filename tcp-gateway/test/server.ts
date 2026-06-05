@@ -1,22 +1,20 @@
 import path from 'path';
 import {DEFAULT_KOA_CONFIG, KoaShortCutConfig} from '../../koa';
-import {TcpGateWayConfig} from '../types';
+import {AssistServiceConfig} from '../types';
 import {SOCKS_SERVER_CONFIG} from '../../koa/middleware/socks/service';
-import {deepClone, getAFreePort, logColorful} from '../../service/external';
+import {logColorful} from '../../service/external';
 import {startTcpGateway} from '../server';
-import {serializeTcpGatewayConfig, TCP_GATEWAY_DEFAULT_CONFIG} from '../service';
 
 const koaConfig = DEFAULT_KOA_CONFIG;
 const koaShortCutConfig: KoaShortCutConfig = {
   staticDir: path.resolve(__dirname, '..'),
 };
 
-export const customConfig: TcpGateWayConfig = {
-  mwConfig: {
-    socks: SOCKS_SERVER_CONFIG,
-  },
-  tcpServerConfig: {
-    // port: await getAFreePort(),
+export const customConfig: AssistServiceConfig = {
+  tcp: {
+    mwConfig: {
+      socks: SOCKS_SERVER_CONFIG,
+    },
   },
   koa: {
     config: koaConfig,
@@ -25,7 +23,7 @@ export const customConfig: TcpGateWayConfig = {
 };
 export async function startCustomTcpGateWay() {
   const info = await startTcpGateway(customConfig);
-  const {host, port} = info;
+  const {gateway: [{host, port}] = []} = info;
   logColorful({}, `start tcp gateway`, {host, port});
   return info;
 }

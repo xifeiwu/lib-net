@@ -1,11 +1,15 @@
+import net from 'net';
+import tls from 'tls';
 import {KoaServerInfo, startKoaServer} from '../koa';
-import {TcpGateWayConfig, TcpHandlerMiddleware} from './types';
-import {startTcpServerAsGateway, TcpHandler} from '../service/external';
+import {AssistServiceConfig, TcpHandlerMiddleware} from './types';
+import {startTcpConnectionRouter, TcpHandler, TcpServerConfig} from '../service/external';
 import {getSocksTcpMw, getAssetsTcpMw} from '../koa/middleware';
 import {getTcpHandler} from './service';
+import {RouteTcpConnectionOptions} from '../../node/utils/tcp-gateway/types';
 
-export async function startTcpGateway(options?: TcpGateWayConfig) {
-  const {tcpServerConfig, mwConfig, middlewares = [], koa} = options ?? {};
+export async function getRouteTcpConnectionOptions(options?: AssistServiceConfig) {
+  const {tcp, koa} = options ?? {};
+  const {middlewares = [], mwConfig} = tcp ?? {};
   let koaServerInfo: KoaServerInfo;
   if (koa) {
     koaServerInfo = await startKoaServer(koa.config, koa.shortCut);
@@ -18,18 +22,27 @@ export async function startTcpGateway(options?: TcpGateWayConfig) {
   if (middlewareList.length > 0) {
     tcpHandler = getTcpHandler(middlewareList);
   }
-  const {host, port, server} = await startTcpServerAsGateway(
-    {
-      redirectByProtocol: koaServerInfo
-        ? {
-            http: koaServerInfo,
-          }
-        : undefined,
-      handleConnection: tcpHandler,
-    },
-    {
-      ...tcpServerConfig,
+  const result: RouteTcpConnectionOptions = {
+    router: koaServerInfo
+      ? {
+          http: koaServerInfo,
+        }
+      : undefined,
+    tcpHandler,
+  };
+  return {routeTcpOptions: result, koaServerInfo};
+}
+
+export async function startTcpGateway(options?: AssistServiceConfig) {
+  const {routeTcpOptions, koaServerInfo} = await getRouteTcpConnectionOptions(options);
+  const gateway: Array<{host: string; port: number; server: net.Server | tls.Server}> = [];
+  if (Array.isArray(options?.gateway)) {
+    for (const serverConfig of options.gateway) {
+      const {host, port, server} = await startTcpConnectionRouter(routeTcpOptions, serverConfig);
+      gateway.push({host, port, server});
     }
-  );
-  return {host, port, server, koaServerInfo};
+  } else {
+    gateway.push(await startTcpConnectionRouter(routeTcpOptions));
+  }
+  return {gateway, koaServerInfo};
 }

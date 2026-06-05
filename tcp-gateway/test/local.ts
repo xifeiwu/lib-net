@@ -3,32 +3,32 @@ import assert from 'assert';
 import {
   connectToSocksServer,
   deepClone,
-  getAFreePort,
   logColorful,
   requestAndGetResponseInfo,
   serializableSocksClientInfo,
   SocksClientConfig,
 } from '../../service/external';
 import {startTcpGateway} from '../server';
-import {serializeTcpGatewayConfig, TCP_GATEWAY_DEFAULT_CONFIG} from '../service';
+import {serializeTcpGatewayConfig, ASSIST_SERVER_DEFAULT_CONFIG} from '../service';
 
 /**
  * Test local tcp gateway
  */
 export async function startLocalTcpGateWay() {
-  const localConfig = deepClone(TCP_GATEWAY_DEFAULT_CONFIG);
+  const localConfig = deepClone(ASSIST_SERVER_DEFAULT_CONFIG);
   const {koa} = localConfig;
   koa.shortCut = {staticDir: path.resolve(__dirname, '..'), uploadDir: path.resolve(__dirname, 'uploads')};
-  const {host, port} = await startTcpGateway(localConfig);
+  const {gateway: [{host, port}] = []} = await startTcpGateway(localConfig);
   logColorful({}, {host, port, tcpGatewayConfig: serializeTcpGatewayConfig(localConfig)});
 }
-export async function testSocksApi() {
-  const host = '127.0.0.1';
-  const port = TCP_GATEWAY_DEFAULT_CONFIG.tcpServerConfig.port as number;
-  const {
-    mwConfig: {socks},
-  } = TCP_GATEWAY_DEFAULT_CONFIG;
 
+export async function testSocksApi() {
+  const {
+    tcp: {
+      mwConfig: {socks},
+    },
+  } = ASSIST_SERVER_DEFAULT_CONFIG;
+  const {gateway: [{host, port}] = []} = await startTcpGateway(ASSIST_SERVER_DEFAULT_CONFIG);
   const origin = `http://${host}:${port}`;
   const requestTarget = 'http://elif.site/api/debug/echo';
   /** test vc1 */

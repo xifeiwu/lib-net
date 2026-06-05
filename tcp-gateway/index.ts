@@ -1,3 +1,3 @@
-export {TCP_GATEWAY_DEFAULT_CONFIG, serializeTcpGatewayConfig} from './service';
-export {startTcpGateway} from './server';
+export {ASSIST_SERVER_DEFAULT_CONFIG, serializeTcpGatewayConfig, serializeTcpGatewayInfo} from './service';
+export {startTcpGateway, getRouteTcpConnectionOptions} from './server';
 export * from './types';

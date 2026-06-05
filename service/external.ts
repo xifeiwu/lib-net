@@ -88,7 +88,7 @@ export {
   compareHttpRequestOptions,
   isHtmlRequest,
 } from '../../node';
-export {startTcpServerAsGateway, Protocol, TcpHandler, HttpHandler} from '../../node/utils/tcp-gateway';
+export {startTcpConnectionRouter, Protocol, TcpHandler, HttpHandler} from '../../node/utils/tcp-gateway';
 export {Cookies} from '../../node/lib/cookies';
 export {
   proxyHttpRequest,
